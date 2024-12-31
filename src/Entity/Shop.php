@@ -143,6 +143,6 @@ class Shop
 
     public function __toString()
     {
-        return $this->name .'('.$this->cm.')';
+        return $this->name .' ('.$this->cm.')';
     }
 }

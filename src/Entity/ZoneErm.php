@@ -31,6 +31,9 @@ class ZoneErm
     #[ORM\OneToOne(mappedBy: 'zoneErm', cascade: ['persist', 'remove'])]
     private ?Manager $zoneManagers = null;
 
+    #[ORM\Column(length: 10, nullable: true)]
+    private ?string $territoryColor = null;
+
     public function __construct()
     {
         $this->shops = new ArrayCollection();
@@ -120,5 +123,17 @@ class ZoneErm
     public function __toString()
     {
         return $this->name;
+    }
+
+    public function getTerritoryColor(): ?string
+    {
+        return $this->territoryColor;
+    }
+
+    public function setTerritoryColor(?string $territoryColor): static
+    {
+        $this->territoryColor = $territoryColor;
+
+        return $this;
     }
 }

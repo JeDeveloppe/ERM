@@ -27,6 +27,9 @@ class RegionErm
     #[ORM\OneToOne(mappedBy: 'regionErm', cascade: ['persist', 'remove'])]
     private ?Manager $regionManagers = null;
 
+    #[ORM\Column(length: 10, nullable: true)]
+    private ?string $territoryColor = null;
+
     public function __construct()
     {
         $this->zoneErms = new ArrayCollection();
@@ -104,5 +107,17 @@ class RegionErm
     public function __toString()
     {
         return $this->name;
+    }
+
+    public function getTerritoryColor(): ?string
+    {
+        return $this->territoryColor;
+    }
+
+    public function setTerritoryColor(?string $territoryColor): static
+    {
+        $this->territoryColor = $territoryColor;
+
+        return $this;
     }
 }
