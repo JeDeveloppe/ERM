@@ -3,10 +3,10 @@
 namespace App\Controller\Admin;
 
 use App\Entity\RegionErm;
-use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
-use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 
 class RegionErmCrudController extends AbstractCrudController
 {
@@ -15,14 +15,22 @@ class RegionErmCrudController extends AbstractCrudController
         return RegionErm::class;
     }
 
-    /*
     public function configureFields(string $pageName): iterable
     {
         return [
-            IdField::new('id'),
-            TextField::new('title'),
-            TextEditorField::new('description'),
+            TextField::new('name', 'Nom de la région ERM:'),
+            ColorField::new('color', 'Couleur de la région:'),
+            AssociationField::new('zoneErms', 'Nombre de zone(s):')->onlyOnIndex(),
+            AssociationField::new('zoneErms', 'Zones de la région:')->onlyOnForms()
         ];
     }
-    */
+    
+    public function configureCrud(Crud $crud): Crud
+    {
+        return $crud
+            ->setPageTitle('index', 'Liste des régions ERM')
+            ->setPageTitle('new', 'Nouvelle région ERM')
+            ->setPageTitle('edit', 'Modifier la région ERM')
+            ->showEntityActionsInlined();
+    }
 }

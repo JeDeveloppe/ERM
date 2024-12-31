@@ -3,11 +3,11 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Manager;
-use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
-use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
-use Symfony\Component\DomCrawler\Form;
+use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 
 class ManagerCrudController extends AbstractCrudController
 {
@@ -20,16 +20,24 @@ class ManagerCrudController extends AbstractCrudController
     {
         return [
             FormField::addTab('Détails'),
-                TextField::new('firstName'),
-                TextField::new('lastName'),
-                TextField::new('phone'),
-                TextField::new('email'),
+                TextField::new('firstName', 'Prénom:'),
+                TextField::new('lastName', 'Nom de famille:'),
+                TextField::new('phone', 'Téléphone:'),
+                TextField::new('email', 'Emai:l'),
 
             FormField::addTab('Manager de'),
-                AssociationField::new('regionErm'),
-                AssociationField::new('zoneErm'),
-                AssociationField::new('shop'),
+                AssociationField::new('regionErm', 'Region ERM:')->onlyOnForms(),
+                AssociationField::new('zoneErm', 'Zone ERM:')->onlyOnForms(),
+                AssociationField::new('shop', 'Centre ERM:')->onlyOnForms(),
         ];
     }
 
+    public function configureCrud(Crud $crud): Crud
+    {
+        return $crud
+            ->setPageTitle('index', 'Liste des managers')
+            ->setPageTitle('new', 'Nouveau manager')
+            ->setPageTitle('edit', 'Modifier le manager')
+            ->showEntityActionsInlined();
+    }
 }
