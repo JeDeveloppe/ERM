@@ -34,6 +34,9 @@ class ZoneErm
     #[ORM\Column(length: 10, nullable: true)]
     private ?string $territoryColor = null;
 
+    #[ORM\ManyToOne(inversedBy: 'zoneErms')]
+    private ?Manager $manager = null;
+
     public function __construct()
     {
         $this->shops = new ArrayCollection();
@@ -133,6 +136,18 @@ class ZoneErm
     public function setTerritoryColor(?string $territoryColor): static
     {
         $this->territoryColor = $territoryColor;
+
+        return $this;
+    }
+
+    public function getManager(): ?Manager
+    {
+        return $this->manager;
+    }
+
+    public function setManager(?Manager $manager): static
+    {
+        $this->manager = $manager;
 
         return $this;
     }

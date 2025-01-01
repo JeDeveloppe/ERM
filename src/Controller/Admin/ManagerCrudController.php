@@ -20,10 +20,11 @@ class ManagerCrudController extends AbstractCrudController
     {
         return [
             FormField::addTab('Détails'),
-                TextField::new('firstName', 'Prénom:'),
+                AssociationField::new('managerClass', 'Classe:'),
                 TextField::new('lastName', 'Nom de famille:'),
+                TextField::new('firstName', 'Prénom:'),
                 TextField::new('phone', 'Téléphone:'),
-                TextField::new('email', 'Emai:l'),
+                TextField::new('email', 'Emai:'),
 
             FormField::addTab('Manager de'),
                 AssociationField::new('regionErm', 'Region ERM:')->onlyOnForms(),
@@ -38,6 +39,7 @@ class ManagerCrudController extends AbstractCrudController
             ->setPageTitle('index', 'Liste des managers')
             ->setPageTitle('new', 'Nouveau manager')
             ->setPageTitle('edit', 'Modifier le manager')
+            ->setSearchFields(['managerClass.name', 'lastName', 'firstName', 'phone', 'email', 'regionErm.name', 'zoneErm.name', 'shop.name'])
             ->showEntityActionsInlined();
     }
 }

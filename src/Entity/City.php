@@ -170,6 +170,6 @@ class City
 
     public function __toString()
     {
-        return $this->name;
+        return $this->name. ' ('.$this->postalCode.')';
     }
 }

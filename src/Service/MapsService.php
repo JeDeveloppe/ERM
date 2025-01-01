@@ -7,6 +7,7 @@ use App\Repository\ShopRepository;
 use App\Repository\CgoTelematicAreaRepository;
 use App\Repository\CgoOperationalAreaRepository;
 use App\Repository\RegionErmRepository;
+use App\Repository\ZoneErmRepository;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class MapsService
@@ -15,6 +16,7 @@ class MapsService
     public function __construct(
             private RequestStack $requestStack,
             private ShopRepository $shopRepository,
+            private ZoneErmRepository $zoneErmRepository,
             private RegionErmRepository $regionErmRepository
         ){}
 
@@ -170,7 +172,7 @@ class MapsService
                     "lat" => $shop->getCity()->getLatitude(),
                     "lng" => $shop->getCity()->getLongitude(),
                     "color" => "#333",
-                    "name" => $shop->getName(),
+                    "name" => $shop->getName().' ('.$shop->getCm().')',
                     "description" => $contactShop,
                     "url" => $baseUrl,
                     "size" => 15,
@@ -197,19 +199,96 @@ class MapsService
 
         foreach($regionErms as $regionErm)
         {
-            
-            $states[$department->getSimplemapCode()] =
-                [
-                    "name" => $department->getName().' ('.$department->getCode().')',
-                    "description" => $contactshop,
-                    "color" => $area->getZoneColor(),
-                ];
-        }
 
-        //?on encode en json
-        $jsonLocations = json_encode($locations, JSON_FORCE_OBJECT); 
-        $donnees['locations'] = $jsonLocations;
+            //pour chaque zone ou récupère les centres
+            foreach($regionErm->getZoneErms() as $zone){
+
+                $shops = $zone->getShops();
+                //pour chaque shop on recupere le département
+                foreach($shops as $shop){
+                    if($shop->getCity()){
+
+                        $department = $shop->getCity()->getDepartment();
+                        dump($department);
+                        $states[$department->getSimplemapCode()] =
+                            [
+                                "name" => $regionErm->getName(),
+                                "description" => $department->getName().' ('.$department->getCode().')',
+                                "color" => $regionErm->getTerritoryColor()
+                            ];
+
+                    }else{
+
+                        $noCities[] = $shop->getName();
+                    }
+                }
+            }
+        }
+        // $jsonLocations = json_encode($locations, JSON_FORCE_OBJECT); 
+        $jsonStates = json_encode($states, JSON_FORCE_OBJECT); 
+
+        // $donnees['locations'] = $jsonLocations;
+        $donnees['states'] = $jsonStates;
 
         return $donnees;
+    }
+
+    public function constructionMapOfZonesByClasse(string $classeName)
+    {
+
+        //? on recupere l'url de base
+        $baseUrl = $this->requestStack->getCurrentRequest()->getScheme() . '://' . $this->requestStack->getCurrentRequest()->getHttpHost() . $this->requestStack->getCurrentRequest()->getBasePath();
+
+        $states = []; //? toutes les réponses seront dans ce tableau final
+
+        //on recupere toutes les zones
+        $zones = $this->zoneErmRepository->findByClasse($classeName);
+
+        //pour chaque zone ou récupère les centres
+        foreach($zones as $zone){
+
+            $randomHexadecimalColor = $this->randomHexadecimalColor();
+            $shops = $zone->getShops();
+            $zoneName = $zone->getName();
+
+            $managerOfZone = $zone->getManager();
+            if($managerOfZone !== null){
+                $zoneContact = $managerOfZone->getFirstName() . ' ' . $managerOfZone->getLastName() . ' ('.$managerOfZone->getManagerClass()->getName().') <br/> ' . $managerOfZone->getPhone() . '<br/>' . $managerOfZone->getEmail();
+            }else{
+                $zoneContact = "MANAGER NON RENSEIGNÉ";
+            }
+
+            //pour chaque shop on recupere le département
+            foreach($shops as $shop){
+                
+                if($shop->getCity() !== null){
+
+                    $department = $shop->getCity()->getDepartment();
+                    
+                    $states[$department->getSimplemapCode()] =
+                        [
+                            "name" => $department->getName().' ('.$department->getCode().')',
+                            "description" => $zoneName.' <br/>'.$zoneContact,
+                            "color" => $zone->getTerritoryColor() ?? $randomHexadecimalColor
+                        ];
+                }
+            }
+        }
+
+        // $jsonLocations = json_encode($locations, JSON_FORCE_OBJECT); 
+        $jsonStates = json_encode($states, JSON_FORCE_OBJECT); 
+
+        // $donnees['locations'] = $jsonLocations;
+        $donnees['states'] = $jsonStates;
+
+        return $donnees;
+    }
+
+    public function randomHexadecimalColor()
+    {
+        $rand = array('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f');
+        $color = '#'.$rand[rand(0,15)].$rand[rand(0,15)].$rand[rand(0,15)].$rand[rand(0,15)].$rand[rand(0,15)].$rand[rand(0,15)];
+
+        return $color;
     }
 }

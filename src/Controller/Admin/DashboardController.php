@@ -11,6 +11,7 @@ use App\Entity\RegionErm;
 use App\Entity\ShopClass;
 use App\Entity\Department;
 use App\Entity\LargeRegion;
+use App\Entity\ManagerClass;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
@@ -44,6 +45,7 @@ class DashboardController extends AbstractDashboardController
             // MenuItem::linkToCrud('Zones télématiques', 'fas fa-list', CgoTelematicArea::class),
             MenuItem::section('Configurations ERM:'),
             MenuItem::linkToCrud('Les managers', 'fas fa-list', Manager::class),
+            MenuItem::linkToCrud('Les status des managers', 'fas fa-list', ManagerClass::class),
             MenuItem::linkToCrud('Les centres', 'fas fa-list', Shop::class),
             MenuItem::linkToCrud('Les classes', 'fas fa-list', ShopClass::class),
             MenuItem::linkToCrud('Les régions ERM', 'fas fa-list', RegionErm::class),

@@ -1,7 +1,9 @@
 var locationRating = document.querySelector('.js-locations');
 var stateRating = document.querySelector('.js-states');
 
-var locations = locationRating.dataset.locations;
+if(locationRating){
+  var locations = locationRating.dataset.locations;
+}
 if(stateRating){
   var states = stateRating.dataset.states;
 }
@@ -16,7 +18,7 @@ var simplemaps_countrymap_mapdata={
     pop_ups: "detect",
     
 		//State defaults
-		state_description: "En cours...",
+		state_description: "Non renseigné...",
     state_color: "#88A4BC",
     state_hover_color: "#3B729F",
     state_url: "",
@@ -377,7 +379,9 @@ var simplemaps_countrymap_mapdata={
   regions: {},
 };
 
-simplemaps_countrymap_mapdata.locations = JSON.parse(locations);
+if(locationRating){
+  simplemaps_countrymap_mapdata.locations = JSON.parse(locations);
+}
 if(stateRating){
   simplemaps_countrymap_mapdata["state_specific"] = JSON.parse(states);
 }

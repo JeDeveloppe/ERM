@@ -24,6 +24,11 @@
 					<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Cartes</a>
 					<div class="dropdown-menu">
 						<a class="dropdown-item" href="{{ path('app_map_all_shops') }}">Tous les centres</a>
+						<a class="dropdown-item" href="{{ path('app_map_all_regions') }}">Toutes les régions</a>
+						<a class="dropdown-item" href="{{ path('app_map_all_zones', {'classeName': 'MV'}) }}">Toutes les zones MV</a>
+						<a class="dropdown-item" href="{{ path('app_map_all_zones', {'classeName': 'VL'}) }}">Toutes les zones VL</a>
+
+						
 					</div>
 				</li>
 			</ul>

@@ -20,8 +20,9 @@ class ShopCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         return [
-            IntegerField::new('cm','CM:'),
-            AssociationField::new('zoneErm', 'Zone ERM:')->onlyOnForms(),
+            IntegerField::new('cm','CM:')->onlyWhenUpdating()->setDisabled(),
+            IntegerField::new('cm','CM:')->onlyWhenCreating()->onlyOnIndex(),
+            AssociationField::new('zoneErm', 'Zone ERM:'),
             AssociationField::new('shopClass', 'Classe:'),
             TextField::new('name', 'Nom:'),
             TextField::new('address', 'Adresse:')->onlyOnForms(),
@@ -36,6 +37,7 @@ class ShopCrudController extends AbstractCrudController
             ->setPageTitle('index', 'Liste des centres ERM')
             ->setPageTitle('new', 'Nouveau centre ERM')
             ->setPageTitle('edit', 'Modifier le centre ERM')
+            ->setSearchFields(['name', 'address', 'phone', 'city.name','cm'])
             ->showEntityActionsInlined();
     }
 }

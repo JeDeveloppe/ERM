@@ -16,6 +16,17 @@ class ZoneErmRepository extends ServiceEntityRepository
         parent::__construct($registry, ZoneErm::class);
     }
 
+    public function findByClasse(string $classe): array
+    {
+        return $this->createQueryBuilder('z')
+            ->where('z.name LIKE :val')
+            ->setParameter('val', '%'.$classe.'%')
+            ->orderBy('z.name', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
     //    /**
     //     * @return ZoneErm[] Returns an array of ZoneErm objects
     //     */
