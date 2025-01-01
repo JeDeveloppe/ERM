@@ -69,10 +69,10 @@ class CityService
         $city->setName($arrayVille['name'])
             ->setLatitude($arrayVille['gps_lat'])
             ->setLongitude($arrayVille['gps_lng'])
-            ->setPostalcode($arrayVille['zip_code'])
+            ->setPostalcode(strval($arrayVille['zip_code']))
             ->setSlug($this->sluggerInterface->slug($arrayVille['name']))
-            ->setDepartment($this->departmentRepository->findOneBy(['code' => $arrayVille['department_code']]) ?? $this->departmentRepository->findOneBy(['code' => 38]))
-            ->setInseeCode($arrayVille['insee_code']);
+            ->setDepartment($this->departmentRepository->findOneBy(['code' => $arrayVille['department_code']]))
+            ->setInseeCode(strval($arrayVille['insee_code']));
 
         return $city;
     }

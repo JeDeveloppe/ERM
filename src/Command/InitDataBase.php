@@ -6,6 +6,7 @@ use App\Entity\ShopClass;
 use App\Service\CityService;
 use App\Service\DepartmentService;
 use App\Service\LargeRegionService;
+use App\Service\ManagerClassService;
 use App\Service\ManagerService;
 use App\Service\RegionErmService;
 use App\Service\RegionErmServiceService;
@@ -30,7 +31,8 @@ class InitDataBase extends Command
         private ZoneErmService $zoneErmService,
         private ShopClassService $shopClassService,
         private ManagerService $managerService,
-        private ShopService $shopService
+        private ShopService $shopService,
+        private ManagerClassService $managerClassService
         )
     {
         parent::__construct();
@@ -45,13 +47,17 @@ class InitDataBase extends Command
         $io = new SymfonyStyle($input,$output);
 
         // $this->largeregionService->importLargesregions($io);
-        // $this->departmentService->importDepartementsFrancais($io);
-        // $this->cityService->importCitiesOfFrance($io);
+        $this->departmentService->importDepartementsFrancais($io);
+        $this->cityService->importCitiesOfFrance($io);
+        // $this->managerClassService->importManagerClass($io);
         // $this->regionErmService->importRegionserm($io);
         // $this->zoneErmService->importZoneserm($io);
         // $this->shopClassService->importShopClasses($io);
-        // $this->managerService->importManagers($io);
-        $this->shopService->importShops($io);
+        // $this->managerService->importRcsManagers($io);
+        // $this->managerService->importDrManagers($io);
+        // $this->managerService->importRAVL_RZManagers($io);
+        // $this->managerService->importAOManagers($io);
+        //$this->shopService->importShops($io);
 
         return Command::SUCCESS;
     }

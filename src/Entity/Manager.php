@@ -42,9 +42,19 @@ class Manager
     #[ORM\OneToOne(mappedBy: 'manager', cascade: ['persist', 'remove'])]
     private ?Cgo $cgo = null;
 
+    #[ORM\ManyToOne(inversedBy: 'managers')]
+    private ?ManagerClass $managerClass = null;
+
+    /**
+     * @var Collection<int, ZoneErm>
+     */
+    #[ORM\OneToMany(targetEntity: ZoneErm::class, mappedBy: 'manager')]
+    private Collection $zoneErms;
+
     public function __construct()
     {
         $this->shop = new ArrayCollection();
+        $this->zoneErms = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -169,5 +179,52 @@ class Manager
         $this->cgo = $cgo;
 
         return $this;
+    }
+
+    public function getManagerClass(): ?ManagerClass
+    {
+        return $this->managerClass;
+    }
+
+    public function setManagerClass(?ManagerClass $managerClass): static
+    {
+        $this->managerClass = $managerClass;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ZoneErm>
+     */
+    public function getZoneErms(): Collection
+    {
+        return $this->zoneErms;
+    }
+
+    public function addZoneErm(ZoneErm $zoneErm): static
+    {
+        if (!$this->zoneErms->contains($zoneErm)) {
+            $this->zoneErms->add($zoneErm);
+            $zoneErm->setManager($this);
+        }
+
+        return $this;
+    }
+
+    public function removeZoneErm(ZoneErm $zoneErm): static
+    {
+        if ($this->zoneErms->removeElement($zoneErm)) {
+            // set the owning side to null (unless already changed)
+            if ($zoneErm->getManager() === $this) {
+                $zoneErm->setManager(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function __toString()
+    {
+        return $this->firstName.' '.$this->lastName;
     }
 }
