@@ -18,10 +18,6 @@ class Cgo
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\OneToOne(inversedBy: 'cgo', cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Manager $manager = null;
-
     #[ORM\Column(length: 255)]
     private ?string $address = null;
 
@@ -50,6 +46,17 @@ class Cgo
     #[ORM\ManyToMany(targetEntity: Shop::class, inversedBy: 'cgos')]
     private Collection $shopsUnderControls;
 
+    #[ORM\ManyToOne(inversedBy: 'cgos')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Manager $manager = null;
+
+    #[ORM\ManyToOne(inversedBy: 'cgos')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?ShopClass $classErm = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $Email = null;
+
     public function __construct()
     {
         $this->shopsUnderControls = new ArrayCollection();
@@ -68,18 +75,6 @@ class Cgo
     public function setName(string $name): static
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    public function getManager(): ?Manager
-    {
-        return $this->manager;
-    }
-
-    public function setManager(Manager $manager): static
-    {
-        $this->manager = $manager;
 
         return $this;
     }
@@ -200,5 +195,41 @@ class Cgo
     public function __toString()
     {
         return $this->name.' '.$this->cm;
+    }
+
+    public function getManager(): ?Manager
+    {
+        return $this->manager;
+    }
+
+    public function setManager(?Manager $manager): static
+    {
+        $this->manager = $manager;
+
+        return $this;
+    }
+
+    public function getClassErm(): ?ShopClass
+    {
+        return $this->classErm;
+    }
+
+    public function setClassErm(?ShopClass $classErm): static
+    {
+        $this->classErm = $classErm;
+
+        return $this;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->Email;
+    }
+
+    public function setEmail(string $Email): static
+    {
+        $this->Email = $Email;
+
+        return $this;
     }
 }

@@ -49,8 +49,8 @@ class CgoService
                 $io->progressAdvance();
                 $entity = $this->createOrUpdate($arrayTotal);
                 $this->em->persist($entity);
+                $this->em->flush();
             }
-            $this->em->flush();
             
 
             $io->progressFinish();
@@ -96,13 +96,14 @@ class CgoService
         }
 
         //Région,CGO,CM,Nom responsable,Prénom responsable,Email responsable,Mobile responsable,Nom et Prénom Superviseur,Mobile superviseur,Adresse,Email générique CGO
-
         $cgo
             ->setCm($arrayEntity['CM'])
             ->setName($arrayEntity['CGO'])
             ->setRegionErm($regionErm)
             ->setAddress($arrayEntity['Adresse'])
             ->setManager($manager)
+            ->setClassErm($this->shopClassRepository->findOneByName($arrayEntity['Classe CGO']))
+            ->setEmail($arrayEntity['Email générique CGO'])
             ->setZoneName($arrayEntity['ZoneCGO'])
             ->setTerritoryColor($this->mapsService->randomHexadecimalColor());
 
@@ -154,7 +155,7 @@ class CgoService
                 $shop->addCgo($cgo);
 
             }else{
-                dump('pas de cgo pour centre '.$shop->getCm());
+                dd('pas de cgo pour centre '.$shop->getCm());
             }
             
         }else if(strlen($arrayEntity['Rattachement direct CGO VI']) == 1 && strlen($arrayEntity['Rattachement direct CGO VL']) > 1){
@@ -164,7 +165,7 @@ class CgoService
 
                 $shop->addCgo($cgo);
             }else{
-                dump('pas de cgo pour centre '.$shop->getCm());
+                dd('pas de cgo pour centre '.$shop->getCm());
             }
 
         }else if(strlen($arrayEntity['Rattachement direct CGO VI']) > 1 && strlen($arrayEntity['Rattachement direct CGO VL']) > 1){
@@ -176,10 +177,10 @@ class CgoService
                     $shop->addCgo($cgo);
                 }
             }
-            dump('ok pour '.$shop->getCm());
 
         }else{
-            dump('pas de cgo pour centre '.$shop->getCm());
+
+            dump('Aucun cgo pour centre '.$shop->getCm());
         }
 
         return $shop;

@@ -39,9 +39,6 @@ class Manager
     #[ORM\Column(length: 255)]
     private ?string $email = null;
 
-    #[ORM\OneToOne(mappedBy: 'manager', cascade: ['persist', 'remove'])]
-    private ?Cgo $cgo = null;
-
     #[ORM\ManyToOne(inversedBy: 'managers')]
     private ?ManagerClass $managerClass = null;
 
@@ -51,10 +48,17 @@ class Manager
     #[ORM\OneToMany(targetEntity: ZoneErm::class, mappedBy: 'manager')]
     private Collection $zoneErms;
 
+    /**
+     * @var Collection<int, Cgo>
+     */
+    #[ORM\OneToMany(targetEntity: Cgo::class, mappedBy: 'manager')]
+    private Collection $cgos;
+
     public function __construct()
     {
         $this->shop = new ArrayCollection();
         $this->zoneErms = new ArrayCollection();
+        $this->cgos = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -164,23 +168,6 @@ class Manager
         return $this;
     }
 
-    public function getCgo(): ?Cgo
-    {
-        return $this->cgo;
-    }
-
-    public function setCgo(Cgo $cgo): static
-    {
-        // set the owning side of the relation if necessary
-        if ($cgo->getManager() !== $this) {
-            $cgo->setManager($this);
-        }
-
-        $this->cgo = $cgo;
-
-        return $this;
-    }
-
     public function getManagerClass(): ?ManagerClass
     {
         return $this->managerClass;
@@ -226,5 +213,35 @@ class Manager
     public function __toString()
     {
         return $this->firstName.' '.$this->lastName;
+    }
+
+    /**
+     * @return Collection<int, Cgo>
+     */
+    public function getCgos(): Collection
+    {
+        return $this->cgos;
+    }
+
+    public function addCgo(Cgo $cgo): static
+    {
+        if (!$this->cgos->contains($cgo)) {
+            $this->cgos->add($cgo);
+            $cgo->setManager($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCgo(Cgo $cgo): static
+    {
+        if ($this->cgos->removeElement($cgo)) {
+            // set the owning side to null (unless already changed)
+            if ($cgo->getManager() === $this) {
+                $cgo->setManager(null);
+            }
+        }
+
+        return $this;
     }
 }
