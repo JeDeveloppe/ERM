@@ -62,10 +62,10 @@ class InitDataBase extends Command
         // $this->managerService->importRAVL_RZManagers($io);
         // $this->managerService->importAOManagers($io);
         // $this->shopService->importShops($io);
-        // $this->shopService->updateShops($io); //! ne marche pas
-        $this->cgoService->importCgos($io);
+        // $this->cgoService->importCgos($io);
         // $this->cgoService->importShopsUnderControls($io);
-        // $this->telematicAreasService->importCgoTelematicAreas($io);
+        // $this->shopService->updateShops($io);
+        //$this->telematicAreasService->importCgoTelematicAreas($io);
 
         return Command::SUCCESS;
     }

@@ -12,6 +12,7 @@ use App\Entity\ShopClass;
 use App\Entity\Department;
 use App\Entity\LargeRegion;
 use App\Entity\ManagerClass;
+use App\Entity\TelematicArea;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
@@ -49,8 +50,9 @@ class DashboardController extends AbstractDashboardController
             MenuItem::linkToCrud('Les status des managers', 'fas fa-list', ManagerClass::class),
             MenuItem::linkToCrud('Les centres', 'fas fa-list', Shop::class),
             MenuItem::linkToCrud('Les classes', 'fas fa-list', ShopClass::class),
-            MenuItem::linkToCrud('Les régions ERM', 'fas fa-list', RegionErm::class),
             MenuItem::linkToCrud('Les zones ERM', 'fas fa-list', ZoneErm::class),
+            MenuItem::linkToCrud('Les régions ERM', 'fas fa-list', RegionErm::class),
+            MenuItem::linkToCrud('Zones télématiques', 'fas fa-list', TelematicArea::class),
             MenuItem::section('Configurations FRANCE:'),
             MenuItem::linkToCrud('Les villes', 'fas fa-list', City::class),
             MenuItem::linkToCrud('Départements', 'fas fa-list', Department::class),

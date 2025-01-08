@@ -17,17 +17,6 @@ class MapsController extends AbstractController
     {
     }
 
-    // #[Route('/maps/cgovi-et-leur-centre', name: 'app_map_cgovi_and_shops')]
-    // public function mapCgoViAndShops(): Response
-    // {
-    //     //?on recupere les donnees dans le service
-    //     $donnees = $this->areasService->constructionOperationnalMapByShops();
-
-    //     return $this->render('site/maps/operational_by_shops.html.twig', [
-    //         'donnees' => $donnees,
-    //     ]);
-    // }
-
     #[Route('/maps/tous-les-centres-de-france', name: 'app_map_all_shops')]
     public function mapAllShops(): Response
     {
@@ -39,15 +28,26 @@ class MapsController extends AbstractController
         ]);
     }
 
-    #[Route('/maps/tous-les-centres-de-france-sous-cgo', name: 'app_map_all_shops_under_cgo')]
-    public function mapAllShopsUnderCgo(): Response
+    #[Route('/maps/tous-les-centres-de-france-sous-cgo-{classeName}', name: 'app_map_all_shops_under_cgo')]
+    public function mapAllShopsUnderCgo(string $classeName): Response
     {
-        //?on recupere les donnees dans le service
-        $donnees = $this->mapsService->constructionMapOfAllShopsUnderCgo();
+        $class = $this->shopClassRepository->findOneByName($classeName);
 
-        return $this->render('site/maps/all_shops_under_cgo.html.twig', [
-            'donnees' => $donnees,
-        ]);
+        if($class){
+
+            //?on recupere les donnees dans le service
+            $donnees = $this->mapsService->constructionMapOfAllShopsUnderCgo($class);
+    
+            return $this->render('site/maps/all_shops_under_cgo.html.twig', [
+                'donnees' => $donnees,
+                'classeName' => $class->getName(),
+            ]);
+
+        }else{
+
+            throw $this->createNotFoundException('Cette classe n\'existe pas');
+        }
+
     }
 
     #[Route('/maps/toutes-les-regions', name: 'app_map_all_regions')]
@@ -61,7 +61,7 @@ class MapsController extends AbstractController
         ]);
     }
 
-    #[Route('/maps/toutes-les-zones/{classeName}', name: 'app_map_all_zones')]
+    #[Route('/maps/toutes-les-zones-{classeName}', name: 'app_map_all_zones')]
     public function mapAllZonesByClasse(string $classeName): Response
     {
         $classe = $this->shopClassRepository->findOneByName($classeName);
@@ -83,14 +83,14 @@ class MapsController extends AbstractController
         }
     }
 
-    // #[Route('/maps/telematique', name: 'app_map_telematique')]
-    // public function mapTelematiqueArea(): Response
-    // {
-    //     //?on recupere les donnees dans le service
-    //     $donnees = $this->areasService->constructionMapOfTelematique();
+    #[Route('/maps/telematique', name: 'app_map_telematique')]
+    public function mapTelematiqueArea(): Response
+    {
+        //?on recupere les donnees dans le service
+        $donnees = $this->mapsService->constructionMapOfTelematique();
 
-    //     return $this->render('site/maps/telematic.html.twig', [
-    //         'donnees' => $donnees,
-    //     ]);
-    // }
+        return $this->render('site/maps/telematic.html.twig', [
+            'donnees' => $donnees,
+        ]);
+    }
 }

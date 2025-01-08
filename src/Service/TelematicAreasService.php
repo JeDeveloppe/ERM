@@ -2,9 +2,11 @@
 
 namespace App\Service;
 
+use App\Entity\Cgo;
 use League\Csv\Reader;
 use App\Entity\TelematicArea;
 use App\Repository\CgoRepository;
+use App\Repository\ShopClassRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\TelematicAreaRepository;
 
@@ -14,7 +16,8 @@ class TelematicAreasService
 {
     public function __construct(
         private EntityManagerInterface $em,
-        private TelematicAreaRepository $TelematicAreaRepository,
+        private TelematicAreaRepository $telematicAreaRepository,
+        private ShopClassRepository $shopClassRepository,
         private CgoRepository $cgoRepository,
         private MapsService $mapsService
         ){
@@ -24,14 +27,14 @@ class TelematicAreasService
     {
         $io->title('Importation des zones télématic');
 
-            $totals = $this->readCsvFile();
+            $cgos = $this->cgoRepository->findBy(['classErm' => $this->shopClassRepository->findOneBy(['name' => 'MV'])]);
         
-            $io->progressStart(count($totals));
+            $io->progressStart(count($cgos));
 
-            foreach($totals as $arrayTotal){
+            foreach($cgos as $cgo){
 
                 $io->progressAdvance();
-                $entity = $this->createOrUpdate($arrayTotal);
+                $entity = $this->createOrUpdate($cgo);
                 $this->em->persist($entity);
                 $this->em->flush();
             }
@@ -43,17 +46,9 @@ class TelematicAreasService
         $io->success('Importation terminée');
     }
 
-    private function readCsvFile(): Reader
+    private function createOrUpdate(Cgo $entity): TelematicArea
     {
-        $csv = Reader::createFromPath('%kernel.root.dir%/../import/cgos.csv','r');
-        $csv->setHeaderOffset(0);
-
-        return $csv;
-    }
-
-    private function createOrUpdate(array $arrayEntity): TelematicArea
-    {
-        $cgoArea = $this->TelematicAreaRepository->findOneByCgo($arrayEntity['CM']);
+        $cgoArea = $this->telematicAreaRepository->findOneByCgo($entity);
 
         if(!$cgoArea){
             $cgoArea = new TelematicArea();
@@ -61,7 +56,7 @@ class TelematicAreasService
 
         //"id","cgo_who_controls_area_id","zone_color"
         $cgoArea
-            ->setCgo($this->cgoRepository->findOneByCm($arrayEntity['CM']))
+            ->setCgo($this->cgoRepository->find($entity))
             ->setTerritoryColor($this->mapsService->randomHexadecimalColor());
 
         return $cgoArea;

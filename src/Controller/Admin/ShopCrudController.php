@@ -27,7 +27,7 @@ class ShopCrudController extends AbstractCrudController
             AssociationField::new('shopClass', 'Classe:'),
             TextField::new('name', 'Nom:'),
             TextField::new('address', 'Adresse:')->onlyOnForms(),
-            AssociationField::new('city', 'Ville:')->onlyOnForms(),
+            AssociationField::new('city', 'Ville:'),
             AssociationField::new('cgos')
                 ->setQueryBuilder(fn(QueryBuilder $queryBuilder) => 
                         $queryBuilder
@@ -35,6 +35,7 @@ class ShopCrudController extends AbstractCrudController
                     )
                 ->setFormTypeOptions(['placeholder' => 'Séléctionner un CGO', 'by_reference' => false, 'multiple' => true]),
             TextField::new('phone', 'Téléphone:'),
+            AssociationField::new('manager', 'Manager:'),
         ];
     }
 

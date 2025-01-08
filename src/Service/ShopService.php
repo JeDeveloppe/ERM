@@ -102,8 +102,8 @@ class ShopService
                 $io->progressAdvance();
                 $entity = $this->createOrUpdateShops($arrayTotal);
                 $this->em->persist($entity);
-                $this->em->flush();
             }
+            $this->em->flush();
             
 
             $io->progressFinish();
@@ -125,27 +125,14 @@ class ShopService
         //"id","zone_erm_id","shop_class_id","city_id","manager_id","cm","name","address","phone"
         
         $shop = $this->shopRepository->findOneByCm($arrayEntity['cm']);
-        $manager = $this->managerRepository->findOneById($arrayEntity['manager_id']);
 
-        if($manager){
-            
-            if(!$shop){
-                $shop = new Shop();
-            }
-    
-            $shop
-                ->setCm($arrayEntity['cm'])
-                ->setName($arrayEntity['name'])
-                ->setZoneErm($this->zoneErmRepository->findOneById($arrayEntity['zone_erm_id']))
-                ->setShopClass($this->shopClassRepository->findOneById($arrayEntity['shop_class_id']))
-                ->setAddress($arrayEntity['address'])
-                ->setPhone($arrayEntity['phone'])
-                ->setManager()
-                ->setCity($this->cityRepository->findOneById($arrayEntity['city_id']));
-    
-            return $shop;
-        }else{
-            dump($shop->getName());
+        if(!$shop){
+            $shop = new Shop();
         }
+
+        $shop
+            ->setCity($this->cityRepository->findOneById($arrayEntity['city_id']));
+
+        return $shop;
     }
 }
