@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Shop;
+use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
@@ -26,7 +27,13 @@ class ShopCrudController extends AbstractCrudController
             AssociationField::new('shopClass', 'Classe:'),
             TextField::new('name', 'Nom:'),
             TextField::new('address', 'Adresse:')->onlyOnForms(),
-            AssociationField::new('city', 'Ville:'),
+            AssociationField::new('city', 'Ville:')->onlyOnForms(),
+            AssociationField::new('cgos')
+                ->setQueryBuilder(fn(QueryBuilder $queryBuilder) => 
+                        $queryBuilder
+                            ->orderBy('entity.name', 'ASC')
+                    )
+                ->setFormTypeOptions(['placeholder' => 'Séléctionner un CGO', 'by_reference' => false, 'multiple' => true]),
             TextField::new('phone', 'Téléphone:'),
         ];
     }

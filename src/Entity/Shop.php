@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ShopRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ShopRepository::class)]
@@ -39,6 +41,17 @@ class Shop
 
     #[ORM\Column(length: 25)]
     private ?string $phone = null;
+
+    /**
+     * @var Collection<int, Cgo>
+     */
+    #[ORM\ManyToMany(targetEntity: Cgo::class, mappedBy: 'shopsUnderControls')]
+    private Collection $cgos;
+
+    public function __construct()
+    {
+        $this->cgos = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -143,6 +156,34 @@ class Shop
 
     public function __toString()
     {
-        return $this->name .' ('.$this->cm.')'. $this->city->getDepartment();
+        return $this->name .' ('.$this->cm.')';
     }
+
+    /**
+     * @return Collection<int, Cgo>
+     */
+    public function getCgos(): Collection
+    {
+        return $this->cgos;
+    }
+
+    public function addCgo(Cgo $cgo): static
+    {
+        if (!$this->cgos->contains($cgo)) {
+            $this->cgos->add($cgo);
+            $cgo->addShopsUnderControl($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCgo(Cgo $cgo): static
+    {
+        if ($this->cgos->removeElement($cgo)) {
+            $cgo->removeShopsUnderControl($this);
+        }
+
+        return $this;
+    }
+
 }

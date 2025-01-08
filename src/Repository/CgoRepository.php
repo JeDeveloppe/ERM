@@ -16,6 +16,18 @@ class CgoRepository extends ServiceEntityRepository
         parent::__construct($registry, Cgo::class);
     }
 
+    public function findOneCgoByZoneNameAndClasse(string $zoneName, string $classe)
+    {
+        $query = $this->createQueryBuilder('c')
+            ->where('c.zoneName = :zoneName')
+            ->setParameter('zoneName', $zoneName)
+            ->andWhere('c.name LIKE :classe')
+            ->setParameter('classe', '%'.$classe.'%')
+            ->getQuery()
+            ->getOneOrNullResult();
+        return $query;
+    }
+
     //    /**
     //     * @return Cgo[] Returns an array of Cgo objects
     //     */

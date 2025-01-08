@@ -44,9 +44,16 @@ class City
     #[ORM\OneToMany(targetEntity: Shop::class, mappedBy: 'city')]
     private Collection $shops;
 
+    /**
+     * @var Collection<int, Cgo>
+     */
+    #[ORM\OneToMany(targetEntity: Cgo::class, mappedBy: 'city')]
+    private Collection $cgos;
+
     public function __construct()
     {
         $this->shops = new ArrayCollection();
+        $this->cgos = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -171,5 +178,35 @@ class City
     public function __toString()
     {
         return $this->name. ' ('.$this->postalCode.')';
+    }
+
+    /**
+     * @return Collection<int, Cgo>
+     */
+    public function getCgos(): Collection
+    {
+        return $this->cgos;
+    }
+
+    public function addCgo(Cgo $cgo): static
+    {
+        if (!$this->cgos->contains($cgo)) {
+            $this->cgos->add($cgo);
+            $cgo->setCity($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCgo(Cgo $cgo): static
+    {
+        if ($this->cgos->removeElement($cgo)) {
+            // set the owning side to null (unless already changed)
+            if ($cgo->getCity() === $this) {
+                $cgo->setCity(null);
+            }
+        }
+
+        return $this;
     }
 }

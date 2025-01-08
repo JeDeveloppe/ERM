@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\CgoRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CgoRepository::class)]
@@ -28,6 +30,30 @@ class Cgo
 
     #[ORM\OneToOne(mappedBy: 'cgo', cascade: ['persist', 'remove'])]
     private ?TelematicArea $telematicArea = null;
+
+    #[ORM\ManyToOne(inversedBy: 'cgos')]
+    private ?City $city = null;
+
+    #[ORM\ManyToOne(inversedBy: 'cgos')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?RegionErm $regionErm = null;
+
+    #[ORM\Column]
+    private ?int $cm = null;
+
+    #[ORM\Column(length: 50)]
+    private ?string $zoneName = null;
+
+    /**
+     * @var Collection<int, Shop>
+     */
+    #[ORM\ManyToMany(targetEntity: Shop::class, inversedBy: 'cgos')]
+    private Collection $shopsUnderControls;
+
+    public function __construct()
+    {
+        $this->shopsUnderControls = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -97,5 +123,82 @@ class Cgo
         $this->telematicArea = $telematicArea;
 
         return $this;
+    }
+
+    public function getCity(): ?City
+    {
+        return $this->city;
+    }
+
+    public function setCity(?City $city): static
+    {
+        $this->city = $city;
+
+        return $this;
+    }
+
+    public function getRegionErm(): ?RegionErm
+    {
+        return $this->regionErm;
+    }
+
+    public function setRegionErm(?RegionErm $regionErm): static
+    {
+        $this->regionErm = $regionErm;
+
+        return $this;
+    }
+
+    public function getCm(): ?int
+    {
+        return $this->cm;
+    }
+
+    public function setCm(int $cm): static
+    {
+        $this->cm = $cm;
+
+        return $this;
+    }
+
+    public function getZoneName(): ?string
+    {
+        return $this->zoneName;
+    }
+
+    public function setZoneName(string $zoneName): static
+    {
+        $this->zoneName = $zoneName;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Shop>
+     */
+    public function getShopsUnderControls(): Collection
+    {
+        return $this->shopsUnderControls;
+    }
+
+    public function addShopsUnderControl(Shop $shopsUnderControl): static
+    {
+        if (!$this->shopsUnderControls->contains($shopsUnderControl)) {
+            $this->shopsUnderControls->add($shopsUnderControl);
+        }
+
+        return $this;
+    }
+
+    public function removeShopsUnderControl(Shop $shopsUnderControl): static
+    {
+        $this->shopsUnderControls->removeElement($shopsUnderControl);
+
+        return $this;
+    }
+
+    public function __toString()
+    {
+        return $this->name.' '.$this->cm;
     }
 }

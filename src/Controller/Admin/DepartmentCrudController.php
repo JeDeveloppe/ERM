@@ -23,6 +23,7 @@ class DepartmentCrudController extends AbstractCrudController
             TextField::new('code', 'Code du departement:')->setDisabled(true),
             TextField::new('slug', 'Slug du departement:'),
             TextField::new('simplemapCode', 'Code simplemap:')->setDisabled(true),
+            AssociationField::new('telematicArea', 'Zone Télématique de:'),
             AssociationField::new('cities')
         ];
     }
