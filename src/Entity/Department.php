@@ -37,6 +37,9 @@ class Department
     #[ORM\OneToMany(targetEntity: City::class, mappedBy: 'department')]
     private Collection $cities;
 
+    #[ORM\ManyToOne(inversedBy: 'departments')]
+    private ?TelematicArea $telematicArea = null;
+
     public function __construct()
     {
         $this->cities = new ArrayCollection();
@@ -140,5 +143,17 @@ class Department
     public function __toString()
     {
         return $this->name;
+    }
+
+    public function getTelematicArea(): ?TelematicArea
+    {
+        return $this->telematicArea;
+    }
+
+    public function setTelematicArea(?TelematicArea $telematicArea): static
+    {
+        $this->telematicArea = $telematicArea;
+
+        return $this;
     }
 }

@@ -25,7 +25,7 @@ class ManagerClassService
     {
         $io->title('Importation des classes de managers ERM');
 
-            $totals = ['AO','RCS','DR','RAVL','RZ'];
+            $totals = ['AO','RCS','DR','RAVL','RZ','RCGO'];
         
             $io->progressStart(count($totals));
 

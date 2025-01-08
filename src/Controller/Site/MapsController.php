@@ -28,13 +28,24 @@ class MapsController extends AbstractController
     //     ]);
     // }
 
-    #[Route('/maps/tous-les-centres', name: 'app_map_all_shops')]
+    #[Route('/maps/tous-les-centres-de-france', name: 'app_map_all_shops')]
     public function mapAllShops(): Response
     {
         //?on recupere les donnees dans le service
         $donnees = $this->mapsService->constructionMapOfAllShops();
 
         return $this->render('site/maps/all_shops.html.twig', [
+            'donnees' => $donnees,
+        ]);
+    }
+
+    #[Route('/maps/tous-les-centres-de-france-sous-cgo', name: 'app_map_all_shops_under_cgo')]
+    public function mapAllShopsUnderCgo(): Response
+    {
+        //?on recupere les donnees dans le service
+        $donnees = $this->mapsService->constructionMapOfAllShopsUnderCgo();
+
+        return $this->render('site/maps/all_shops_under_cgo.html.twig', [
             'donnees' => $donnees,
         ]);
     }

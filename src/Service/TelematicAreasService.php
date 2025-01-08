@@ -4,7 +4,7 @@ namespace App\Service;
 
 use League\Csv\Reader;
 use App\Entity\TelematicArea;
-use App\Repository\ShopRepository;
+use App\Repository\CgoRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\TelematicAreaRepository;
 
@@ -15,7 +15,8 @@ class TelematicAreasService
     public function __construct(
         private EntityManagerInterface $em,
         private TelematicAreaRepository $TelematicAreaRepository,
-        private ShopRepository $shopRepository
+        private CgoRepository $cgoRepository,
+        private MapsService $mapsService
         ){
     }
 
@@ -32,9 +33,9 @@ class TelematicAreasService
                 $io->progressAdvance();
                 $entity = $this->createOrUpdate($arrayTotal);
                 $this->em->persist($entity);
+                $this->em->flush();
             }
             
-            $this->em->flush();
 
             $io->progressFinish();
         
@@ -44,7 +45,7 @@ class TelematicAreasService
 
     private function readCsvFile(): Reader
     {
-        $csv = Reader::createFromPath('%kernel.root.dir%/../import/TelematicAreas.csv','r');
+        $csv = Reader::createFromPath('%kernel.root.dir%/../import/cgos.csv','r');
         $csv->setHeaderOffset(0);
 
         return $csv;
@@ -52,7 +53,7 @@ class TelematicAreasService
 
     private function createOrUpdate(array $arrayEntity): TelematicArea
     {
-        $cgoArea = $this->TelematicAreaRepository->findOneBy(['cgoWhoControlsArea' => $this->shopRepository->findOneBy(['id' => $arrayEntity['cgo_who_controls_area_id']])]);
+        $cgoArea = $this->TelematicAreaRepository->findOneByCgo($arrayEntity['CM']);
 
         if(!$cgoArea){
             $cgoArea = new TelematicArea();
@@ -60,9 +61,8 @@ class TelematicAreasService
 
         //"id","cgo_who_controls_area_id","zone_color"
         $cgoArea
-            ->setCgoWhoControlsArea($this->shopRepository->findOneBy(['id' => $arrayEntity['cgo_who_controls_area_id']]))
-            ->setZoneColor($arrayEntity['zone_color']);
-
+            ->setCgo($this->cgoRepository->findOneByCm($arrayEntity['CM']))
+            ->setTerritoryColor($this->mapsService->randomHexadecimalColor());
 
         return $cgoArea;
     }

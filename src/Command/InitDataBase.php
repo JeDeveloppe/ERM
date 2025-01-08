@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Entity\ShopClass;
+use App\Service\CgoService;
 use App\Service\CityService;
 use App\Service\DepartmentService;
 use App\Service\LargeRegionService;
@@ -12,6 +13,7 @@ use App\Service\RegionErmService;
 use App\Service\RegionErmServiceService;
 use App\Service\ShopClassService;
 use App\Service\ShopService;
+use App\Service\TelematicAreasService;
 use App\Service\ZoneErmService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -32,7 +34,9 @@ class InitDataBase extends Command
         private ShopClassService $shopClassService,
         private ManagerService $managerService,
         private ShopService $shopService,
-        private ManagerClassService $managerClassService
+        private ManagerClassService $managerClassService,
+        private CgoService $cgoService,
+        private TelematicAreasService $telematicAreasService
         )
     {
         parent::__construct();
@@ -47,8 +51,8 @@ class InitDataBase extends Command
         $io = new SymfonyStyle($input,$output);
 
         // $this->largeregionService->importLargesregions($io);
-        $this->departmentService->importDepartementsFrancais($io);
-        $this->cityService->importCitiesOfFrance($io);
+        // $this->departmentService->importDepartementsFrancais($io);
+        // $this->cityService->importCitiesOfFrance($io);
         // $this->managerClassService->importManagerClass($io);
         // $this->regionErmService->importRegionserm($io);
         // $this->zoneErmService->importZoneserm($io);
@@ -57,7 +61,11 @@ class InitDataBase extends Command
         // $this->managerService->importDrManagers($io);
         // $this->managerService->importRAVL_RZManagers($io);
         // $this->managerService->importAOManagers($io);
-        //$this->shopService->importShops($io);
+        // $this->shopService->importShops($io);
+        // $this->shopService->updateShops($io); //! ne marche pas
+        $this->cgoService->importCgos($io);
+        // $this->cgoService->importShopsUnderControls($io);
+        // $this->telematicAreasService->importCgoTelematicAreas($io);
 
         return Command::SUCCESS;
     }

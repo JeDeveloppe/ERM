@@ -30,9 +30,9 @@ class RegionErmService
                 $io->progressAdvance();
                 $entity = $this->createOrUpdate($arrayTotal);
                 $this->em->persist($entity);
-                $this->em->flush();
             }
             
+            $this->em->flush();
 
             $io->progressFinish();
         

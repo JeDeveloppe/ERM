@@ -20,7 +20,8 @@ class ManagerService
     public function __construct(
         private EntityManagerInterface $em,
         private ManagerRepository $managerRepository,
-        private ManagerClassRepository $managerClassRepository
+        private ManagerClassRepository $managerClassRepository,
+        private ShopRepository $shopRepository
         ){
     }
 
@@ -40,6 +41,8 @@ class ManagerService
                 $this->em->flush($entity);
             }
 
+            //on cré un manager générique au cas ou il en manque un
+            $this->createOrUpdateFakeManager('manager.inconnu@euromaster.com', 'RCS');
             $io->progressFinish();
         
         $io->success('Importation terminée');
@@ -64,8 +67,8 @@ class ManagerService
        // Région,Nom DR,Secteur RA VL ou Zone MV,Nom RA VL ou Nom R. Zone,Nom AO,Libelle CM regroupés,CM,Libelle Centre,Statut,Classe,Nb EAD,"Rattachement direct CGO VI","Rattachement direct CGO VL",Nom RCS,Prénom RCS,email,"Ligne pour les clients(diffusion OK)",Tél mobile resp.,"Ligne directe centre (ne pas diffuser aux clients)",Adresse,Code Postal,Ville,"Animateur Prévention
 
         $manager
-            ->setFirstName($arrayEntity['Prénom RCS'])
-            ->setLastName($arrayEntity['Nom RCS'])
+            ->setFirstName($arrayEntity['Prénom RCS'] ?? 'A DEFINIR')
+            ->setLastName($arrayEntity['Nom RCS'] ?? 'A DEFINIR')
             ->setEmail($arrayEntity['email'])
             ->setManagerClass($this->managerClassRepository->findOneByName('RCS'))
             ->setPhone($arrayEntity['Tél mobile resp.']);
@@ -201,5 +204,24 @@ class ManagerService
             ->setManagerClass($this->managerClassRepository->findOneByName('AO'));
 
         return $manager;
+    }
+
+    public function createOrUpdateFakeManager(string $email, string $managerClass){
+
+        $manager = $this->managerRepository->findOneByEmail($email);
+
+        if(!$manager){
+            $manager = new Manager();
+        }
+
+        $manager
+            ->setFirstName('A définir')
+            ->setLastName('A définir')
+            ->setEmail($email)
+            ->setPhone('A définir')
+            ->setManagerClass($this->managerClassRepository->findOneByName($managerClass));
+
+        $this->em->persist($manager);
+        $this->em->flush($manager);
     }
 }

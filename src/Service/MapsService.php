@@ -6,6 +6,7 @@ namespace App\Service;
 use App\Repository\ShopRepository;
 use App\Repository\CgoTelematicAreaRepository;
 use App\Repository\CgoOperationalAreaRepository;
+use App\Repository\CgoRepository;
 use App\Repository\RegionErmRepository;
 use App\Repository\ZoneErmRepository;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -17,7 +18,8 @@ class MapsService
             private RequestStack $requestStack,
             private ShopRepository $shopRepository,
             private ZoneErmRepository $zoneErmRepository,
-            private RegionErmRepository $regionErmRepository
+            private RegionErmRepository $regionErmRepository,
+            private CgoRepository $cgoRepository
         ){}
 
     // public function constructionMapOfTelematique()
@@ -194,11 +196,16 @@ class MapsService
         $baseUrl = $this->requestStack->getCurrentRequest()->getScheme() . '://' . $this->requestStack->getCurrentRequest()->getHttpHost() . $this->requestStack->getCurrentRequest()->getBasePath();
         //?on recupere tous les centres
         $regionErms = $this->regionErmRepository->findAll();
+        //?on fait un tableau des couleurs des régions
+        $regionColors = [];
+
 
         $states = []; //? toutes les réponses seront dans ce tableau final
 
         foreach($regionErms as $regionErm)
         {
+
+            $regionColors[$regionErm->getName()] = $this->randomHexadecimalColor();
 
             //pour chaque zone ou récupère les centres
             foreach($regionErm->getZoneErms() as $zone){
@@ -209,12 +216,11 @@ class MapsService
                     if($shop->getCity()){
 
                         $department = $shop->getCity()->getDepartment();
-                        dump($department);
                         $states[$department->getSimplemapCode()] =
                             [
                                 "name" => $regionErm->getName(),
                                 "description" => $department->getName().' ('.$department->getCode().')',
-                                "color" => $regionErm->getTerritoryColor()
+                                "color" => $regionErm->getTerritoryColor() ?? $regionColors[$regionErm->getName()],
                             ];
 
                     }else{
@@ -247,9 +253,10 @@ class MapsService
         //pour chaque zone ou récupère les centres
         foreach($zones as $zone){
 
-            $randomHexadecimalColor = $this->randomHexadecimalColor();
-            $shops = $zone->getShops();
             $zoneName = $zone->getName();
+            $zoneColors[$zoneName] = $this->randomHexadecimalColor();
+            
+            $shops = $zone->getShops();
 
             $managerOfZone = $zone->getManager();
             if($managerOfZone !== null){
@@ -269,7 +276,7 @@ class MapsService
                         [
                             "name" => $department->getName().' ('.$department->getCode().')',
                             "description" => $zoneName.' <br/>'.$zoneContact,
-                            "color" => $zone->getTerritoryColor() ?? $randomHexadecimalColor
+                            "color" => $zone->getTerritoryColor() ?? $zoneColors[$zoneName],
                         ];
                 }
             }
@@ -290,5 +297,57 @@ class MapsService
         $color = '#'.$rand[rand(0,15)].$rand[rand(0,15)].$rand[rand(0,15)].$rand[rand(0,15)].$rand[rand(0,15)].$rand[rand(0,15)];
 
         return $color;
+    }
+
+    public function constructionMapOfAllShopsUnderCgo()
+    {
+
+        //? on recupere l'url de base
+        $baseUrl = $this->requestStack->getCurrentRequest()->getScheme() . '://' . $this->requestStack->getCurrentRequest()->getHttpHost() . $this->requestStack->getCurrentRequest()->getBasePath();
+        
+        //?on recupere tous les cgos
+        $cgos = $this->cgoRepository->findAll();
+
+        $locations = []; //? toutes les réponses seront dans ce tableau final
+
+        foreach($cgos as $cgo)
+        {
+            $shops = $cgo->getShopsUnderControls();
+
+            foreach($shops as $shop)
+            {
+                //?si on a les coordonnees de renseignées dans la base uniquement
+                if(!is_null($shop->getCity()))
+                {
+    
+                    if($shop->getManager() !== null){
+    
+                        $manager = $shop->getManager();
+                        $contactShop = $manager->getFirstName() . ' ' . $manager->getLastName() . ' <br/> ' . $shop->getManager()->getPhone() . '<br/>' . $manager->getEmail();
+                    
+                    }else{
+    
+                        $contactShop = "NON RENSEIGNÉ";
+                    }
+                    
+                    $locations[] = 
+                    [
+                        "lat" => $shop->getCity()->getLatitude(),
+                        "lng" => $shop->getCity()->getLongitude(),
+                        "color" => $cgo->getTerritoryColor() ?? $this->randomHexadecimalColor(),
+                        "name" => $shop->getName().' ('.$shop->getCm().')',
+                        "description" => $contactShop,
+                        "url" => $baseUrl,
+                        "size" => 15,
+                    ];
+                }
+            }
+        }
+
+        //?on encode en json
+        $jsonLocations = json_encode($locations, JSON_FORCE_OBJECT); 
+        $donnees['locations'] = $jsonLocations;
+
+        return $donnees;
     }
 }

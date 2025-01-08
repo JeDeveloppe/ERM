@@ -2,7 +2,7 @@
 
 namespace App\Controller\Admin;
 
-
+use App\Entity\Cgo;
 use App\Entity\City;
 use App\Entity\Shop;
 use App\Entity\Manager;
@@ -45,6 +45,7 @@ class DashboardController extends AbstractDashboardController
             // MenuItem::linkToCrud('Zones télématiques', 'fas fa-list', CgoTelematicArea::class),
             MenuItem::section('Configurations ERM:'),
             MenuItem::linkToCrud('Les managers', 'fas fa-list', Manager::class),
+            MenuItem::linkToCrud('Les cgos', 'fas fa-list', Cgo::class),
             MenuItem::linkToCrud('Les status des managers', 'fas fa-list', ManagerClass::class),
             MenuItem::linkToCrud('Les centres', 'fas fa-list', Shop::class),
             MenuItem::linkToCrud('Les classes', 'fas fa-list', ShopClass::class),
