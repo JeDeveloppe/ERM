@@ -25,6 +25,7 @@ class MapsController extends AbstractController
 
         return $this->render('site/maps/all_shops.html.twig', [
             'donnees' => $donnees,
+            'title' => 'Tous les centres',
         ]);
     }
 
@@ -40,7 +41,7 @@ class MapsController extends AbstractController
     
             return $this->render('site/maps/all_shops_under_cgo.html.twig', [
                 'donnees' => $donnees,
-                'classeName' => $class->getName(),
+                'title' => 'Tous les centres sous CGO ' . $class->getName(),
             ]);
 
         }else{
@@ -58,6 +59,7 @@ class MapsController extends AbstractController
 
         return $this->render('site/maps/all_regions.html.twig', [
             'donnees' => $donnees,
+            'title' => 'Toutes les régions',
         ]);
     }
 
@@ -73,7 +75,7 @@ class MapsController extends AbstractController
     
             return $this->render('site/maps/all_zones.html.twig', [
                 'donnees' => $donnees,
-                'classeName' => $classe->getName(),
+                'title' => 'Toutes les zones ' . $classe->getName(),
             ]);
 
         }else{
@@ -91,6 +93,7 @@ class MapsController extends AbstractController
 
         return $this->render('site/maps/telematic.html.twig', [
             'donnees' => $donnees,
+            'title' => 'Zones télématiques MV',
         ]);
     }
 }
