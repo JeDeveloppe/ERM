@@ -24,9 +24,6 @@ class Cgo
     #[ORM\Column(length: 10)]
     private ?string $territoryColor = null;
 
-    #[ORM\OneToOne(mappedBy: 'cgo', cascade: ['persist', 'remove'])]
-    private ?TelematicArea $telematicArea = null;
-
     #[ORM\ManyToOne(inversedBy: 'cgos')]
     private ?City $city = null;
 
@@ -56,6 +53,9 @@ class Cgo
 
     #[ORM\Column(length: 255)]
     private ?string $Email = null;
+
+    #[ORM\ManyToOne(inversedBy: 'cgos')]
+    private ?TelematicArea $telematicArea = null;
 
     public function __construct()
     {
@@ -99,23 +99,6 @@ class Cgo
     public function setTerritoryColor(string $territoryColor): static
     {
         $this->territoryColor = $territoryColor;
-
-        return $this;
-    }
-
-    public function getTelematicArea(): ?TelematicArea
-    {
-        return $this->telematicArea;
-    }
-
-    public function setTelematicArea(TelematicArea $telematicArea): static
-    {
-        // set the owning side of the relation if necessary
-        if ($telematicArea->getCgo() !== $this) {
-            $telematicArea->setCgo($this);
-        }
-
-        $this->telematicArea = $telematicArea;
 
         return $this;
     }
@@ -229,6 +212,18 @@ class Cgo
     public function setEmail(string $Email): static
     {
         $this->Email = $Email;
+
+        return $this;
+    }
+
+    public function getTelematicArea(): ?TelematicArea
+    {
+        return $this->telematicArea;
+    }
+
+    public function setTelematicArea(?TelematicArea $telematicArea): static
+    {
+        $this->telematicArea = $telematicArea;
 
         return $this;
     }

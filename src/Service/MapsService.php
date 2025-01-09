@@ -38,45 +38,77 @@ class MapsService
 
         foreach($areas as $area)
         {
-            
-            //?si le cgo à au moins 1 département
+            //?si la zone contient au moins 1 département
             if($area->getDepartments()->count() > 0){
 
-                //?on recupere le shop
-                $cgo = $area->getCgo();
+                $contactCgo = "";
+                foreach($area->getCgos() as $cgo){
+                    //?comment contacter le cgo
+                    if($cgo->getManager() !== null){
 
-                //?comment contacter le shop
-                if($cgo->getManager() !== null){
+                        $contactCgo .= '<p><b>' . $cgo->getName() . '</b><br/> ' . $cgo->getManager()->getFirstName() . ' ' . $cgo->getManager()->getLastName() . ' <br/> ' . $cgo->getManager()->getPhone() . '<br/>' . $cgo->getManager()->getEmail().'</p>';
 
-                    $contactCgo = $cgo->getManager()->getFirstName() . ' ' . $cgo->getManager()->getLastName() . ' - ' . $cgo->getManager()->getPhone() . '<br/>' . $cgo->getManager()->getEmail();
+                    }else{
 
-                }else{
-
-                    $contactCgo = "MANAGER DE CGO NON RENSEIGNÉ !";
+                        $contactCgo = "MANAGER DE CGO NON RENSEIGNÉ !";
+                    }
                 }
 
-                $locations[] = 
-                [
-                    "lat" => $cgo->getCity()->getLatitude() ? $cgo->getCity()->getLatitude() : $cgo->getCity()->getLatitude(),
-                    "lng" => $cgo->getCity()->getLongitude() ? $cgo->getCity()->getLongitude() : $cgo->getCity()->getLongitude(),
-                    "color" => "#000000",
-                    "name" => $cgo->getName(),
-                    "description" => $contactCgo,
-                    "url" => $baseUrl,
-                    "size" => 20,
-                ];
+                //?on boucle sur les plusieurs cgo possible de la zone
+                foreach($area->getCgos() as $cgo){
 
-                //?on traite les departements ratachées au shop
-                $departments = $area->getDepartments();
-                foreach($departments as $department){
-            
-                    $states[$department->getSimplemapCode()] =
+                    $locations[] = 
                     [
-                        "name" => $department->getName().' ('.$department->getCode().')',
+                        "lat" => $cgo->getCity()->getLatitude() ? $cgo->getCity()->getLatitude() : $cgo->getCity()->getLatitude(),
+                        "lng" => $cgo->getCity()->getLongitude() ? $cgo->getCity()->getLongitude() : $cgo->getCity()->getLongitude(),
+                        "color" => "#000000",
+                        "name" => $cgo->getName(),
                         "description" => $contactCgo,
-                        "color" => $area->getCgo()->getTerritoryColor(),
+                        "url" => $baseUrl,
+                        "size" => 20,
                     ];
-                    
+
+                    // //?on rajoute les centres sous controle du cgo (option1)
+                    // foreach($cgo->getShopsUnderControls() as $shop){
+                    //     $locations[] = 
+                    //     [
+                    //         "lat" => $shop->getCity()->getLatitude() ? $shop->getCity()->getLatitude() : $shop->getCity()->getLatitude(),
+                    //         "lng" => $shop->getCity()->getLongitude() ? $shop->getCity()->getLongitude() : $shop->getCity()->getLongitude(),
+                    //         "color" => "#000000",
+                    //         "name" => $shop->getName(),
+                    //         "description" => $cgo->getName(),
+                    //         "url" => $baseUrl,
+                    //         "size" => 10,
+                    //     ];
+                    // }
+
+                    //?on traite les departements ratachées au shop
+                    $departments = $area->getDepartments();
+                    foreach($departments as $department){
+                
+                        // //?pour chaque departement on recupere les shops (option2)
+                        // $shops = $this->shopRepository->findAllShopsFromDepartment($department);
+                        // foreach($shops as $shop){
+                        //     $locations[] = 
+                        //     [
+                        //         "lat" => $shop->getCity()->getLatitude() ? $shop->getCity()->getLatitude() : $shop->getCity()->getLatitude(),
+                        //         "lng" => $shop->getCity()->getLongitude() ? $shop->getCity()->getLongitude() : $shop->getCity()->getLongitude(),
+                        //         "color" => "#000000",
+                        //         "name" => $shop->getName(),
+                        //         "description" => $cgo->getName(),
+                        //         "url" => $baseUrl,
+                        //         "size" => 10,
+                        //     ];
+                        // }
+
+                        $states[$department->getSimplemapCode()] =
+                        [
+                            "name" => $department->getName().' ('.$department->getCode().')',
+                            "description" => $contactCgo,
+                            "color" => $area->getTerritoryColor(),
+                        ];
+                        
+                    }
                 }
             }
         }

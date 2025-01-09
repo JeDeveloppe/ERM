@@ -15,9 +15,7 @@ class TelematicArea
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\OneToOne(inversedBy: 'telematicArea', cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Cgo $cgo = null;
+
 
     /**
      * @var Collection<int, Department>
@@ -28,26 +26,21 @@ class TelematicArea
     #[ORM\Column(length: 20)]
     private ?string $territoryColor = null;
 
+    /**
+     * @var Collection<int, Cgo>
+     */
+    #[ORM\OneToMany(targetEntity: Cgo::class, mappedBy: 'telematicArea')]
+    private Collection $cgos;
+
     public function __construct()
     {
         $this->departments = new ArrayCollection();
+        $this->cgos = new ArrayCollection();
     }
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getCgo(): ?Cgo
-    {
-        return $this->cgo;
-    }
-
-    public function setCgo(Cgo $cgo): static
-    {
-        $this->cgo = $cgo;
-
-        return $this;
     }
 
     /**
@@ -92,8 +85,34 @@ class TelematicArea
         return $this;
     }
 
-    public function __toString()
+    /**
+     * @return Collection<int, Cgo>
+     */
+    public function getCgos(): Collection
     {
-        return $this->cgo->getName();
+        return $this->cgos;
     }
+
+    public function addCgo(Cgo $cgo): static
+    {
+        if (!$this->cgos->contains($cgo)) {
+            $this->cgos->add($cgo);
+            $cgo->setTelematicArea($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCgo(Cgo $cgo): static
+    {
+        if ($this->cgos->removeElement($cgo)) {
+            // set the owning side to null (unless already changed)
+            if ($cgo->getTelematicArea() === $this) {
+                $cgo->setTelematicArea(null);
+            }
+        }
+
+        return $this;
+    }
+
 }
