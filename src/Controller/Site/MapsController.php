@@ -4,6 +4,7 @@ namespace App\Controller\Site;
 
 use App\Service\MapsService;
 use App\Repository\ShopClassRepository;
+use App\Repository\TelematicAreaRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -12,7 +13,8 @@ class MapsController extends AbstractController
 {
     public function __construct(
         private MapsService $mapsService,
-        private ShopClassRepository $shopClassRepository
+        private ShopClassRepository $shopClassRepository,
+        private TelematicAreaRepository $telematicAreaRepository
     )
     {
     }
@@ -91,9 +93,12 @@ class MapsController extends AbstractController
         //?on recupere les donnees dans le service
         $donnees = $this->mapsService->constructionMapOfTelematique();
 
+        $telematicAreas = $this->telematicAreaRepository->findAll();
+
         return $this->render('site/maps/telematic.html.twig', [
             'donnees' => $donnees,
             'title' => 'Zones télématiques MV',
+            'telematicAreas' => $telematicAreas
         ]);
     }
 }

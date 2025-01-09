@@ -7,7 +7,7 @@
     <div class="js-locations" data-locations="{{ donnees.locations }}"></div>
     <div class="js-states" data-states="{{ donnees.states }}"></div>
 	
-	<div class="row g-0 justify-content-center align-items-center">
+	<div class="row g-0 justify-content-center align-items-center mb-5">
 		<h1 class="col-12 text-center my-5">{{ title }}</h1>
 		<div class="col-9 col-md-6 col-lg-5 d-flex justify-content-center align-items-center">
 			{# affichage de la carte de France #}
@@ -15,6 +15,29 @@
 			<script type="text/javascript" src="{{ asset('map/countrymap_france.js') }}"></script>
 			<div id="map"></div>
 		</div>
+	</div>
+
+	<div class="row g-0 justify-content-center my-5">
+		{% for telematicArea in telematicAreas %}
+			{% if telematicArea.departments | length > 0 %}
+				<div class="col-11 col-sm-8 col-md-6 col-lg-4 col-xxl-3 mb-3">
+					<div class="card col-11 mx-auto shadow border-dark">
+						<div class="card-header" style="background-color: {{ telematicArea.territoryColor }}; height: 20px"></div>					
+						<div class="card-body">
+							{% for cgo in telematicArea.cgos %}
+								<p>
+									<h5>{{ cgo.name }}</h5>
+									{{ cgo.manager.firstName }} {{ cgo.manager.lastName }}<br/>
+									{{ cgo.manager.phone }}<br/>
+									{{ cgo.manager.email}}
+
+								</p>
+							{% endfor %}
+						</div>
+					</div>
+				</div>
+			{% endif %}
+		{% endfor %}
 	</div>
 
 
