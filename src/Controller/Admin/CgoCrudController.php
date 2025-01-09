@@ -10,7 +10,9 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ColorField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
+use Symfony\Component\DomCrawler\Form;
 
 class CgoCrudController extends AbstractCrudController
 {
@@ -22,13 +24,17 @@ class CgoCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         return [
-            IntegerField::new('cm'),
-            TextField::new('name', 'Nom:'),
-            TextField::new('address', 'Adresse:'),
-            AssociationField::new('city', 'Ville:'),
-            TextField::new('ZoneName','Nom de zone:'),
-            ColorField::new('territoryColor', 'Couleur de la zone:'),
-            AssociationField::new('shopsUnderControls')
+            FormField::addTab('Informations'),
+                IntegerField::new('cm')->setDisabled(true),
+                TextField::new('name', 'Nom:')->setDisabled(true),
+                TextField::new('address', 'Adresse:'),
+                AssociationField::new('city', 'Ville:')->autocomplete(),
+                // TextField::new('ZoneName','Nom de zone:'),
+                ColorField::new('territoryColor', 'Couleur de la zone:'),
+
+            FormField::addTab('Les centres'),
+            AssociationField::new('shopsUnderControls', 'Nombre de centres:')->onlyOnIndex(),
+            AssociationField::new('shopsUnderControls', 'Les centres de la zone:')->onlyOnForms(),
         ];
     }
 
