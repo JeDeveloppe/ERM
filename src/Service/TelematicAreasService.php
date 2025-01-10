@@ -3,9 +3,11 @@
 namespace App\Service;
 
 use App\Entity\Cgo;
+use App\Entity\Department;
 use League\Csv\Reader;
 use App\Entity\TelematicArea;
 use App\Repository\CgoRepository;
+use App\Repository\DepartmentRepository;
 use App\Repository\ShopClassRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\TelematicAreaRepository;
@@ -19,7 +21,8 @@ class TelematicAreasService
         private TelematicAreaRepository $telematicAreaRepository,
         private ShopClassRepository $shopClassRepository,
         private CgoRepository $cgoRepository,
-        private MapsService $mapsService
+        private MapsService $mapsService,
+        private DepartmentRepository $departmentRepository
         ){
     }
 
@@ -62,4 +65,47 @@ class TelematicAreasService
         return $cgoArea;
     }
 
+    public function importDepartmentsInTelematicsAreas(SymfonyStyle $io): void
+    {
+        $io->title('Importation des départements dans les zones télématiques');
+
+            $totals = $this->readCsvFileDepartments();
+        
+            $io->progressStart(count($totals));
+
+            foreach($totals as $arrayTotal){
+
+                $io->progressAdvance();
+                $entity = $this->createOrUpdateDepartment($arrayTotal);
+                $this->em->persist($entity);
+            }
+            $this->em->flush();
+
+            $io->progressFinish();
+        
+        $io->success('Importation terminée');
+    }
+
+    private function readCsvFileDepartments(): Reader
+    {
+        $csv = Reader::createFromPath('%kernel.root.dir%/../import/departments.csv','r');
+        $csv->setHeaderOffset(0);
+
+        return $csv;
+    }
+
+    private function createOrUpdateDepartment(array $arrayEntity): Department
+    {
+        $department = $this->departmentRepository->findOneByCode($arrayEntity['code']);
+
+        if(!$department){
+            $department = new Department();
+        }
+
+        //"id","large_region_id","telematic_area_id","name","slug","code","simplemap_code"
+        $department
+            ->setTelematicArea($this->telematicAreaRepository->find($arrayEntity['telematic_area_id']));
+
+        return $department;
+    }
 }

@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Manager;
+use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
@@ -29,7 +30,18 @@ class ManagerCrudController extends AbstractCrudController
             FormField::addTab('Manager de'),
                 AssociationField::new('regionErm', 'Region ERM:')->onlyOnForms(),
                 AssociationField::new('zoneErm', 'Zone ERM:')->onlyOnForms(),
-                AssociationField::new('shop', 'Centre ERM:')->onlyOnForms(),
+                AssociationField::new('cgos', 'CGO(s):')->onlyOnForms()
+                    ->setQueryBuilder(fn(QueryBuilder $queryBuilder) => 
+                            $queryBuilder
+                                ->orderBy('entity.name', 'ASC')
+                        )
+                    ->setFormTypeOptions(['placeholder' => 'Séléctionner un CGO', 'by_reference' => false, 'multiple' => true]),
+                AssociationField::new('shops', 'Centre ERM:')->onlyOnForms()
+                    ->setQueryBuilder(fn(QueryBuilder $queryBuilder) => 
+                    $queryBuilder
+                        ->orderBy('entity.name', 'ASC')
+                    )
+                    ->setFormTypeOptions(['placeholder' => 'Séléctionner un centre', 'by_reference' => false, 'multiple' => true]),
         ];
     }
 
@@ -39,7 +51,7 @@ class ManagerCrudController extends AbstractCrudController
             ->setPageTitle('index', 'Liste des managers')
             ->setPageTitle('new', 'Nouveau manager')
             ->setPageTitle('edit', 'Modifier le manager')
-            ->setSearchFields(['managerClass.name', 'lastName', 'firstName', 'phone', 'email', 'regionErm.name', 'zoneErm.name', 'shop.name'])
+            ->setSearchFields(['managerClass.name', 'lastName', 'firstName', 'phone', 'email', 'regionErm.name', 'zoneErm.name', 'shops.name'])
             ->showEntityActionsInlined();
     }
 }

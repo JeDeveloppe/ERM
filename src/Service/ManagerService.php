@@ -38,8 +38,8 @@ class ManagerService
                 $io->progressAdvance();
                 $entity = $this->createOrUpdateRCS($arrayTotal);
                 $this->em->persist($entity);
+                $this->em->flush($entity);
             }
-            $this->em->flush($entity);
 
             //on cré un manager générique au cas ou il en manque un
             $this->createOrUpdateFakeManager('manager.inconnu@euromaster.com', 'RCS');

@@ -65,7 +65,8 @@ class InitDataBase extends Command
         // $this->cgoService->importCgos($io);
         // $this->cgoService->importShopsUnderControls($io);
         // $this->shopService->updateShops($io);
-        //$this->telematicAreasService->importCgoTelematicAreas($io);
+        // $this->telematicAreasService->importCgoTelematicAreas($io);
+        // $this->telematicAreasService->importDepartmentsInTelematicsAreas($io);
 
         return Command::SUCCESS;
     }

@@ -35,10 +35,6 @@ class Shop
     #[ORM\ManyToOne(inversedBy: 'shops')]
     private ?City $city = null;
 
-    #[ORM\ManyToOne(inversedBy: 'shop')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Manager $manager = null;
-
     #[ORM\Column(length: 25)]
     private ?string $phone = null;
 
@@ -47,6 +43,9 @@ class Shop
      */
     #[ORM\ManyToMany(targetEntity: Cgo::class, mappedBy: 'shopsUnderControls')]
     private Collection $cgos;
+
+    #[ORM\ManyToOne(inversedBy: 'shops')]
+    private ?Manager $manager = null;
 
     public function __construct()
     {
@@ -130,18 +129,6 @@ class Shop
         return $this;
     }
 
-    public function getManager(): ?Manager
-    {
-        return $this->manager;
-    }
-
-    public function setManager(?Manager $manager): static
-    {
-        $this->manager = $manager;
-
-        return $this;
-    }
-
     public function getPhone(): ?string
     {
         return $this->phone;
@@ -182,6 +169,18 @@ class Shop
         if ($this->cgos->removeElement($cgo)) {
             $cgo->removeShopsUnderControl($this);
         }
+
+        return $this;
+    }
+
+    public function getManager(): ?Manager
+    {
+        return $this->manager;
+    }
+
+    public function setManager(?Manager $manager): static
+    {
+        $this->manager = $manager;
 
         return $this;
     }

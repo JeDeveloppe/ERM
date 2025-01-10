@@ -24,8 +24,6 @@ class Manager
     /**
      * @var Collection<int, Shop>
      */
-    #[ORM\OneToMany(targetEntity: Shop::class, mappedBy: 'manager')]
-    private Collection $shop;
 
     #[ORM\Column(length: 255)]
     private ?string $firstName = null;
@@ -54,11 +52,18 @@ class Manager
     #[ORM\OneToMany(targetEntity: Cgo::class, mappedBy: 'manager')]
     private Collection $cgos;
 
+    /**
+     * @var Collection<int, Shop>
+     */
+    #[ORM\OneToMany(targetEntity: Shop::class, mappedBy: 'manager')]
+    private Collection $shops;
+
     public function __construct()
     {
         $this->shop = new ArrayCollection();
         $this->zoneErms = new ArrayCollection();
         $this->cgos = new ArrayCollection();
+        $this->shops = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -86,36 +91,6 @@ class Manager
     public function setZoneErm(?ZoneErm $zoneErm): static
     {
         $this->zoneErm = $zoneErm;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Shop>
-     */
-    public function getShop(): Collection
-    {
-        return $this->shop;
-    }
-
-    public function addShop(Shop $shop): static
-    {
-        if (!$this->shop->contains($shop)) {
-            $this->shop->add($shop);
-            $shop->setManager($this);
-        }
-
-        return $this;
-    }
-
-    public function removeShop(Shop $shop): static
-    {
-        if ($this->shop->removeElement($shop)) {
-            // set the owning side to null (unless already changed)
-            if ($shop->getManager() === $this) {
-                $shop->setManager(null);
-            }
-        }
 
         return $this;
     }
@@ -212,7 +187,20 @@ class Manager
 
     public function __toString()
     {
-        return $this->firstName.' '.$this->lastName;
+        if($this->getShops() !== null){
+            $shops = '';
+            foreach($this->getShops() as $shop){
+                $shops .= ' '.$shop->getCm().'-';
+            }
+            //?on supprime le premier charactère
+            $shops = substr($shops, 1);
+            //?on supprime le dernier charactère
+            $shops = substr($shops, 0, -1);
+            $shops = ' ('.$shops.')';
+        }else{
+            $shops = '()';
+        }
+        return $this->firstName.' '.$this->lastName.$shops;
     }
 
     /**
@@ -239,6 +227,36 @@ class Manager
             // set the owning side to null (unless already changed)
             if ($cgo->getManager() === $this) {
                 $cgo->setManager(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Shop>
+     */
+    public function getShops(): Collection
+    {
+        return $this->shops;
+    }
+
+    public function addShop(Shop $shop): static
+    {
+        if (!$this->shops->contains($shop)) {
+            $this->shops->add($shop);
+            $shop->setManager($this);
+        }
+
+        return $this;
+    }
+
+    public function removeShop(Shop $shop): static
+    {
+        if ($this->shops->removeElement($shop)) {
+            // set the owning side to null (unless already changed)
+            if ($shop->getManager() === $this) {
+                $shop->setManager(null);
             }
         }
 
