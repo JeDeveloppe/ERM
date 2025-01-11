@@ -1,46 +1,46 @@
 # ERM MAPS
-***
 Display all shops from ERM in France.
 
 
-# HELPER MISE EN PRODUCTION
+***
+## HELPER MISE EN PRODUCTION
 
-## SE CONNECTER AU SERVEUR
+### SE CONNECTER AU SERVEUR
     - ssh...
     - password
 
-## CE DEPLACER DANS LE DOSSIER OU L'ON VA METTRE LE PROJET
-## CLONER LE DEPOT GITHUB (SOIT PUBLIC, SOIT CLEF PRIVEE)
+### CE DEPLACER DANS LE DOSSIER OU L'ON VA METTRE LE PROJET
+### CLONER LE DEPOT GITHUB (SOIT PUBLIC, SOIT CLEF PRIVEE)
     - git clone ...
 
-## CE DEPLACER DANS LE DOSSIER DU PROJET
+### CE DEPLACER DANS LE DOSSIER DU PROJET
     - cd {nom du projet}
 
-## INSTALLER COMPOSER DANS LE PROJET
+### INSTALLER COMPOSER DANS LE PROJET
     - curl -sS https://getcomposer.org/installer
     -> permet d'utiliser la commande:  /usr/bin/php8.2-cli
     -> exemple: /usr/bin/php8.2-cli bin/console d:m:m
 
-## EN LOCAL PUIS TRANSFERT PAR FTP
+### EN LOCAL PUIS TRANSFERT PAR FTP
     - mettre fichier .env = PROD
     - transferer les dossiers .env ET .env.prod sur le serveur
 
-## INSTALLER LES DEPENDANCES DU PROJET
+### INSTALLER LES DEPENDANCES DU PROJET
     - /usr/bin/php8.2-cli composer.phar install
 
-## FAIRE TOURNER LES MIGRATIONS OU METTRE LA BDD EN PLACE
+### FAIRE TOURNER LES MIGRATIONS OU METTRE LA BDD EN PLACE
     - /usr/bin/php8.2-cli bin/console d:m:m
     - /usr/bin/php8.2-cli bin/console d:s:u --force
 
-## ON INITIALISE LE PROJET
+### ON INITIALISE LE PROJET
     - /usr/bin/php8.2-cli bin/console app:initdatabase ...
 
-## SI PROJET SYMFONY > À 6.4 ON COMPILE LES ASSETS
+### SI PROJET SYMFONY > À 6.4 ON COMPILE LES ASSETS
     - /usr/bin/php8.2-cli bin/console asset-map:compile
 
-## TRANSFERT PAR FTP ?
+### TRANSFERT PAR FTP ?
     - dossier IMPORT ?
     - dossier PUBLIC ? 
 
-## SUR HEBERGEUR
+### SUR HEBERGEUR
     - faire pointer l'espace web sur le dossier public
