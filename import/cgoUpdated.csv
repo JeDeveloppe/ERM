@@ -1,0 +1,20 @@
+"id","city_id","region_erm_id","name","address","territory_color","cm","zone_name","manager_id","class_erm_id","email","telematic_area_id"
+"1","25067","1","CGO VI Clermont Lumière","Centre ERM Lumière, ZI Le Brézet 63 100 Clermont-Ferrand","#4c0f15","3425","Clermont","317","1","gen.fr.cgovl.clermont@euromaster.com","1"
+"2","25067","1","CGO VL Clermont Lumière","Centre ERM Lumière, ZI Le Brézet","#7e3592","3414","Clermont","317","3","gen.fr.cgovi.clermont@euromaster.com",NULL
+"3","6955","36","CGO VI Dijon","Parc Tertiaire Mirande batiment H 14 rue Pierre de Coubertin","#f8f11b","3408","Dijon","318","1","gen.fra.cgovi.dijon@euromaster.com","2"
+"4","6955","36","CGO VL Dijon","Parc Tertiaire Mirande batiment H 14 rue Pierre de Coubertin","#cf55fa","3420","Dijon","319","3","gen.fr.cgovl.dijon@euromaster.com",NULL
+"5","13511","68","CGO VI Rennes Cesson","Centre ERM Cesson Rue des Charmilles Chantepie 35510 Cesson Sévigné","#74d6e2","3406","Cesson","320","1","gen.fr.cgovi.rennes@euromaster.com","3"
+"6","13511","68","CGO VL Rennes Cesson","Centre ERM Cesson Rue des Charmilles Chantepie","#ce74c2","3412","Cesson","321","3","gen.fr.cgovl.rennes@euromaster.com",NULL
+"7","4743","68","CGO VI Grentheville","Centre ERM Caen ZI de Mondeville","#01e784","3428","Grentheville","322","1","cgovi-grentheville@euromaster.com","5"
+"8","33939","102","CGO VL Limoges VL","Centre ERM Limoges 51 RUE CLAUDE. HENRI GORCEIX","#a36d4a","3427","Limoges","323","3","gen.fr.cgovl.limoges@euromaster.com",NULL
+"9","33939","102","CGO VI Limoges","Centre ERM Limoges 51 RUE CLAUDE. HENRI GORCEIX","#b873b4","3429","Limoges","324","1","gen.fr.cgovi.limoges@euromaster.com","6"
+"10","14099","102","CGO VI Chambray les tours","Centre ERM Chambray 14 Rue Jean Perrin","#e271ae","3407","Chambray Les Tours","325","1","gen.fra.cgovi.tours@euromaster.com","6"
+"11","22651","135","CGO VI Lesquin","Centre ERM Lesquin Rue de la croix Bougard Crt","#3a2b2c","3426","Lesquin","326","1","gen.fr.cgovi.lesquin@euromaster.com","7"
+"12","22651","135","CGO VL Lesquin","Centre ERM Lesquin Rue de la croix Bougard Crt","#f1e6e3","3421","Lesquin","326","3","gen.fr.cgovl.lesquin@euromaster.com",NULL
+"13","35296","166","CGO VI Antony","Centre ERM Antony, 12 14 avenue Sommer","#7a681c","3410","Antony","327","1","gen.fr.cgovi.antony@euromaster.com","8"
+"14","35296","166","CGO VL Antony","Centre ERM Antony, 12 14 avenue Sommer","#18a7d6","3418","Antony","328","3","gen.fr.cgovl.antony@euromaster.com",NULL
+"15","13288","263","CGO VL Montpellier","159 Rue de Thor, étage 1","#583f53","3422","Montpellier","329","3","gen.fr.cgovl.montpellier@euromaster.com",NULL
+"16","13288","263","CGO VI Montpellier","159 Rue de Thor, étage 1","#1a6599","3423","Montpellier","330","1","gen.fr.cgovi.montpellier@euromaster.com","9"
+"17","27810","231","CGO VL Lyon/Venissieux","Centre ERM Vénissieux 63/65 rue André Sentuc","#3e5d87","3409","Lyon","333","3","gen.fr.cgovl.venissieux@euromaster.com",NULL
+"18","14679","231","CGO VI St Egrève","Centre ERM ST Egrève Avenue de L'Ile Brune ZI","#861ffe","3411","St_Egreve","331","1","gen.fra.cgovi.stegreve@euromaster.com","10"
+"19","14679","231","CGO VL St Egrève","Centre ERM ST Egrève Avenue de L'Ile Brune ZI","#683a05","3416","St_Egreve","331","3","gen.fr.cgovl.stegreve@euromaster.com",NULL

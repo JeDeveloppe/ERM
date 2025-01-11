@@ -123,66 +123,6 @@ class MapsService
         return $donnees;
     }
 
-    // public function constructionOperationnalMapByShops()
-    // {
-
-    //     //? on recupere l'url de base
-    //     $baseUrl = $this->requestStack->getCurrentRequest()->getScheme() . '://' . $this->requestStack->getCurrentRequest()->getHttpHost() . $this->requestStack->getCurrentRequest()->getBasePath();
-    //     //?on recupere les shops concernés
-    //     $areas = $this->shopOperationalAreaRepository->findAll();
-
-    //     $locations = []; //? toutes les réponses seront dans ce tableau final
-
-    //     foreach($areas as $area)
-    //     {
-
-    //         //?on recupere le shop
-    //         $cgoWhoControlsTheArea = $area->getCgoWhoControlsTheArea();
-
-    //         //?comment contacter le shop
-    //         $managerFromCgoWhoControlsTheArea = $cgoWhoControlsTheArea->getManager();
-    //         $contactCgoWhoControlsTheArea = $managerFromCgoWhoControlsTheArea->getFirstName() . ' ' . $managerFromCgoWhoControlsTheArea->getLastName() . ' <br/> ' . $managerFromCgoWhoControlsTheArea->getPhone() . '<br/>' . $managerFromCgoWhoControlsTheArea->getEmail();
-
-    //         $locations[] = 
-    //         [
-    //             "lat" => $cgoWhoControlsTheArea->getLatitude() ? $cgoWhoControlsTheArea->getLatitude() : $cgoWhoControlsTheArea->getCity()->getLatitude(),
-    //             "lng" => $cgoWhoControlsTheArea->getLongitude() ? $cgoWhoControlsTheArea->getLongitude() : $cgoWhoControlsTheArea->getCity()->getLongitude(),
-    //             "color" => $cgoWhoControlsTheArea->getTerritoryColor(),
-    //             "name" => $cgoWhoControlsTheArea->getName(),
-    //             "description" => $contactCgoWhoControlsTheArea,
-    //             "url" => $baseUrl,
-    //             "size" => 20,
-    //         ];
-
-    //         //?on traite les departements ratachées au shop
-    //         $shops = $area->getShopsUnderControl();
-    //         foreach($shops as $shop){
-                
-    //             $contactShop = $shop->getManager()->getFirstName() . ' ' . $shop->getManager()->getLastName() . ' <br/> ' . $shop->getManager()->getPhone() . '<br/>' . $shop->getManager()->getEmail();
-                
-    //             $locations[] =
-    //             [
-    //                 "name" => $shop->getName(),
-    //                 "description" => $contactShop,
-    //                 "color" => $cgoWhoControlsTheArea->getTerritoryColor(),
-    //                 "size" => 15,
-    //                 "lat" => $shop->getLatitude(),
-    //                 "lng" => $shop->getLongitude()
-    //             ];
-                
-    //         }
-    //     }
-
-    //     //?on encode en json
-    //     $jsonLocations = json_encode($locations, JSON_FORCE_OBJECT); 
-    //     // $jsonStates = json_encode($locations, JSON_FORCE_OBJECT); 
-
-    //     $donnees['locations'] = $jsonLocations;
-    //     // $donnees['states'] = $jsonStates;
-
-    //     return $donnees;
-    // }
-
     public function constructionMapOfAllShops()
     {
 
@@ -217,7 +157,7 @@ class MapsService
                     "name" => $shop->getName().' ('.$shop->getCm().')',
                     "description" => $contactShop,
                     "url" => $baseUrl,
-                    "size" => 15,
+                    "size" => 10,
                 ];
             }
         }
@@ -352,6 +292,19 @@ class MapsService
 
         foreach($cgos as $cgo)
         {
+            //?le cgo
+            $locations[] = 
+            [
+                "lat" => $cgo->getCity()->getLatitude(),
+                "lng" => $cgo->getCity()->getLongitude(),
+                "color" => $cgo->getTerritoryColor() ?? $this->randomHexadecimalColor(),
+                "name" => $cgo->getName().' ('.$cgo->getCm().')',
+                "description" => $cgo->getManager()->getFirstName().' '.$cgo->getManager()->getLastName(),
+                "size" => 20,
+                'type' => 'image',
+                'image_url' => $baseUrl.'assets/images/mapq/phone.png'
+            ];
+            
             $shops = $cgo->getShopsUnderControls();
 
             foreach($shops as $shop)

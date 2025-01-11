@@ -16,7 +16,8 @@ class ZoneErmService
     public function __construct(
         private EntityManagerInterface $em,
         private ZoneErmRepository $zoneErmRepository,
-        private RegionErmRepository $regionErmRepository
+        private RegionErmRepository $regionErmRepository,
+        private MapsService $mapsService
         ){
     }
 
@@ -61,7 +62,7 @@ class ZoneErmService
             $zoneErm = new ZoneErm();
         }
 
-        $zoneErm->setName($arrayEntity['Secteur RA VL ou Zone MV'])->setRegionErm($regionErm);
+        $zoneErm->setName($arrayEntity['Secteur RA VL ou Zone MV'])->setRegionErm($regionErm)->setTerritoryColor($this->mapsService->randomHexadecimalColor());
 
         return $zoneErm;
     }

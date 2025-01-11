@@ -1,3 +1,7 @@
 body {
-    background-color: skyblue;
+    background-color: #f0f0f0;
+}
+.footerIconeSize {
+    width: 40px;
+    height: 40px;
 }

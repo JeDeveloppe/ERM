@@ -51,7 +51,7 @@ class TelematicAreasService
 
     private function createOrUpdate(Cgo $entity): TelematicArea
     {
-        $cgoArea = $this->telematicAreaRepository->findOneByCgo($entity);
+        $cgoArea = $this->telematicAreaRepository->findTerritoryFromCgo($entity);
 
         if(!$cgoArea){
             $cgoArea = new TelematicArea();
@@ -59,7 +59,7 @@ class TelematicAreasService
 
         //"id","cgo_who_controls_area_id","zone_color"
         $cgoArea
-            ->setCgo($this->cgoRepository->find($entity))
+            ->addCgo($this->cgoRepository->find($entity))
             ->setTerritoryColor($this->mapsService->randomHexadecimalColor());
 
         return $cgoArea;

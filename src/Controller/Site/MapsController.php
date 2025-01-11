@@ -19,7 +19,7 @@ class MapsController extends AbstractController
     {
     }
 
-    #[Route('/maps/tous-les-centres-de-france', name: 'app_map_all_shops')]
+    #[Route('/maps/france/tous-les-centres', name: 'app_map_all_shops')]
     public function mapAllShops(): Response
     {
         //?on recupere les donnees dans le service
@@ -27,14 +27,14 @@ class MapsController extends AbstractController
 
         return $this->render('site/maps/all_shops.html.twig', [
             'donnees' => $donnees,
-            'title' => 'Tous les centres',
+            'title' => 'Tous les centres ERM',
         ]);
     }
 
-    #[Route('/maps/tous-les-centres-de-france-sous-cgo-{classeName}', name: 'app_map_all_shops_under_cgo')]
+    #[Route('/maps/france/centres-sous-cgo-{classeName}', name: 'app_map_all_shops_under_cgo')]
     public function mapAllShopsUnderCgo(string $classeName): Response
     {
-        $class = $this->shopClassRepository->findOneByName($classeName);
+        $class = $this->shopClassRepository->findOneByName(strtoupper($classeName));
 
         if($class){
 
@@ -68,7 +68,7 @@ class MapsController extends AbstractController
     #[Route('/maps/toutes-les-zones-{classeName}', name: 'app_map_all_zones')]
     public function mapAllZonesByClasse(string $classeName): Response
     {
-        $classe = $this->shopClassRepository->findOneByName($classeName);
+        $classe = $this->shopClassRepository->findOneByName(strtoupper($classeName));
 
         if($classe){
 
