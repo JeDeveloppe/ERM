@@ -155,8 +155,6 @@ class CgoService
 
                 $shop->addCgo($cgo);
 
-            }else{
-                dd('pas de cgo pour centre '.$shop->getCm());
             }
             
         }else if(strlen($arrayEntity['Rattachement direct CGO VI']) == 1 && strlen($arrayEntity['Rattachement direct CGO VL']) > 1){
@@ -165,8 +163,6 @@ class CgoService
             if($cgo instanceof Cgo){
 
                 $shop->addCgo($cgo);
-            }else{
-                dd('pas de cgo pour centre '.$shop->getCm());
             }
 
         }else if(strlen($arrayEntity['Rattachement direct CGO VI']) > 1 && strlen($arrayEntity['Rattachement direct CGO VL']) > 1){
@@ -179,9 +175,6 @@ class CgoService
                 }
             }
 
-        }else{
-
-            dump('Aucun cgo pour centre '.$shop->getCm());
         }
 
         return $shop;
