@@ -13,6 +13,7 @@ use App\Entity\Department;
 use App\Entity\LargeRegion;
 use App\Entity\ManagerClass;
 use App\Entity\TelematicArea;
+use App\Entity\User;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
@@ -58,6 +59,8 @@ class DashboardController extends AbstractDashboardController
             MenuItem::linkToCrud('Les villes', 'fas fa-list', City::class),
             MenuItem::linkToCrud('Les départements', 'fas fa-list', Department::class),
             MenuItem::linkToCrud('Les grandes régions', 'fas fa-list', LargeRegion::class),
+            MenuItem::section('Configuration des accès:'),
+            MenuItem::linkToCrud('Les utilisateurs', 'fas fa-list', User::class),
         ];
 
     }

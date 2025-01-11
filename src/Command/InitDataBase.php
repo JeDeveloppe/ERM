@@ -14,6 +14,7 @@ use App\Service\RegionErmServiceService;
 use App\Service\ShopClassService;
 use App\Service\ShopService;
 use App\Service\TelematicAreasService;
+use App\Service\UserService;
 use App\Service\ZoneErmService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -36,7 +37,8 @@ class InitDataBase extends Command
         private ShopService $shopService,
         private ManagerClassService $managerClassService,
         private CgoService $cgoService,
-        private TelematicAreasService $telematicAreasService
+        private TelematicAreasService $telematicAreasService,
+        private UserService $userService
         )
     {
         parent::__construct();
@@ -50,24 +52,25 @@ class InitDataBase extends Command
 
         $io = new SymfonyStyle($input,$output);
 
-        $this->largeregionService->importLargesregions($io);
-        $this->departmentService->importDepartementsFrancais($io);
-        $this->cityService->importCitiesOfFrance($io);
-        $this->managerClassService->importManagerClass($io);
-        $this->regionErmService->importRegionserm($io);
-        $this->zoneErmService->importZoneserm($io);
-        $this->shopClassService->importShopClasses($io);
-        $this->managerService->importRcsManagers($io);
-        $this->managerService->importDrManagers($io);
-        $this->managerService->importRAVL_RZManagers($io);
-        $this->managerService->importAOManagers($io);
-        $this->shopService->importShops($io);
-        $this->cgoService->importCgos($io);
-        $this->cgoService->importShopsUnderControls($io);
-        $this->shopService->updateShops($io);
-        $this->telematicAreasService->importCgoTelematicAreas($io);
-        $this->telematicAreasService->importDepartmentsInTelematicsAreas($io);
-        $this->cgoService->updateCgos($io);
+        $this->userService->initAdmin($io);
+        // $this->largeregionService->importLargesregions($io);
+        // $this->departmentService->importDepartementsFrancais($io);
+        // $this->cityService->importCitiesOfFrance($io);
+        // $this->managerClassService->importManagerClass($io);
+        // $this->regionErmService->importRegionserm($io);
+        // $this->zoneErmService->importZoneserm($io);
+        // $this->shopClassService->importShopClasses($io);
+        // $this->managerService->importRcsManagers($io);
+        // $this->managerService->importDrManagers($io);
+        // $this->managerService->importRAVL_RZManagers($io);
+        // $this->managerService->importAOManagers($io);
+        // $this->shopService->importShops($io);
+        // $this->cgoService->importCgos($io);
+        // $this->cgoService->importShopsUnderControls($io);
+        // $this->shopService->updateShops($io);
+        // $this->telematicAreasService->importCgoTelematicAreas($io);
+        // $this->telematicAreasService->importDepartmentsInTelematicsAreas($io);
+        // $this->cgoService->updateCgos($io);
 
         return Command::SUCCESS;
     }
