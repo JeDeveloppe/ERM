@@ -18,8 +18,9 @@ Display all shops from ERM in France.
 
 ### INSTALLER COMPOSER DANS LE PROJET
     - curl -sS https://getcomposer.org/installer
-    -> permet d'utiliser la commande:  /usr/bin/php8.2-cli
-    -> exemple: /usr/bin/php8.2-cli bin/console d:m:m
+
+Cela permet d'utiliser la commande:  /usr/bin/php8.2-cli
+Exemple: /usr/bin/php8.2-cli bin/console d:m:m
 
 ### EN LOCAL PUIS TRANSFERT PAR FTP
     - mettre fichier .env = PROD
