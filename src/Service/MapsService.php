@@ -22,7 +22,7 @@ class MapsService
             private ZoneErmRepository $zoneErmRepository,
             private RegionErmRepository $regionErmRepository,
             private TelematicAreaRepository $telematicAreaRepository,
-            private CgoRepository $cgoRepository
+            private CgoRepository $cgoRepository,
         ){}
 
     public function constructionMapOfTelematique()

@@ -19,6 +19,45 @@ class MapsController extends AbstractController
     {
     }
 
+    #[Route('/maps', name: 'app_maps_choices')]
+    public function mapsChoices(): Response
+    {
+        $routes = [];
+        $routes[] = [
+            'url' => $this->generateUrl('app_map_all_shops'),
+            'name' => 'Tous les centres'
+        ];
+        $routes[] = [
+            'url' => $this->generateUrl('app_map_all_shops_under_cgo', ['classeName' => 'mv']),
+            'name' => 'Tous les centres sous cgo MV'
+        ];
+        $routes[] = [
+            'url' => $this->generateUrl('app_map_all_shops_under_cgo', ['classeName' => 'vl']),
+            'name' => 'Tous les centres sous cgo VL'
+        ];
+        $routes[] = [
+            'url' => $this->generateUrl('app_map_all_regions'),
+            'name' => 'Toutes les régions'
+        ];
+        $routes[] = [
+            'url' => $this->generateUrl('app_map_all_zones', ['classeName' => 'mv']),
+            'name' => 'Toutes les zones MV'
+        ];
+        $routes[] = [
+            'url' => $this->generateUrl('app_map_all_zones', ['classeName' => 'vl']),
+            'name' => 'Toutes les zones VL'
+        ];
+        $routes[] = [
+            'url' => $this->generateUrl('app_map_telematique'),
+            'name' => 'Toutes les zones télématiques'
+        ];
+
+        return $this->render('site/maps/choices.html.twig', [
+            'title' => 'Les cartes possibles',
+            'routes' => $routes
+        ]);
+    }
+
     #[Route('/maps/france/tous-les-centres', name: 'app_map_all_shops')]
     public function mapAllShops(): Response
     {
