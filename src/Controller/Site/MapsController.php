@@ -53,7 +53,7 @@ class MapsController extends AbstractController
         ];
 
         return $this->render('site/maps/choices.html.twig', [
-            'title' => 'Les cartes possibles',
+            'title' => 'Les cartes',
             'routes' => $routes
         ]);
     }

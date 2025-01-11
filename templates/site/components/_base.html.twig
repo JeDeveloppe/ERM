@@ -19,12 +19,8 @@
         {% endblock %}
     </head>
     <body class="d-flex flex-column vh-100">
-		{% if is_granted('ROLE_USER') %}
-            {% include "site/components/_navbar_connected.html.twig" %}
-        {% else %}
-            {% include "site/components/_navbar_no_connected.html.twig" %}
-        {% endif %}
 
+        {% include "site/components/_navbar.html.twig" %}
 
         <div class="container">
             {% block body %}{% endblock %}
