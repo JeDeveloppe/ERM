@@ -59,13 +59,14 @@ class DepartmentService
             $departement = new Department();
         }
 
-        // "id","largeregion_id","cgo_telematic_area_id","name","slug","code","simplemap_code"
+        //"id","large_region_id","telematic_area_id","name","slug","code","simplemap_code"
 
-        $departement->setName($arrayDepartement['name'])
-                ->setCode(strval($arrayDepartement['code']))
-                ->setSlug($this->sluggerInterface->slug($arrayDepartement['slug']))
-                ->setSimplemapCode($arrayDepartement['simplemap_code'])
-                ->setLargeregion($this->largeregionRepository->findOneBy(['id' => $arrayDepartement['largeregion_id'] ]));
+        $departement
+            ->setName($arrayDepartement['name'])
+            ->setCode(strval($arrayDepartement['code']))
+            ->setSlug($this->sluggerInterface->slug($arrayDepartement['slug']))
+            ->setSimplemapCode($arrayDepartement['simplemap_code'])
+            ->setLargeregion($this->largeregionRepository->findOneBy(['id' => $arrayDepartement['large_region_id'] ]));
 
         return $departement;
     }

@@ -18,7 +18,7 @@ var simplemaps_countrymap_mapdata={
     pop_ups: "detect",
     
 		//State defaults
-		state_description: "Non renseigné...",
+		state_description: "Description non renseignée",
     state_color: "#88A4BC",
     state_hover_color: "#3B729F",
     state_url: "",
@@ -27,7 +27,7 @@ var simplemaps_countrymap_mapdata={
     all_states_zoomable: "yes",
     
 		//Location defaults
-		location_description: "Location description",
+		location_description: "Description de la location non renseignée",
     location_url: "",
     location_color: "#FF0067",
     location_opacity: 0.8,

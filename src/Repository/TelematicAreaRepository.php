@@ -16,6 +16,23 @@ class TelematicAreaRepository extends ServiceEntityRepository
         parent::__construct($registry, TelematicArea::class);
     }
 
+    
+    /**
+    * @return TelematicArea[] Returns an array of TelematicArea objects
+    */
+    public function findTerritoryFromCgo($cgo): array
+    {
+        return $this->createQueryBuilder('t')
+            ->join('t.cgos', 'c')
+            ->where('c.id = :val')
+            ->setParameter('val', $cgo->getId())
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+
     //    /**
     //     * @return TelematicArea[] Returns an array of TelematicArea objects
     //     */

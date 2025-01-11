@@ -1,0 +1,21 @@
+<footer class="row g-0 align-items-center p-4 mt-auto" style="background-color: rgba(0, 0, 0, 0.05);">
+	<div class="col-12 col-md-4 text-center text-md-start mb-3 mb-md-0">
+    {% set startedAt = 2025 %}
+    {% set now = 'now'|date('Y') %}
+    {% if startedAt != now %}
+		{{ start }} - {{ now }}
+    {% else %}
+        {{ now }}
+    {% endif %}
+	</div>
+	<div class="col-12 col-md-4 text-center mb-3 mb-md-0">
+		<a href="http://www.linkedin.com/in/wetta-rene-jd" class="mx-2" target="_blank" role="button"><twig:ux:icon name="skill-icons:linkedin" class="footerIconeSize"/></a>
+		<a href="https://github.com/JeDeveloppe" class="mx-2" target="_blank" role="button"><twig:ux:icon name="skill-icons:github-dark" class="footerIconeSize"/></a>
+		<a href="https://www.facebook.com/JeDevloppe" class="mx-2" target="_blank" role="button"><twig:ux:icon name="devicon:facebook" class="footerIconeSize"/></a>
+	</div>
+	<ul class="col-12 col-md-4 nav justify-content-center justify-content-md-end">
+		<li class="nav-item">
+			<a class="nav-link text-dark" href="#">Mentions légales</a>
+		</li>
+	</ul>
+</footer>

@@ -12,9 +12,14 @@
             {% block importmap %}{{ importmap('site') }}{% endblock %}
         {% endblock %}
     </head>
-    <body>
+    <body class="d-flex flex-column h-100">
         {% include "site/components/_navbar.html.twig" %}
 
-        {% block body %}{% endblock %}
+        <div class="col-11 mx-auto">
+            {% block body %}{% endblock %}
+        </div>
+
+        {% include "site/components/_footer.html.twig" %}
+
     </body>
 </html>

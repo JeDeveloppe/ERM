@@ -13,7 +13,8 @@ class RegionErmService
 {
     public function __construct(
         private EntityManagerInterface $em,
-        private RegionErmRepository $regionErmRepository
+        private RegionErmRepository $regionErmRepository,
+        private MapsService $mapsService
         ){
     }
 
@@ -56,7 +57,7 @@ class RegionErmService
             $regionErm = new RegionErm();
         }
 
-        $regionErm->setName($arrayEntity['Région']);
+        $regionErm->setName($arrayEntity['Région'])->setTerritoryColor($this->mapsService->randomHexadecimalColor());
 
         return $regionErm;
     }

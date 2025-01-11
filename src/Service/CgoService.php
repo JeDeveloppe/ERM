@@ -91,6 +91,7 @@ class CgoService
         }
 
         $cgo = $this->cgoRepository->findOneByCm($arrayEntity['CM']);
+
         if(!$cgo){
             $cgo = new Cgo();
         }
@@ -184,5 +185,48 @@ class CgoService
         }
 
         return $shop;
+    }
+
+    public function updateCgos(SymfonyStyle $io): void
+    {
+        $io->title('Mise à jour des CGOs');
+
+            $totals = $this->readCsvFileForUpdate();
+        
+            $io->progressStart(count($totals));
+
+            foreach($totals as $arrayTotal){
+
+                $io->progressAdvance();
+                $entity = $this->update($arrayTotal);
+                $this->em->persist($entity);
+                $this->em->flush();
+            }
+            
+
+            $io->progressFinish();
+        
+
+        $io->success('Màj terminée');
+    }
+
+    private function readCsvFileForUpdate(): Reader
+    {
+        $csv = Reader::createFromPath('%kernel.root.dir%/../import/cgoUpdated.csv','r');
+        $csv->setHeaderOffset(0);
+
+        return $csv;
+    }
+
+    private function update(array $arrayEntity): Cgo
+    {
+
+        $cgo = $this->cgoRepository->findOneByCm($arrayEntity['cm']);
+
+        //"id","city_id","region_erm_id","name","address","territory_color","cm","zone_name","manager_id","class_erm_id","email","telematic_area_id"
+        $cgo
+            ->setCity($this->cityRepository->find($arrayEntity['city_id']));
+
+        return $cgo;
     }
 }
