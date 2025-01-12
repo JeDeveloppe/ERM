@@ -1,13 +1,3 @@
-var locationRating = document.querySelector('.js-locations');
-var stateRating = document.querySelector('.js-states');
-
-if(locationRating){
-  var locations = locationRating.dataset.locations;
-}
-if(stateRating){
-  var states = stateRating.dataset.states;
-}
-
 var simplemaps_countrymap_mapdata={
   main_settings: {
     //General settings
@@ -379,9 +369,13 @@ var simplemaps_countrymap_mapdata={
   regions: {},
 };
 
+
+var locationRating = document.querySelector('.js-locations');
+var stateRating = document.querySelector('.js-states');
+
 if(locationRating){
-  simplemaps_countrymap_mapdata.locations = JSON.parse(locations);
+  simplemaps_countrymap_mapdata.locations = JSON.parse(locationRating.dataset.locations);
 }
 if(stateRating){
-  simplemaps_countrymap_mapdata["state_specific"] = JSON.parse(states);
+  simplemaps_countrymap_mapdata["state_specific"] = JSON.parse(stateRating.dataset.states);
 }

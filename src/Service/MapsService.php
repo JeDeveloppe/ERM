@@ -68,38 +68,10 @@ class MapsService
                         "size" => 20,
                     ];
 
-                    // //?on rajoute les centres sous controle du cgo (option1)
-                    // foreach($cgo->getShopsUnderControls() as $shop){
-                    //     $locations[] = 
-                    //     [
-                    //         "lat" => $shop->getCity()->getLatitude() ? $shop->getCity()->getLatitude() : $shop->getCity()->getLatitude(),
-                    //         "lng" => $shop->getCity()->getLongitude() ? $shop->getCity()->getLongitude() : $shop->getCity()->getLongitude(),
-                    //         "color" => "#000000",
-                    //         "name" => $shop->getName(),
-                    //         "description" => $cgo->getName(),
-                    //         "url" => $baseUrl,
-                    //         "size" => 10,
-                    //     ];
-                    // }
 
                     //?on traite les departements ratachées au shop
                     $departments = $area->getDepartments();
                     foreach($departments as $department){
-                
-                        // //?pour chaque departement on recupere les shops (option2)
-                        // $shops = $this->shopRepository->findAllShopsFromDepartment($department);
-                        // foreach($shops as $shop){
-                        //     $locations[] = 
-                        //     [
-                        //         "lat" => $shop->getCity()->getLatitude() ? $shop->getCity()->getLatitude() : $shop->getCity()->getLatitude(),
-                        //         "lng" => $shop->getCity()->getLongitude() ? $shop->getCity()->getLongitude() : $shop->getCity()->getLongitude(),
-                        //         "color" => "#000000",
-                        //         "name" => $shop->getName(),
-                        //         "description" => $cgo->getName(),
-                        //         "url" => $baseUrl,
-                        //         "size" => 10,
-                        //     ];
-                        // }
 
                         $states[$department->getSimplemapCode()] =
                         [
