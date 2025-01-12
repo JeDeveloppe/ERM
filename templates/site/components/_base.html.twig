@@ -4,6 +4,8 @@
         <meta charset="UTF-8">
         <title>{% block title %}{% endblock %}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        {# aucun robot ne va indexer se site #}
+        <meta name="robots" content="noindex">
         {% block stylesheets %}
         {% endblock %}
         <link rel="icon" type="image/svg+xml" href="{{ asset('favicon//favicon.svg') }}" />
