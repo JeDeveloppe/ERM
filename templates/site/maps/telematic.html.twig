@@ -4,15 +4,15 @@
 
 {% block body %}
 
-    <div class="js-locations" data-locations="{{ donnees.locations }}"></div>
-    <div class="js-states" data-states="{{ donnees.states }}"></div>
+    <div class="js-locations" data-locations="{{ mapDonnees.locations }}"></div>
+    <div class="js-states" data-states="{{ mapDonnees.states }}"></div>
 	
 	<div class="row g-0 justify-content-center align-items-center mb-5">
 		<h1 class="col-12 text-center my-5">{{ title }}</h1>
-		<div class="col-9 col-md-6 col-lg-5 d-flex justify-content-center align-items-center">
+		<div class="col-11 col-md-9 col-lg-7 d-flex justify-content-center align-items-center">
 			{# affichage de la carte de France #}
-			<script type="text/javascript" src="{{ asset('map/mapdata_france.js') }}"></script>
-			<script type="text/javascript" src="{{ asset('map/countrymap_france.js') }}"></script>
+			<script type="text/javascript" src="{{ asset('map/mapdata_france.js') }}" defer></script>
+			<script type="text/javascript" src="{{ asset('map/countrymap_france.js') }}" defer></script>
 			<div id="map"></div>
 		</div>
 	</div>

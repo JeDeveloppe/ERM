@@ -62,10 +62,10 @@ class MapsController extends AbstractController
     public function mapAllShops(): Response
     {
         //?on recupere les donnees dans le service
-        $donnees = $this->mapsService->constructionMapOfAllShops();
+        $mapDonnees = $this->mapsService->constructionMapOfAllShops();
 
         return $this->render('site/maps/all_shops.html.twig', [
-            'donnees' => $donnees,
+            'mapDonnees' => $mapDonnees,
             'title' => 'Tous les centres ERM',
         ]);
     }
@@ -78,10 +78,10 @@ class MapsController extends AbstractController
         if($class){
 
             //?on recupere les donnees dans le service
-            $donnees = $this->mapsService->constructionMapOfAllShopsUnderCgo($class);
+            $mapDonnees = $this->mapsService->constructionMapOfAllShopsUnderCgo($class);
     
             return $this->render('site/maps/all_shops_under_cgo.html.twig', [
-                'donnees' => $donnees,
+                'mapDonnees' => $mapDonnees,
                 'title' => 'Tous les centres sous CGO ' . $class->getName(),
             ]);
 
@@ -96,10 +96,10 @@ class MapsController extends AbstractController
     public function mapAllRegions(): Response
     {
         //?on recupere les donnees dans le service
-        $donnees = $this->mapsService->constructionMapOfRegions();
+        $mapDonnees = $this->mapsService->constructionMapOfRegions();
 
         return $this->render('site/maps/all_regions.html.twig', [
-            'donnees' => $donnees,
+            'mapDonnees' => $mapDonnees,
             'title' => 'Toutes les régions',
         ]);
     }
@@ -112,10 +112,10 @@ class MapsController extends AbstractController
         if($classe){
 
             //?on recupere les donnees dans le service
-            $donnees = $this->mapsService->constructionMapOfZonesByClasse($classe->getName());
+            $mapDonnees = $this->mapsService->constructionMapOfZonesByClasse($classe->getName());
     
             return $this->render('site/maps/all_zones.html.twig', [
-                'donnees' => $donnees,
+                'mapDonnees' => $mapDonnees,
                 'title' => 'Toutes les zones ' . $classe->getName(),
             ]);
 
@@ -130,12 +130,12 @@ class MapsController extends AbstractController
     public function mapTelematiqueArea(): Response
     {
         //?on recupere les donnees dans le service
-        $donnees = $this->mapsService->constructionMapOfTelematique();
+        $mapDonnees = $this->mapsService->constructionMapOfTelematique();
 
         $telematicAreas = $this->telematicAreaRepository->findAll();
 
         return $this->render('site/maps/telematic.html.twig', [
-            'donnees' => $donnees,
+            'mapDonnees' => $mapDonnees,
             'title' => 'Zones télématiques MV',
             'telematicAreas' => $telematicAreas
         ]);
