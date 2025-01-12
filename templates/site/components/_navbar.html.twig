@@ -29,9 +29,11 @@
 				<li class="nav-item dropdown dropstart">
 					<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa-solid fa-user"></i></a>
 					<div class="dropdown-menu">
-						{% if is_granted('ROLE_SUPER_ADMIN') %}
-							<a class="dropdown-item" href="{{ path('admin') }}"><i class="fa-solid fa-gear"></i> ADMIN</a>
-							<div class="dropdown-divider"></div>
+						{% if is_granted('ROLE_USER') %}
+							{% if is_granted('ROLE_ADMIN') %}
+								<a class="dropdown-item" href="{{ path('admin') }}"><i class="fa-solid fa-gear"></i> ADMIN</a>
+								<div class="dropdown-divider"></div>
+							{% endif %}
 							<a class="dropdown-item" href="{{ path('app_logout')}}"><i class="fa-solid fa-lock-open text-warning"></i> Déconnexion</a>
 						{% else %}
 							<a class="dropdown-item" href="{{ path('app_login')}}"><i class="fa-solid fa-lock text-warning"></i> Se connecter</a>

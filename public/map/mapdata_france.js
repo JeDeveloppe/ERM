@@ -41,7 +41,7 @@ var simplemaps_countrymap_mapdata={
 
 		//Zoom settings
 		zoom: "yes",
-    // manual_zoom: "no",
+    manual_zoom: "yes",
     back_image: "no",
     initial_back: "no",
     initial_zoom: "-1",

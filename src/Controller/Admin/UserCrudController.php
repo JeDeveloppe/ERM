@@ -31,7 +31,7 @@ class UserCrudController extends AbstractCrudController
         return [
             FormField::addTab('Informations utilisateur'),
             TextField::new('email', 'Email'),
-            TextField::new('password', 'Mot de passe')->onlyOnForms()->setDisabled(true),
+            TextField::new('password', 'Mot de passe')->onlyWhenCreating(),
             ArrayField::new('roles', 'Rôles'),
             FormField::addTab('Suivis utilisateur'),
             DateTimeField::new('createdAt', 'Créé le')->setFormat('dd/MM/yyyy HH:mm:ss')->onlyWhenUpdating()->setDisabled(true),

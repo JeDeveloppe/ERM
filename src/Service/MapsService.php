@@ -65,7 +65,9 @@ class MapsService
                         "name" => $cgo->getName(),
                         "description" => $contactCgo,
                         "url" => $baseUrl,
-                        "size" => 20,
+                        "size" => 30,
+                        "type" => "image",
+                        "image_url" => "https://ermmaps.je-developpe.fr/map/images/logoCgo.png"
                     ];
 
 
@@ -102,8 +104,25 @@ class MapsService
         $baseUrl = $this->requestStack->getCurrentRequest()->getScheme() . '://' . $this->requestStack->getCurrentRequest()->getHttpHost() . $this->requestStack->getCurrentRequest()->getBasePath();
         //?on recupere tous les centres
         $shops = $this->shopRepository->findAll();
+        $cgos = $this->cgoRepository->findAll();
 
         $locations = []; //? toutes les réponses seront dans ce tableau final
+
+        //?on boucle sur les cgos
+        foreach($cgos as $cgo){
+            $locations[] = 
+            [
+                "lat" => $cgo->getCity()->getLatitude(),
+                "lng" => $cgo->getCity()->getLongitude(),
+                "color" => $cgo->getTerritoryColor() ?? $this->randomHexadecimalColor(),
+                "name" => $cgo->getName().' ('.$cgo->getCm().')',
+                "description" => $cgo->getManager()->getFirstName().' '.$cgo->getManager()->getLastName(),
+                "size" => 30,
+                "type" => "image",
+                "image_url" => "https://ermmaps.je-developpe.fr/map/images/logoCgo.png"
+            ];
+        }
+
 
         foreach($shops as $shop)
         {
@@ -272,9 +291,9 @@ class MapsService
                 "color" => $cgo->getTerritoryColor() ?? $this->randomHexadecimalColor(),
                 "name" => $cgo->getName().' ('.$cgo->getCm().')',
                 "description" => $cgo->getManager()->getFirstName().' '.$cgo->getManager()->getLastName(),
-                "size" => 20,
-                'type' => 'image',
-                'image_url' => $baseUrl.'assets/images/mapq/phone.png'
+                "size" => 30,
+                "type" => "image",
+                "image_url" => "https://ermmaps.je-developpe.fr/map/images/logoCgo.png"
             ];
             
             $shops = $cgo->getShopsUnderControls();
@@ -303,7 +322,7 @@ class MapsService
                         "name" => $shop->getName().' ('.$shop->getCm().')',
                         "description" => $contactShop,
                         "url" => $baseUrl,
-                        "size" => 15,
+                        "size" => 10,
                     ];
                 }
             }
