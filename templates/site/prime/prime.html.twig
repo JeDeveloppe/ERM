@@ -1,0 +1,60 @@
+{% extends "site/components/_base.html.twig" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+
+	<div class="row g-0 justify-content-center align-items-center">
+		<h1 class="col-12 text-center my-5">{{ title }}</h1>
+		<div class="col-12 col-md-10 col-lg-8 d-flex justify-content-center align-items-center mb-5">
+			{{ form_start(form) }}
+				<div class="my-custom-class-for-errors">
+					{{ form_errors(form) }}
+				</div>
+				<div class="row justify-content-around">
+					<div class="col-11 form-group mb-3">
+						<label for="exampleFormControlInput1">{{ form_label(form.fullPs) }}</label>
+						{{ form_widget(form.fullPs) }}
+						{{ form_errors(form.fullPs) }}
+					</div>
+					<div class="col-11 form-group mb-3">
+						<label for="exampleFormControlInput1">{{ form_label(form.divider) }}</label>
+						{{ form_widget(form.divider) }}
+						{{ form_errors(form.divider) }}
+					</div>
+					<div class="col-11">
+						<button type="submit" class="btn btn-primary">Calculer</button>
+					</div>
+				</div>
+			{{ form_end(form) }}
+		</div>
+		<div class="col-12 col-md-10 col-lg-8 d-flex justify-content-center align-items-center mb-5 p-5 shadow-lg">
+			{% if result is not null %}
+				<span class="fw-bold text-warning">Prime par personne: {{ result|number_format(2, '.', ',') }} €</span>
+			{% endif %}
+		</div>
+		<div class="col-12 col-md-10 col-lg-8 d-flex justify-content-center align-items-center mb-5">
+			<table class="col-11 table text-center mb-5">
+				<thead>
+					<tr>
+					<th scope="col">De</th>
+					<th scope="col">à</th>
+					<th scope="col">Poucentage</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for primeLevel in primeLevels %}
+						<tr>
+							<td>{{ primeLevel.start }}</td>
+							<td>{{ primeLevel.end }}</td>
+							<td>{{ primeLevel.percentage }}</td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+
+	</div>
+
+
+{% endblock %}
