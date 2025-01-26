@@ -12,8 +12,10 @@ use App\Entity\ShopClass;
 use App\Entity\Department;
 use App\Entity\LargeRegion;
 use App\Entity\ManagerClass;
+use App\Entity\Primelevel;
 use App\Entity\TelematicArea;
 use App\Entity\User;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
@@ -61,7 +63,14 @@ class DashboardController extends AbstractDashboardController
             MenuItem::linkToCrud('Les grandes régions', 'fas fa-list', LargeRegion::class),
             MenuItem::section('Configuration des accès:'),
             MenuItem::linkToCrud('Les utilisateurs', 'fas fa-list', User::class),
+            MenuItem::linkToCrud('Les paliers de prime', 'fas fa-list', Primelevel::class),
         ];
 
+    }
+
+    public function configureCrud(): Crud
+    {
+        return Crud::new()
+            ->showEntityActionsInlined();
     }
 }

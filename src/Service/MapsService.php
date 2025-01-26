@@ -67,7 +67,7 @@ class MapsService
                         "url" => $baseUrl,
                         "size" => 30,
                         "type" => "image",
-                        "image_url" => "https://ermmaps.je-developpe.fr/map/images/logoCgo.png"
+                        "image_url" => "https://erm.je-developpe.fr/map/images/logoCgo.png"
                     ];
 
 
@@ -119,7 +119,7 @@ class MapsService
                 "description" => $cgo->getManager()->getFirstName().' '.$cgo->getManager()->getLastName(),
                 "size" => 30,
                 "type" => "image",
-                "image_url" => "https://ermmaps.je-developpe.fr/map/images/logoCgo.png"
+                "image_url" => "https://erm.je-developpe.fr/map/images/logoCgo.png"
             ];
         }
 
@@ -293,7 +293,7 @@ class MapsService
                 "description" => $cgo->getManager()->getFirstName().' '.$cgo->getManager()->getLastName(),
                 "size" => 30,
                 "type" => "image",
-                "image_url" => "https://ermmaps.je-developpe.fr/map/images/logoCgo.png"
+                "image_url" => "https://erm.je-developpe.fr/map/images/logoCgo.png"
             ];
             
             $shops = $cgo->getShopsUnderControls();
