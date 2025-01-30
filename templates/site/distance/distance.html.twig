@@ -1,0 +1,81 @@
+{% extends 'site/components/_base.html.twig' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+
+	<h1 class="col-12 text-center h3 my-5">{{ title }}</h1>
+
+	<div class="row justify-content-around my-5">
+		<div class="card col-11 col-md-5 p-0">
+			<div class="card-header">Recherche par ville:</div>
+			<div class="card-body">
+				{{ form_start(formSearchByCity) }}
+						<div class="col-11 mb-3">
+							{{ form_widget(formSearchByCity.city) }}
+						</div>
+				{{ form_end(formSearchByCity) }}
+			</div>
+		</div>
+		{# <div class="card col-11 col-md-5 p-0">
+			<div class="card-header">Recherche par coordonnées:</div>
+				{{ form_start(formSearchByGpsPoints) }}
+					<div class="card-body d-flex justify-content-around">
+						<div class="col-11 col-md-5">
+							<label class="form-label">{{ form_label(formSearchByGpsPoints.interventionLatitude) }}</label>
+								{{ form_widget(formSearchByGpsPoints.interventionLatitude) }}
+						</div>
+						<div class="col-11 col-md-5">
+							<label class="form-label">{{ form_label(formSearchByGpsPoints.interventionLongitude) }}</label>
+								{{ form_widget(formSearchByGpsPoints.interventionLongitude) }}
+						</div>
+					</div>
+					<div class="col-12 text-center my-3">
+						<button type="submit" class="btn btn-success">Calculer</button>
+					</div>
+				{{ form_end(formSearchByGpsPoints) }}
+		</div> #}
+	</div>
+
+    {# s'il y a une recherche #}
+    {% if datas | length > 0 %}
+        <div class="row justify-content-center mb-5">
+            <div class="col-12 col-md-10 col-lg-8 d-flex justify-content-center align-items-center">
+                <div class="col-12 text-center">Résultat(s):</div>
+                <table class="col-12 table text-center align-middle table-striped mb-3">
+                    <thead>
+                        <th>Depuis:</th>
+                        {# <th>Type de centre:</th> #}
+                        <th>Distance:<br/>(ALLER)</th>
+                        <th>Temps de trajet:<br/>(ALLER)</th>
+                    </thead>
+                    <tbody>
+                        {% for key, data in datas %}
+                            {% set dureeEnSecondes = data.duration %}
+                            {% set hours = (dureeEnSecondes / 3600) %60 | round %}
+                            {% set minutes = (dureeEnSecondes / 60) %60 | round %}
+                            <tr>
+                                <td>{{ data.shop.cm }} - {{ data.shop.name }}</td>
+                                {# <td><span class="badge" style="color:{{ data.state.textColor }}; background-color:{{ data.state.backgroundColor }};"> {{ data.state.name }} </span></td> #}
+                                <td>{{ data.distance / 1000 }}
+                                    KMS</td>
+                                <td>
+                                    {% if hours > 0 %}
+                                        {{ hours }}
+                                        H
+                                    {% endif %}
+                                    {{ minutes }}
+                                    min
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <div class="col-12 text-center">
+                    <a class="btn btn-sm btn-info" href="{{ path('app_home') }}">Reset</a>
+                </div>
+            </div>
+        </div>
+	{% endif %}
+
+{% endblock %}

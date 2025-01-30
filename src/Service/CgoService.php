@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Cgo;
+use App\Entity\City;
 use App\Entity\Shop;
 use League\Csv\Reader;
 use App\Entity\Manager;
@@ -19,6 +20,7 @@ use App\Repository\RegionErmRepository;
 use App\Repository\ShopClassRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class CgoService
 {
@@ -32,7 +34,8 @@ class CgoService
         private RegionErmRepository $regionErmRepository,
         private ManagerClassRepository $managerClassRepository,
         private MapsService $mapsService,
-        private ShopRepository $shopRepository
+        private ShopRepository $shopRepository,
+        private HttpClientInterface $client
         ){
     }
 
@@ -221,5 +224,61 @@ class CgoService
             ->setCity($this->cityRepository->find($arrayEntity['city_id']));
 
         return $cgo;
+    }
+
+    public function getDistancesBeetweenDepannageAndShop(City $cityOfIntervention, Shop $shop): array
+    {
+        $interventionLatitude = $cityOfIntervention->getLatitude();
+        $interventionLongitude = $cityOfIntervention->getLongitude();
+
+        $response = $this->client->request(
+            'GET',
+            'https://api.tomtom.com/routing/1/calculateRoute/'.$interventionLatitude.','.$interventionLongitude.':'.$shop->getCity()->getLatitude().','.$shop->getCity()->getLongitude().'/json?key='.$_ENV['TOMTOM_API_KEY']
+        );
+
+        $array_reponse = $response->toArray();
+
+        $filtredResponse = [
+            'shop'     => $shop,
+            'distance' => $array_reponse['routes'][0]['summary']['lengthInMeters'],
+            'duration' => $array_reponse['routes'][0]['summary']['travelTimeInSeconds']
+        ];
+
+        return $filtredResponse;
+        // return $response;
+    }
+
+    public function getDistances(City $cityOfIntervention)
+    {
+
+        $datas = [];
+
+        $cities = $cityOfIntervention->getDepartment()->getCities();
+        
+        foreach($cities as $city){
+            $shops = $city->getShops();
+            foreach($shops as $i => $shop){
+                array_push($datas, $this->getDistancesBeetweenDepannageAndShop($cityOfIntervention,$shop));
+                //on attend 1 seconde tous les 5 appels à l'api
+                if($i > 0 && $i % 5 == 0){
+                    sleep(1);
+                }
+            }
+        }
+
+        // foreach($shopsArray as $i => $myShop){
+
+        //     $shopState = $myShop->getShopState();
+        //     array_push($datas, $this->getDistancesBeetweenDepannageAndShop($cityOfIntervention,$myShop->getShop(),$shopState));
+
+        //     if($i > 0 && $i % 5 == 0){
+        //         sleep(1);
+        //     }
+        // }
+
+        //on tri le tableau en fonction de la distance la plus courte
+        array_multisort(array_column($datas, 'distance'), SORT_ASC, $datas);
+
+        return $datas;
     }
 }
