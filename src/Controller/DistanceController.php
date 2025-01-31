@@ -15,18 +15,18 @@ class DistanceController extends AbstractController
         private CgoService $cgoService,
     ){}
 
-    #[Route('/search-distance', name: 'app_search_distance')]
+    #[Route('/search-distance', name: 'app_search_distance', methods: ['GET', 'POST'])]
     public function searchDistance(Request $request): Response
     {
 
         $form = $this->createForm(SearchShopsByCityType::class);
-        $form->handleRequest($request);
 
         if($request->isMethod('POST')){
 
-            $form->submit($request->getPayload()->get($form->getName()));
-    dd($form);
-            if ($form->isSubmitted() && $form->isValid()) {
+            $allValues = $request->request->all();
+            $form->submit($allValues[$form->getName()]);
+
+            if($form->isSubmitted() && $form->isValid()){
 
                 $cityOfIntervention = $form->get('city')->getData();
                 $datas = $this->cgoService->getDistances($cityOfIntervention);
