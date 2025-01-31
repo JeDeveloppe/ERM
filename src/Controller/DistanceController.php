@@ -18,57 +18,23 @@ class DistanceController extends AbstractController
     #[Route('/search-distance', name: 'app_search_distance')]
     public function searchDistance(Request $request): Response
     {
-        // $user = $this->security->getUser();
-        // $departmentsCollection = $user->getMyDepartments();
-        // $myDepartments = $departmentsCollection->toArray();
 
+        $form = $this->createForm(SearchShopsByCityType::class);
+        $form->handleRequest($request);
 
-        // //si aucun departements
-        // if($myDepartments == null){
-        //     $this->addFlash('warning', 'Le CGO ne semble pas avoir de départements rattachés...');
-        //     return $this->redirectToRoute('admin', [], Response::HTTP_SEE_OTHER);
-        // }
+        if($request->isMethod('POST')){
 
-        // $departments = [];
+            $form->submit($request->getPayload()->get($form->getName()));
+    dd($form);
+            if ($form->isSubmitted() && $form->isValid()) {
 
-        // foreach($myDepartments as $myDepartment){
-        //     array_push($departments, $myDepartment->getDepartment());
-        // }
-
-        // //on cherche les centres rattachés au cgo
-        // $myShops = $user->getMyShops();
-
-        // //si aucun centre en ligne ou créé
-        // if($myShops == null){
-        //     $this->addFlash('warning', 'Le CGO ne semble pas avoir de centre rattachés...');
-        //     return $this->redirectToRoute('admin', [], Response::HTTP_SEE_OTHER);
-        // }
-
-        $formSearchByCity = $this->createForm(SearchShopsByCityType::class, null, []);
-        $formSearchByCity->handleRequest($request);
-
-        // $formSearchByGpsPoints = $this->createForm(SearchDistancesByGpsPointsType::class, null);
-        // $formSearchByGpsPoints->handleRequest($request);
-
-        if($formSearchByCity->isSubmitted() && $formSearchByCity->isValid()) {
-            $cityOfIntervention = $formSearchByCity->get('city')->getData();
-
-
-            $datas = $this->cgoService->getDistances($cityOfIntervention);
+                $cityOfIntervention = $form->get('city')->getData();
+                $datas = $this->cgoService->getDistances($cityOfIntervention);
+            }
         }
 
-        // if($formSearchByGpsPoints->isSubmitted() && $formSearchByGpsPoints->isValid()){
-
-        //     $interventionLongitude = $formSearchByGpsPoints->get('interventionLongitude')->getData();
-        //     $interventionLatitude = $formSearchByGpsPoints->get('interventionLatitude')->getData() ;
-
-        //     $datas = $this->cgoService->distanceLogic($myShops, $interventionLongitude,$interventionLatitude);
-
-        // } 
-
         return $this->render('site/distance/distance.html.twig', [
-            'formSearchByCity' => $formSearchByCity->createView(),
-            // 'formSearchByGpsPoints' => $formSearchByGpsPoints->createView(),
+            'formSearchByCity' => $form->createView(),
             'datas' => $datas ?? null,
             'title' => 'Recherche de distance'
         ]);

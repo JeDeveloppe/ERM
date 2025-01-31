@@ -17,7 +17,7 @@ class PrimelevelRepository extends ServiceEntityRepository
         parent::__construct($registry, Primelevel::class);
     }
 
-    public function findPrimeLevelWhereStartIsBigerAndEndIsLowerByStaff(int $psByPerson)
+    public function findPrimeLevelWherePsByPersonIsBetweenStartAndEnd(int $psByPerson)
     {
 
         $query = $this->createQueryBuilder('p')

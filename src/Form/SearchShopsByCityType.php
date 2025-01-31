@@ -16,18 +16,18 @@ class SearchShopsByCityType extends AbstractType
     {
 
         $builder
-        // ->add('city', SearchShopAutocompleteField::class)
-        ->add('city', EntityType::class, [
-                'class' => City::class,
-                'placeholder' => 'Choisir une ville...',
-                // 'choice_label' => function (City $ville) {
-                //     return $ville->getPostalCode().' - '.$ville->getName();
-                // },
-                'autocomplete' => true,
-                // 'attr' => [
-                //     'class' => 'form-control p-0',
-                // ],
-            ])
+        ->add('city', SearchShopsByCityAutocompleteField::class)
+        // ->add('city', EntityType::class, [
+        //         'class' => City::class,
+        //         'placeholder' => 'Choisir une ville...',
+        //         // 'choice_label' => function (City $ville) {
+        //         //     return $ville->getPostalCode().' - '.$ville->getName();
+        //         // },
+        //         'autocomplete' => true,
+        //         // 'attr' => [
+        //         //     'class' => 'form-control p-0',
+        //         // ],
+        //     ])
         ->add('submit', SubmitType::class, [
             'label' => 'Rechercher',
             'attr' => [
@@ -38,8 +38,6 @@ class SearchShopsByCityType extends AbstractType
 
     public function configureOptions(OptionsResolver $resolver): void
     {
-        $resolver->setDefaults([
-            'data_class' => City::class,
-        ]);
+        $resolver->setDefaults([]);
     }
 }
