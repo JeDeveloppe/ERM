@@ -19,7 +19,9 @@ class SearchShopsByCityAutocompleteField extends AbstractType
             'attr' => [
                 'class' => 'form-control',
             ],
-            'choice_label' => 'name',
+            'choice_label' => function (City $ville) {
+                return $ville->getPostalCode().' - '.$ville->getName();
+            },
 
             // choose which fields to use in the search
             // if not passed, *all* fields are used
