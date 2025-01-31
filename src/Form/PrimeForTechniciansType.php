@@ -7,6 +7,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\NumberType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
 class PrimeForTechniciansType extends AbstractType
 {
@@ -14,7 +15,7 @@ class PrimeForTechniciansType extends AbstractType
     {
         $builder
             ->add('fullPs', IntegerType::class, [
-                'label' => 'CA PS total:',
+                'label' => 'PS total:',
                 'attr' => [
                     'placeholder' => 'Saisir un nombre',
                     'class' => 'form-control',
