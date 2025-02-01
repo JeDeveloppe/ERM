@@ -17,6 +17,19 @@ class SearchShopsByCityType extends AbstractType
 
         $builder
         ->add('city', SearchShopsByCityAutocompleteField::class)
+        // ->add('city', EntityType::class, [
+        //     'class' => City::class,
+        //     'query_builder' => function (CityRepository $cityRepository) {
+        //         return $cityRepository->createQueryBuilder('c')
+        //             ->orderBy('c.name', 'ASC');
+        //     },
+        //     'choice_label' => 'name',
+        //     'placeholder' => 'Choisir une ville',
+        //     'attr' => [
+        //         'class' => 'form-control'
+        //     ],
+        //     'autocomplete' => true
+        // ])
         ->add('submit', SubmitType::class, [
             'label' => 'Rechercher',
             'attr' => [

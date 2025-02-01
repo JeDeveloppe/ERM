@@ -4,7 +4,6 @@ namespace App\Controller\Site;
 
 use App\Form\PrimeForTechniciansType;
 use App\Repository\PrimelevelRepository;
-use App\Repository\StaffRepository;
 use App\Service\PrimeLevelService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -20,11 +19,13 @@ class PrimeController extends AbstractController
     {
     }
 
-    #[Route('/prime', name: 'app_prime', methods: ['GET', 'POST'])]
+    #[Route('/prime', name: 'app_prime')]
     public function prime(Request $request): Response
     {
         //on récupere le formulaire par la request
-        $form = $this->createForm(PrimeForTechniciansType::class);
+        $form = $this->createForm(PrimeForTechniciansType::class, null, [
+            'action' => $this->generateUrl('app_prime'),
+        ]);
 
         //on récupere les niveaux de prime en bdd
         $primeLevels = $this->primelevelRepository->findAll();
@@ -59,9 +60,11 @@ class PrimeController extends AbstractController
 
         return $this->render('site/prime/prime.html.twig', [
             'title' => 'Estimation prime mensuelle',
-            'form' => $form->createView(),
+            'form' => $form,
             'primeLevels' => $primeLevels,
             'result' => $result ?? null,
+            'primeLevels' => $primeLevels ?? null,
+            'primeLevelFromCalc' => $primeLevel ?? null,
             'nextLevel' => $nextLevel ?? null,
             'infosForNextLevel' => $infosForNextLevel ?? null,
         ]);
