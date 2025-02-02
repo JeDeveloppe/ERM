@@ -26,7 +26,7 @@ class PrimeController extends AbstractController
         $form = $this->createForm(PrimeForTechniciansType::class);
 
         //on récupere les niveaux de prime en bdd
-        $primeLevels = $this->primelevelRepository->findAll();
+        $primeLevels = $this->primelevelRepository->findBy([], ['start' => 'ASC']);
 
         if($request->isMethod('POST')) {
             $allValues = $request->request->all();
