@@ -23,9 +23,7 @@ class PrimeController extends AbstractController
     public function prime(Request $request): Response
     {
         //on récupere le formulaire par la request
-        $form = $this->createForm(PrimeForTechniciansType::class, null, [
-            'action' => $this->generateUrl('app_prime'),
-        ]);
+        $form = $this->createForm(PrimeForTechniciansType::class);
 
         //on récupere les niveaux de prime en bdd
         $primeLevels = $this->primelevelRepository->findAll();
@@ -46,7 +44,7 @@ class PrimeController extends AbstractController
                         
                     }else{
                         
-                        $result = $this->primeLevelService->getValuePrimeByPerson($psByPerson, $primeLevel);
+                        $primeByPerson = $this->primeLevelService->getValuePrimeByPerson($psByPerson, $primeLevel);
                         $nextLevel = $this->primeLevelService->getPrimeLevel($primeLevel->getEnd() + 1);
 
                         if($nextLevel === null){
@@ -62,7 +60,7 @@ class PrimeController extends AbstractController
             'title' => 'Estimation prime mensuelle',
             'form' => $form,
             'primeLevels' => $primeLevels,
-            'result' => $result ?? null,
+            'primeByPerson' => $primeByPerson ?? null,
             'primeLevels' => $primeLevels ?? null,
             'primeLevelFromCalc' => $primeLevel ?? null,
             'nextLevel' => $nextLevel ?? null,

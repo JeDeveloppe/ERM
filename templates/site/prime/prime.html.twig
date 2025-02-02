@@ -6,32 +6,11 @@
 
 	<div class="row g-0 justify-content-center align-items-center">
 		<h1 class="col-12 text-center my-5">{{ title }}</h1>
-		<div class="col-12 col-md-10 col-lg-8 d-flex justify-content-center align-items-center mb-5">
-			{{ form_start(form) }}
-				<div class="my-custom-class-for-errors">
-					{{ form_errors(form) }}
-				</div>
-				<div class="row justify-content-around">
-					<div class="col-11 form-group mb-3">
-						<label for="exampleFormControlInput1">{{ form_label(form.fullPs) }}</label>
-						{{ form_widget(form.fullPs) }}
-						{{ form_errors(form.fullPs) }}
-					</div>
-					<div class="col-11 form-group mb-3">
-						<label for="exampleFormControlInput1">{{ form_label(form.divider) }}</label>
-						{{ form_widget(form.divider) }}
-						{{ form_errors(form.divider) }}
-					</div>
-					<div class="col-11 d-flex justify-content-center align-items-center mb-3">
-						<button type="submit" class="btn btn-primary">Calculer</button>
-					</div>
-				</div>
-			{{ form_end(form) }}
-		</div>
-		{% if result is not null %}
+
+		{% if primeByPerson is not null %}
 			<div class="col-12 col-md-10 col-lg-8 d-flex flex-wrap justify-content-center align-items-center mb-5 p-5 shadow-lg">
-				<p class="col-12 fw-bold text-warning">Prime par personne: {{ result|number_format(2, '.', ',') }} €</p>
-				<table class="table table-striped">
+				<p class="col-12 fw-bold text-warning">Prime par personne: {{ primeByPerson|number_format(2, '.', ',') }} €</p>
+				<table class="table table-striped mb-3">
 					<tr>
 						<td colspan="2">Prochain palier:</td>
 					</tr>
@@ -49,7 +28,34 @@
 					</tr>
 				</table>
 			</div>
+			<div class="col-12 text-center mb-5">
+				<a class="btn btn-secondary" href="{{ path('app_prime') }}">Autre calcul</a>
+			</div>
+		{% else %}
+			<div class="col-12 col-md-10 col-lg-8 d-flex justify-content-center align-items-center mb-5">
+				{{ form_start(form) }}
+					<div class="my-custom-class-for-errors">
+						{{ form_errors(form) }}
+					</div>
+					<div class="row justify-content-around">
+						<div class="col-11 form-group mb-3">
+							<label for="exampleFormControlInput1">{{ form_label(form.fullPs) }}</label>
+							{{ form_widget(form.fullPs) }}
+							{{ form_errors(form.fullPs) }}
+						</div>
+						<div class="col-11 form-group mb-3">
+							<label for="exampleFormControlInput1">{{ form_label(form.divider) }}</label>
+							{{ form_widget(form.divider) }}
+							{{ form_errors(form.divider) }}
+						</div>
+						<div class="col-11 d-flex justify-content-center align-items-center mb-3">
+							<button type="submit" class="btn btn-primary">Calculer</button>
+						</div>
+					</div>
+				{{ form_end(form) }}
+			</div>
 		{% endif %}
+		
 		<div class="col-12 col-md-10 col-lg-8 d-flex justify-content-center align-items-center mb-5">
 			<table class="col-11 table text-center mb-5">
 				<thead>
@@ -74,8 +80,6 @@
 				</tbody>
 			</table>
 		</div>
-
 	</div>
-
 
 {% endblock %}
