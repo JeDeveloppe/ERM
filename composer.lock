@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "271b7838d89288310a9c84758e267325",
+    "content-hash": "7dbc3437ccc8b4493204376bd068e0c6",
     "packages": [
         {
             "name": "composer/semver",
@@ -7253,6 +7253,75 @@
             ],
             "support": {
                 "source": "https://github.com/symfony/ux-autocomplete/tree/v2.22.1"
+            },
+            "funding": [
+                {
+                    "url": "https://symfony.com/sponsor",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/symfony/symfony",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2024-12-05T14:25:02+00:00"
+        },
+        {
+            "name": "symfony/ux-google-map",
+            "version": "v2.22.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/ux-google-map.git",
+                "reference": "1af365ba7bd363ca89e84151058f83e077d05874"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/ux-google-map/zipball/1af365ba7bd363ca89e84151058f83e077d05874",
+                "reference": "1af365ba7bd363ca89e84151058f83e077d05874",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.3",
+                "symfony/stimulus-bundle": "^2.18.1",
+                "symfony/ux-map": "^2.19"
+            },
+            "require-dev": {
+                "symfony/phpunit-bridge": "^6.4|^7.0"
+            },
+            "type": "symfony-ux-map-bridge",
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\UX\\Map\\Bridge\\Google\\": "src/"
+                },
+                "exclude-from-classmap": []
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Hugo Alliaume",
+                    "email": "hugo@alliau.me"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony UX Map GoogleMaps Bridge",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "google-maps",
+                "map",
+                "symfony-ux"
+            ],
+            "support": {
+                "source": "https://github.com/symfony/ux-google-map/tree/v2.22.1"
             },
             "funding": [
                 {

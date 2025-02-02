@@ -2,15 +2,20 @@
 
 namespace App\Service;
 
+use App\Entity\City;
+use Symfony\UX\Map\Map;
 use App\Entity\ShopClass;
+use Symfony\UX\Map\Point;
+use Symfony\UX\Map\Marker;
 use App\Entity\TelematicArea;
-use App\Repository\ShopRepository;
-use App\Repository\CgoTelematicAreaRepository;
-use App\Repository\CgoOperationalAreaRepository;
+use Symfony\UX\Map\InfoWindow;
 use App\Repository\CgoRepository;
+use App\Repository\ShopRepository;
+use App\Repository\ZoneErmRepository;
 use App\Repository\RegionErmRepository;
 use App\Repository\TelematicAreaRepository;
-use App\Repository\ZoneErmRepository;
+use App\Repository\CgoTelematicAreaRepository;
+use App\Repository\CgoOperationalAreaRepository;
 use Symfony\Component\HttpFoundation\RequestStack;
 
 class MapsService
@@ -334,4 +339,50 @@ class MapsService
 
         return $donnees;
     }
+
+    public function getMapWithInterventionPointAndAllShopsArround(City $cityOfIntervention, array $arrayFromAllShopsNearCityOfIntervention): Map
+    {
+        $map = (new Map());
+        
+        $map
+            ->center(new Point($cityOfIntervention->getLatitude(), $cityOfIntervention->getLongitude()))
+            ->zoom(9);
+
+        $map
+            ->addMarker( new Marker(
+                position: new Point($cityOfIntervention->getLatitude(), $cityOfIntervention->getLongitude()),
+                title: $cityOfIntervention->getName(),
+                infoWindow: new InfoWindow(
+                    headerContent: $cityOfIntervention->getName(),
+                    content: 'Lieu de l\'intervention'
+                ),
+                extra: [
+                    'icon_mask_url' => 'https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet.svg',
+                ],
+            ));
+
+        foreach($arrayFromAllShopsNearCityOfIntervention as $data){
+
+            $cgos = "";
+            foreach ($data['shop']->getCgos() as $cgo) {
+                $cgos .= $cgo->getName().'<br>';
+            }
+
+            $map
+                ->addMarker( new Marker(
+                    position: new Point($data['shop']->getCity()->getLatitude(), $data['shop']->getCity()->getLongitude()),
+                    title: $data['shop']->getName(),
+                    infoWindow: new InfoWindow(
+                        headerContent: $data['shop']->getName(),
+                        content: 'Distance : '.($data['distance'] / 1000).' kms <br>Temps de trajet : '.gmdate("H:i:s", $data['duration']).'<br/>'.$cgos
+                    ),
+                    extra: [
+                        'icon_mask_url' => 'https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet.svg',
+                    ],
+                ));
+        }
+
+        return $map;
+    }
+
 }
