@@ -248,17 +248,42 @@ class CgoService
         // return $response;
     }
 
-    public function getDistances(City $cityOfIntervention)
+    public function getDistances(City $cityOfIntervention, array $classErm): array
     {
 
         $datas = [];
+        $largeRegion = $cityOfIntervention->getDepartment()->getLargeRegion();
+        $departments = $largeRegion->getDepartments();
+        $collectionsOfCities = [];
+        foreach($departments as $department){
+            $collectionsOfCities[] = $department->getCities();
+        }
+        foreach($collectionsOfCities as $collection){
+            foreach($collection as $city){
+                $cities[] = $city;
+            }
+        }
 
-        $cities = $cityOfIntervention->getDepartment()->getCities();
-        
+
         foreach($cities as $city){
+            //on récupère les magasins de la ville
             $shops = $city->getShops();
-            foreach($shops as $i => $shop){
-                array_push($datas, $this->getDistancesBeetweenDepannageAndShop($cityOfIntervention,$shop));
+            $shopsFiltred = [];
+            foreach($shops as $shop){
+                if(in_array($shop->getShopClass()->getName(), $classErm)){
+                    $shopsFiltred[] = $shop;
+                }
+            }
+
+            $shopsByRayonOfIntervention = [];
+            foreach($shopsFiltred as $shopFiltred){
+                if($this->distance($cityOfIntervention,$shopFiltred,'K', 80) == true){
+                    $shopsByRayonOfIntervention[] = $shopFiltred;
+                }
+            }
+
+            foreach($shopsByRayonOfIntervention as $i => $shopFiltred){
+                array_push($datas, $this->getDistancesBeetweenDepannageAndShop($cityOfIntervention,$shopFiltred));
                 //on attend 1 seconde tous les 5 appels à l'api
                 if($i > 0 && $i % 5 == 0){
                     sleep(1);
@@ -266,19 +291,43 @@ class CgoService
             }
         }
 
-        // foreach($shopsArray as $i => $myShop){
-
-        //     $shopState = $myShop->getShopState();
-        //     array_push($datas, $this->getDistancesBeetweenDepannageAndShop($cityOfIntervention,$myShop->getShop(),$shopState));
-
-        //     if($i > 0 && $i % 5 == 0){
-        //         sleep(1);
-        //     }
-        // }
-
         //on tri le tableau en fonction de la distance la plus courte
         array_multisort(array_column($datas, 'distance'), SORT_ASC, $datas);
 
         return $datas;
+    }
+
+    private function distance(City $cityOfIntervention, Shop $shop, string $unit, int $rayonOfIntervention):bool 
+    {
+        $lat1 = $cityOfIntervention->getLatitude();
+        $lon1 = $cityOfIntervention->getLongitude();
+        $lat2 = $shop->getCity()->getLatitude();
+        $lon2 = $shop->getCity()->getLongitude();
+
+        if (($lat1 == $lat2) && ($lon1 == $lon2)) {
+            $rayon = 0;
+        }
+        else {
+            $theta = $lon1 - $lon2;
+            $dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) +  cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta));
+            $dist = acos($dist);
+            $dist = rad2deg($dist);
+            $miles = $dist * 60 * 1.1515;
+            $unit = strtoupper($unit);
+        
+            if($unit == "K") {
+                $rayon = ($miles * 1.609344);
+            } else if ($unit == "N") {
+                $rayon = ($miles * 0.8684);
+            } else {
+                $rayon =  $miles;
+            }
+        }
+
+        if($rayon <= $rayonOfIntervention){
+            return true;
+        }else{
+            return false;
+        }
     }
 }
