@@ -35,7 +35,7 @@ class DistanceController extends AbstractController
             if($form->isSubmitted() && $form->isValid()){
 
                 $cityOfIntervention = $form->get('city')->getData();
-                $datas = $this->cgoService->getDistances($cityOfIntervention);
+                $datas = $this->cgoService->getDistances($cityOfIntervention, ['MX','MV']);
 
                 $map = $this->mapsService->getMapWithInterventionPointAndAllShopsArround($cityOfIntervention, $datas);
             }
@@ -48,4 +48,5 @@ class DistanceController extends AbstractController
             'title' => 'Recherche de distance'
         ]);
     }
+
 }

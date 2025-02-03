@@ -346,7 +346,7 @@ class MapsService
         
         $map
             ->center(new Point($cityOfIntervention->getLatitude(), $cityOfIntervention->getLongitude()))
-            ->zoom(9);
+            ->zoom(10);
 
         $map
             ->addMarker( new Marker(
@@ -363,9 +363,14 @@ class MapsService
 
         foreach($arrayFromAllShopsNearCityOfIntervention as $data){
 
+            //?on recupere les cgos pour chaque shop
             $cgos = "";
-            foreach ($data['shop']->getCgos() as $cgo) {
-                $cgos .= $cgo->getName().'<br>';
+            if(count($data['shop']->getCgos()) > 0){
+                foreach ($data['shop']->getCgos() as $cgo) {
+                    $cgos .= $cgo->getName().'<br>';
+                }
+            }else{
+                $cgos = "Aucun cgo rattaché";
             }
 
             $map
@@ -373,8 +378,8 @@ class MapsService
                     position: new Point($data['shop']->getCity()->getLatitude(), $data['shop']->getCity()->getLongitude()),
                     title: $data['shop']->getName(),
                     infoWindow: new InfoWindow(
-                        headerContent: $data['shop']->getName(),
-                        content: 'Distance : '.($data['distance'] / 1000).' kms <br>Temps de trajet : '.gmdate("H:i:s", $data['duration']).'<br/>'.$cgos
+                        headerContent: $data['shop']->getName().' ('.$data['shop']->getCm().') <br/>'.$data['shop']->getPhone(),
+                        content: '<p>Distance : '.($data['distance'] / 1000).' kms <br>Temps de trajet : '.gmdate("H:i:s", $data['duration']).'</p>'.$cgos
                     ),
                     extra: [
                         'icon_mask_url' => 'https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet.svg',
@@ -384,5 +389,4 @@ class MapsService
 
         return $map;
     }
-
 }
