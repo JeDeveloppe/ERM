@@ -49,9 +49,10 @@ class TelematicAreasService
         $io->success('Importation terminée');
     }
 
-    private function createOrUpdate(Cgo $entity): TelematicArea
+    private function createOrUpdate(Cgo $cgo): TelematicArea
     {
-        $cgoArea = $this->telematicAreaRepository->findTerritoryFromCgo($entity);
+        $cgoArea = $this->telematicAreaRepository->findTerritoryFromCgo($cgo);
+
 
         if(!$cgoArea){
             $cgoArea = new TelematicArea();
@@ -59,7 +60,7 @@ class TelematicAreasService
 
         //"id","cgo_who_controls_area_id","zone_color"
         $cgoArea
-            ->addCgo($this->cgoRepository->find($entity))
+            ->addCgo($cgo)
             ->setTerritoryColor($this->mapsService->randomHexadecimalColor());
 
         return $cgoArea;
