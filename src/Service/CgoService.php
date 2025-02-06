@@ -169,12 +169,15 @@ class CgoService
             }
 
         }else if(strlen($arrayEntity['Rattachement direct CGO VI']) > 1 && strlen($arrayEntity['Rattachement direct CGO VL']) > 1){
-
-            $cgos[] = $this->cgoRepository->findBy(['zoneName' => $arrayEntity['Rattachement direct CGO VL'], 'zoneName' => $arrayEntity['Rattachement direct CGO VI']]);
+            $cgos = [];
+            $cgos[] = $this->cgoRepository->findBy(['zoneName' => $arrayEntity['Rattachement direct CGO VL']]);
+            $cgos[] = $this->cgoRepository->findBy(['zoneName' => $arrayEntity['Rattachement direct CGO VI']]);
         
             foreach($cgos as $array){
                 foreach($array as $cgo){
-                    $shop->addCgo($cgo);
+                    if($cgo instanceof Cgo){
+                        $shop->addCgo($cgo);
+                    }
                 }
             }
 
@@ -277,7 +280,7 @@ class CgoService
 
             $shopsByRayonOfIntervention = [];
             foreach($shopsFiltred as $shopFiltred){
-                if($this->distance($cityOfIntervention,$shopFiltred,'K', 80) == true){
+                if($this->distance($cityOfIntervention,$shopFiltred,'K', $_ENV['RAYON_OF_INTERVENTION']) == true){
                     $shopsByRayonOfIntervention[] = $shopFiltred;
                 }
             }

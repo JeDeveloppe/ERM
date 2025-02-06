@@ -20,15 +20,14 @@ class TelematicAreaRepository extends ServiceEntityRepository
     /**
     * @return TelematicArea[] Returns an array of TelematicArea objects
     */
-    public function findTerritoryFromCgo($cgo): array
+    public function findTerritoryFromCgo($cgo): ?TelematicArea
     {
         return $this->createQueryBuilder('t')
             ->join('t.cgos', 'c')
             ->where('c.id = :val')
             ->setParameter('val', $cgo->getId())
-            ->setMaxResults(1)
             ->getQuery()
-            ->getResult()
+            ->getOneOrNullResult()
         ;
     }
 
