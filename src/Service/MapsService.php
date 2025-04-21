@@ -8,6 +8,7 @@ use App\Entity\ShopClass;
 use Symfony\UX\Map\Point;
 use Symfony\UX\Map\Marker;
 use App\Entity\TelematicArea;
+use Symfony\UX\Map\Icon\Icon;
 use Symfony\UX\Map\InfoWindow;
 use App\Repository\CgoRepository;
 use App\Repository\ShopRepository;
@@ -343,6 +344,7 @@ class MapsService
     public function getMapWithInterventionPointAndAllShopsArround(City $cityOfIntervention, array $arrayFromAllShopsNearCityOfIntervention): Map
     {
         $map = (new Map());
+        $iconOfIntervention = Icon::ux('tabler:truck-filled')->width(42)->height(42);
         
         $map
             ->center(new Point($cityOfIntervention->getLatitude(), $cityOfIntervention->getLongitude()))
@@ -356,9 +358,10 @@ class MapsService
                     headerContent: $cityOfIntervention->getName(),
                     content: 'Lieu de l\'intervention'
                 ),
-                extra: [
-                    'icon_mask_url' => 'https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet.svg',
-                ],
+                icon: $iconOfIntervention,
+                // extra: [
+                //     'icon_mask_url' => 'https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet.svg',
+                // ],
             ));
 
         foreach($arrayFromAllShopsNearCityOfIntervention as $data){
