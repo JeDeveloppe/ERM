@@ -78,7 +78,8 @@ class MapsController extends AbstractController
         if($class){
 
             //?on recupere les donnees dans le service
-            $mapDonnees = $this->mapsService->constructionMapOfAllShopsUnderCgo($class);
+            // $mapDonnees = $this->mapsService->constructionMapOfAllShopsUnderCgo($class);
+            $mapDonnees = $this->mapsService->constructionMapOfAllShopsUnderCgoWithUxMap($class);
     
             return $this->render('site/maps/all_shops_under_cgo.html.twig', [
                 'mapDonnees' => $mapDonnees,

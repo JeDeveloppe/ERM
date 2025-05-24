@@ -7,7 +7,6 @@ use Symfony\UX\Map\Map;
 use App\Entity\ShopClass;
 use Symfony\UX\Map\Point;
 use Symfony\UX\Map\Marker;
-use App\Entity\TelematicArea;
 use Symfony\UX\Map\Icon\Icon;
 use Symfony\UX\Map\InfoWindow;
 use App\Repository\CgoRepository;
@@ -15,9 +14,10 @@ use App\Repository\ShopRepository;
 use App\Repository\ZoneErmRepository;
 use App\Repository\RegionErmRepository;
 use App\Repository\TelematicAreaRepository;
-use App\Repository\CgoTelematicAreaRepository;
-use App\Repository\CgoOperationalAreaRepository;
+use Symfony\UX\Map\Bridge\Leaflet\LeafletOptions;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\UX\Map\Bridge\Leaflet\Option\TileLayer;
 
 class MapsService
 {
@@ -29,6 +29,7 @@ class MapsService
             private RegionErmRepository $regionErmRepository,
             private TelematicAreaRepository $telematicAreaRepository,
             private CgoRepository $cgoRepository,
+            private KernelInterface $kernel
         ){}
 
     public function constructionMapOfTelematique()
@@ -344,6 +345,18 @@ class MapsService
     public function getMapWithInterventionPointAndAllShopsArround(City $cityOfIntervention, array $arrayFromAllShopsNearCityOfIntervention): Map
     {
         $map = (new Map());
+        $leafletOptions = (new LeafletOptions())
+            ->tileLayer(new TileLayer(
+                url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                options: [
+                    'minZoom' => 8,
+                    'maxZoom' => 10,
+                ]
+            ));
+        // Add the custom options to the map
+        $map->options($leafletOptions);
+
         $iconOfIntervention = Icon::ux('tabler:truck-filled')->width(42)->height(42);
         
         $map
@@ -389,6 +402,120 @@ class MapsService
                     ],
                 ));
         }
+
+        return $map;
+    }
+
+    public function constructionMapOfAllShopsUnderCgoWithUxMap(ShopClass $classErm)
+    {
+
+        //? on recupere l'url de base
+        $baseUrl = $this->requestStack->getCurrentRequest()->getScheme() . '://' . $this->requestStack->getCurrentRequest()->getHttpHost() . $this->requestStack->getCurrentRequest()->getBasePath();
+
+        //?on recupere tous les cgos
+        $cgos = $this->cgoRepository->findBy(['classErm' => $classErm]);
+        $map = (new Map());
+
+        $iconOfCgo = Icon::url('../../map/images/logoCgo.png')->width(32)->height(32);
+        $iconOfShopUnderCgo = Icon::ux('tabler:truck-filled')->width(14)->height(14)->color('#D22500');
+
+        $map->fitBoundsToMarkers();
+
+        foreach($cgos as $cgo)
+        {
+            $map->addMarker(new Marker(
+                position: new Point($cgo->getCity()->getLatitude(), $cgo->getCity()->getLongitude()),
+                icon: $iconOfCgo,
+                title: $cgo->getName(),
+                infoWindow: new InfoWindow(
+                    content: $cgo->getName(),
+                )
+            ));
+
+            //tous les shops du cgo
+            $shops = $cgo->getShopsUnderControls();
+
+            foreach($shops as $shop)
+            {
+                $map->addMarker(new Marker(
+                    position: new Point($shop->getCity()->getLatitude(), $shop->getCity()->getLongitude()),
+                    icon: $iconOfShopUnderCgo,
+                    title: $shop->getName(),
+                    infoWindow: new InfoWindow(
+                        content: $shop->getName().'('.$shop->getCm().')<p>'.$shop->getManager()->getFirstNameAndNameOnly().'<br/>'.$shop->getPhone().'</p>',
+                    )
+                ));
+            }
+            
+        }
+
+
+
+
+        // $locations = []; //? toutes les réponses seront dans ce tableau final
+
+        // foreach($cgos as $cgo)
+        // {
+        //     //?le cgo
+        //     $locations[] = 
+        //     [
+        //         "lat" => $cgo->getCity()->getLatitude(),
+        //         "lng" => $cgo->getCity()->getLongitude(),
+        //         "color" => $cgo->getTerritoryColor() ?? $this->randomHexadecimalColor(),
+        //         "name" => $cgo->getName().' ('.$cgo->getCm().')',
+        //         "description" => $cgo->getManager()->getFirstName().' '.$cgo->getManager()->getLastName(),
+        //         "size" => 30,
+        //         "type" => "image",
+        //         "image_url" => "https://erm.je-developpe.fr/map/images/logoCgo.png"
+        //     ];
+            
+        //     $shops = $cgo->getShopsUnderControls();
+
+        //     foreach($shops as $shop)
+        //     {
+        //         //?si on a les coordonnees de renseignées dans la base uniquement
+        //         if(!is_null($shop->getCity()))
+        //         {
+    
+        //             if($shop->getManager() !== null){
+    
+        //                 $manager = $shop->getManager();
+        //                 $contactShop = $manager->getFirstName() . ' ' . $manager->getLastName() . ' <br/> ' . $shop->getManager()->getPhone() . '<br/>' . $manager->getEmail();
+                    
+        //             }else{
+    
+        //                 $contactShop = "NON RENSEIGNÉ";
+        //             }
+                    
+        //             $locations[] = 
+        //             [
+        //                 "lat" => $shop->getCity()->getLatitude(),
+        //                 "lng" => $shop->getCity()->getLongitude(),
+        //                 "color" => $cgo->getTerritoryColor() ?? $this->randomHexadecimalColor(),
+        //                 "name" => $shop->getName().' ('.$shop->getCm().')',
+        //                 "description" => $contactShop,
+        //                 "url" => $baseUrl,
+        //                 "size" => 10,
+        //             ];
+        //         }
+        //     }
+        // }
+
+        // //?on encode en json
+        // $jsonLocations = json_encode($locations, JSON_FORCE_OBJECT); 
+        // $donnees['locations'] = $jsonLocations;
+
+        $leafletOptions = (new LeafletOptions())
+            ->tileLayer(new TileLayer(
+                url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                options: [
+                    'minZoom' => 6,
+                    'maxZoom' => 10,        
+                ]
+                ));
+        // Add the custom options to the map
+        $map->options($leafletOptions);
 
         return $map;
     }
