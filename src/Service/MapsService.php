@@ -32,7 +32,7 @@ class MapsService
             private KernelInterface $kernel
         ){}
 
-    public function constructionMapOfTelematique()
+    public function constructionMapOfZonesTelematique()
     {
 
         //? on recupere l'url de base
