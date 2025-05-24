@@ -48,7 +48,7 @@ class MapsController extends AbstractController
             'name' => 'Toutes les zones VL'
         ];
         $routes[] = [
-            'url' => $this->generateUrl('app_map_telematique'),
+            'url' => $this->generateUrl('app_map_zones_telematique'),
             'name' => 'Toutes les zones télématiques'
         ];
 
@@ -127,8 +127,23 @@ class MapsController extends AbstractController
         }
     }
 
-    #[Route('/maps/telematique', name: 'app_map_telematique')]
-    public function mapTelematiqueArea(): Response
+    #[Route('/maps/zones-telematique', name: 'app_map_zones_telematique')]
+    public function mapZonesTelematiqueArea(): Response
+    {
+        //?on recupere les donnees dans le service
+        $mapDonnees = $this->mapsService->constructionMapOfZonesTelematique();
+
+        $telematicAreas = $this->telematicAreaRepository->findAll();
+
+        return $this->render('site/maps/telematic.html.twig', [
+            'mapDonnees' => $mapDonnees,
+            'title' => 'Zones télématiques MV',
+            'telematicAreas' => $telematicAreas
+        ]);
+    }
+
+    #[Route('/maps/techniciens-telematique', name: 'app_map_technicians_telematique')]
+    public function mapTechniciansTelematiqueArea(): Response
     {
         //?on recupere les donnees dans le service
         $mapDonnees = $this->mapsService->constructionMapOfTelematique();
