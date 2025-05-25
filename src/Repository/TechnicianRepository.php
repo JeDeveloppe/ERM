@@ -31,13 +31,16 @@ class TechnicianRepository extends ServiceEntityRepository
     //        ;
     //    }
 
-    //    public function findOneBySomeField($value): ?Technician
-    //    {
-    //        return $this->createQueryBuilder('t')
-    //            ->andWhere('t.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+       public function findAllTelematicTechniciansByFormationName($formationName): ?array
+       {
+           return $this->createQueryBuilder('t')
+               ->join('t.technicianFormations', 'f')
+               ->where('t.isTelematic = :true')
+               ->andWhere('f.name IN (:formationName)')
+               ->setParameter('true', true)
+               ->setParameter('formationName', $formationName)
+               ->getQuery()
+               ->getResult()
+           ;
+       }
 }

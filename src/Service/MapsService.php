@@ -471,10 +471,15 @@ class MapsService
         return $map;
     }
 
-    public function constructionMapOfTechniciansTelematique()
+    public function constructionMapOfTechniciansTelematique(?string $formationName)
     {
+
         //?on recupere tous les techniciens
-        $technicians = $this->technicianRepository->findBy(['isTelematic' => true]);
+        if($formationName !== NULL){
+            $technicians = $this->technicianRepository->findAllTelematicTechniciansByFormationName($formationName);
+        }else{
+            $technicians = $this->technicianRepository->findBy(['isTelematic' => true]);
+        }
 
         //?on cré un manager et un Cgo fakes
         $fakeManager = new Manager();
@@ -483,10 +488,7 @@ class MapsService
         $fakeCgo->setTerritoryColor('#000000')->setName("PAS DE CGO RENSEIGNÉ")->setManager($fakeManager);
 
         //?on construit la map
-        $map = (new Map())
-        ->center(new Point(48.8566, 2.3522))
-        ->zoom(4);
-        $map->fitBoundsToMarkers(true);
+        $map = (new Map())->fitBoundsToMarkers(true);
 
         foreach($technicians as $technician)
         {
