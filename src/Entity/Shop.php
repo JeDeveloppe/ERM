@@ -47,9 +47,16 @@ class Shop
     #[ORM\ManyToOne(inversedBy: 'shops')]
     private ?Manager $manager = null;
 
+    /**
+     * @var Collection<int, Technician>
+     */
+    #[ORM\OneToMany(targetEntity: Technician::class, mappedBy: 'shop')]
+    private Collection $technicians;
+
     public function __construct()
     {
         $this->cgos = new ArrayCollection();
+        $this->technicians = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -181,6 +188,36 @@ class Shop
     public function setManager(?Manager $manager): static
     {
         $this->manager = $manager;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Technician>
+     */
+    public function getTechnicians(): Collection
+    {
+        return $this->technicians;
+    }
+
+    public function addTechnician(Technician $technician): static
+    {
+        if (!$this->technicians->contains($technician)) {
+            $this->technicians->add($technician);
+            $technician->setShop($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTechnician(Technician $technician): static
+    {
+        if ($this->technicians->removeElement($technician)) {
+            // set the owning side to null (unless already changed)
+            if ($technician->getShop() === $this) {
+                $technician->setShop(null);
+            }
+        }
 
         return $this;
     }

@@ -13,6 +13,9 @@ use App\Entity\Department;
 use App\Entity\LargeRegion;
 use App\Entity\ManagerClass;
 use App\Entity\Primelevel;
+use App\Entity\Technician;
+use App\Entity\TechnicianFormations;
+use App\Entity\TechnicianVehicle;
 use App\Entity\TelematicArea;
 use App\Entity\User;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -46,24 +49,35 @@ class DashboardController extends AbstractDashboardController
             MenuItem::linkToRoute('Site', 'fa fa-globe', 'app_home'),
             // MenuItem::linkToCrud('Zones opérationnelles (par centres)', 'fas fa-list', CgoOperationalAreaByShops::class),
             // MenuItem::linkToCrud('Zones télématiques', 'fas fa-list', CgoTelematicArea::class),
+            MenuItem::section('Télématique:'),
+            MenuItem::linkToCrud('Liste des techniciens', 'fas fa-list', Technician::class),
+            MenuItem::linkToCrud('Liste des formations', 'fas fa-list', TechnicianFormations::class),
+            MenuItem::linkToCrud('Liste des véhicules', 'fas fa-list', TechnicianVehicle::class),
+
             MenuItem::section('Les zones / régions ERM:'),
             MenuItem::linkToCrud('Zones télématiques', 'fas fa-list', TelematicArea::class),
             MenuItem::linkToCrud('Les régions ERM', 'fas fa-list', RegionErm::class),
             MenuItem::linkToCrud('Les zones ERM', 'fas fa-list', ZoneErm::class),
+
             MenuItem::section('Les entités ERM:'),
             MenuItem::linkToCrud('Les cgos', 'fas fa-list', Cgo::class),
             MenuItem::linkToCrud('Les centres', 'fas fa-list', Shop::class),
             MenuItem::linkToCrud('Les managers', 'fas fa-list', Manager::class),
-            MenuItem::section('Configurations ERM:'),
-            MenuItem::linkToCrud('Les status des managers', 'fas fa-gear', ManagerClass::class),
-            MenuItem::linkToCrud('Les classes des centres', 'fas fa-gear', ShopClass::class),
-            MenuItem::section('Configurations Bdd FRANCE:'),
-            MenuItem::linkToCrud('Les villes', 'fas fa-list', City::class),
-            MenuItem::linkToCrud('Les départements', 'fas fa-list', Department::class),
-            MenuItem::linkToCrud('Les grandes régions', 'fas fa-list', LargeRegion::class),
-            MenuItem::section('Configuration des accès:'),
-            MenuItem::linkToCrud('Les utilisateurs', 'fas fa-list', User::class),
-            MenuItem::linkToCrud('Les paliers de prime', 'fas fa-list', Primelevel::class),
+
+            MenuItem::section('Configurations ERM:')->setPermission('ROLE_SUPER_ADMIN'),
+            MenuItem::linkToCrud('Les status des managers', 'fas fa-gear', ManagerClass::class)->setPermission('ROLE_SUPER_ADMIN'),
+            MenuItem::linkToCrud('Les classes des centres', 'fas fa-gear', ShopClass::class)->setPermission('ROLE_SUPER_ADMIN'),
+
+            MenuItem::section('Configurations Bdd FRANCE:')->setPermission('ROLE_SUPER_ADMIN'),
+            MenuItem::linkToCrud('Les villes', 'fas fa-list', City::class)->setPermission('ROLE_SUPER_ADMIN'),
+            MenuItem::linkToCrud('Les départements', 'fas fa-list', Department::class)->setPermission('ROLE_SUPER_ADMIN'),
+            MenuItem::linkToCrud('Les grandes régions', 'fas fa-list', LargeRegion::class)->setPermission('ROLE_SUPER_ADMIN'),
+
+            MenuItem::section('Configuration des accès:')->setPermission('ROLE_SUPER_ADMIN'),
+            MenuItem::linkToCrud('Les utilisateurs', 'fas fa-list', User::class)->setPermission('ROLE_SUPER_ADMIN'),
+
+            MenuItem::section('Calcul des primes:')->setPermission('ROLE_ADMIN'),
+            MenuItem::linkToCrud('Les paliers de prime', 'fas fa-list', Primelevel::class)->setPermission('ROLE_ADMIN'),
         ];
 
     }
