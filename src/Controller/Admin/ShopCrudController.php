@@ -5,11 +5,12 @@ namespace App\Controller\Admin;
 use App\Entity\Shop;
 use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
-use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 
 class ShopCrudController extends AbstractCrudController
 {
@@ -51,5 +52,13 @@ class ShopCrudController extends AbstractCrudController
             ->setPageTitle('edit', 'Modifier un centre ERM')
             ->setSearchFields(['name', 'address', 'phone', 'city.name','cm'])
             ->showEntityActionsInlined();
+    }
+
+    public function configureFilters(Filters $filters): Filters
+    {
+        return $filters
+            ->add('shopClass')
+            ->add('cgos')
+        ;
     }
 }
