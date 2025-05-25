@@ -21,6 +21,7 @@ class TechnicianCrudController extends AbstractCrudController
     {
         return [
             AssociationField::new('shop', 'Centre ERM:'),
+            AssociationField::new('controledByCgo', 'Sous CGO:'),
             TextField::new('name', 'Nom'),
             TextField::new('firstName', 'Prénom'),
             TextField::new('email', 'Email'),

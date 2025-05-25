@@ -65,7 +65,15 @@ class TechnicianService
             $technician = new Technician();
         }
 
+        //?on recupere le shop du technicien
         $shop = $this->shoprepository->findOneBy(['cm' => $arrayTechnician['CM']]);
+
+        //?on recupere le cgo ratacher au shop (peut etre null)
+        $cgo = $shop->getCgos()->first();
+        if(!$cgo){
+            $cgo = null;
+        }
+
         $nameAndFirstName = explode(" ",$arrayTechnician['Télématique VI TM1']);
         $technicianName = $nameAndFirstName[0];
         $technicianFirstName = $nameAndFirstName[1];
@@ -73,6 +81,8 @@ class TechnicianService
         $technician
             ->setEmail($arrayTechnician['Email TM'])
             ->setName($technicianName)
+            ->setIsTelematic(true)
+            ->setControledByCgo($cgo)
             ->setFirstName($technicianFirstName)
             ->setPhone($arrayTechnician['Téléphone Portable'])
             ->setInformations($arrayTechnician['INFOS DIVERS'])

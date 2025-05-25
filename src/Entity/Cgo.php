@@ -57,9 +57,16 @@ class Cgo
     #[ORM\ManyToOne(inversedBy: 'cgos')]
     private ?TelematicArea $telematicArea = null;
 
+    /**
+     * @var Collection<int, Technician>
+     */
+    #[ORM\OneToMany(targetEntity: Technician::class, mappedBy: 'controledByCgo')]
+    private Collection $technicians;
+
     public function __construct()
     {
         $this->shopsUnderControls = new ArrayCollection();
+        $this->technicians = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -224,6 +231,36 @@ class Cgo
     public function setTelematicArea(?TelematicArea $telematicArea): static
     {
         $this->telematicArea = $telematicArea;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Technician>
+     */
+    public function getTechnicians(): Collection
+    {
+        return $this->technicians;
+    }
+
+    public function addTechnician(Technician $technician): static
+    {
+        if (!$this->technicians->contains($technician)) {
+            $this->technicians->add($technician);
+            $technician->setControledByCgo($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTechnician(Technician $technician): static
+    {
+        if ($this->technicians->removeElement($technician)) {
+            // set the owning side to null (unless already changed)
+            if ($technician->getControledByCgo() === $this) {
+                $technician->setControledByCgo(null);
+            }
+        }
 
         return $this;
     }

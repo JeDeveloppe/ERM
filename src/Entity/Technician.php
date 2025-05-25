@@ -45,6 +45,12 @@ class Technician
     #[ORM\JoinColumn(nullable: false)]
     private ?TechnicianVehicle $vehicle = null;
 
+    #[ORM\Column]
+    private ?bool $isTelematic = null;
+
+    #[ORM\ManyToOne(inversedBy: 'technicians')]
+    private ?Cgo $controledByCgo = null;
+
     public function __construct()
     {
         $this->technicianFormations = new ArrayCollection();
@@ -159,6 +165,30 @@ class Technician
     public function setVehicle(?TechnicianVehicle $vehicle): static
     {
         $this->vehicle = $vehicle;
+
+        return $this;
+    }
+
+    public function getIsTelematic(): ?bool
+    {
+        return $this->isTelematic;
+    }
+
+    public function setIsTelematic(bool $isTelematic): static
+    {
+        $this->isTelematic = $isTelematic;
+
+        return $this;
+    }
+
+    public function getControledByCgo(): ?Cgo
+    {
+        return $this->controledByCgo;
+    }
+
+    public function setControledByCgo(?Cgo $controledByCgo): static
+    {
+        $this->controledByCgo = $controledByCgo;
 
         return $this;
     }

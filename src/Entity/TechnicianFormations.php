@@ -24,6 +24,9 @@ class TechnicianFormations
     #[ORM\ManyToMany(targetEntity: Technician::class, mappedBy: 'technicianFormations')]
     private Collection $technicians;
 
+    #[ORM\Column(length: 10)]
+    private ?string $color = null;
+
     public function __construct()
     {
         $this->technicians = new ArrayCollection();
@@ -76,5 +79,17 @@ class TechnicianFormations
     public function __toString(): string
     {
         return $this->name;
+    }
+
+    public function getColor(): ?string
+    {
+        return $this->color;
+    }
+
+    public function setColor(string $color): static
+    {
+        $this->color = $color;
+
+        return $this;
     }
 }

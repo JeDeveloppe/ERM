@@ -1,0 +1,19 @@
+{% extends "site/components/_base.html.twig" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+
+    {# <div class="js-locations" data-locations="{{ mapDonnees.locations }}"></div> #}
+    {# <div class="js-states" data-states="{{ donnees.states }}"></div> #}
+	
+	<div class="row g-0 justify-content-center align-items-center mb-3">
+		<h1 class="col-12 text-center my-5">{{ title }}</h1>
+		<div class="col-11 col-md-10 col-lg-8">
+			{# affichage de la carte de France #}
+			{{ ux_map(mapDonnees, { style: 'height: 600px' }) }}
+		</div>
+	</div>
+
+
+{% endblock %}
