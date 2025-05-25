@@ -185,6 +185,11 @@ class Manager
         return $this;
     }
 
+    public function getFirstNameAndNameOnly(): string
+    {
+        return $this->firstName.' '.$this->lastName;
+    }
+    
     public function __toString()
     {
         if($this->getShops() !== null){
