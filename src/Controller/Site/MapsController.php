@@ -2,12 +2,14 @@
 
 namespace App\Controller\Site;
 
+use App\Form\SearchTechnicianFormationsTypeForm;
 use App\Service\MapsService;
 use App\Repository\ShopClassRepository;
 use App\Repository\TelematicAreaRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 
 class MapsController extends AbstractController
 {
@@ -142,15 +144,32 @@ class MapsController extends AbstractController
         ]);
     }
 
-    #[Route('/maps/techniciens-telematique', name: 'app_map_technicians_telematique')]
-    public function mapTechniciansTelematiqueArea(): Response
+    #[Route('/maps/techniciens-telematique/{formationName?}', name: 'app_map_technicians_telematique', methods: ['GET', 'POST'])]
+    public function mapTechniciansTelematiqueArea(?string $formationName, Request $request): Response
     {
-        //?on recupere les donnees dans le service
-        $mapDonnees = $this->mapsService->constructionMapOfTechniciansTelematique();
+
+        // Create the form, associating it with the $film object
+        $form = $this->createForm(SearchTechnicianFormationsTypeForm::class);
+
+        // Handle the form submission
+        $form->handleRequest($request);
+
+        // Check if the form was submitted and is valid
+        if($form->isSubmitted() && $form->isValid()) {
+
+            $formationName = $form->get('name')->getData()->getName();
+            $mapDonnees = $this->mapsService->constructionMapOfTechniciansTelematique($formationName);
+
+        }else{
+            
+            //?on recupere les donnees dans le service
+            $mapDonnees = $this->mapsService->constructionMapOfTechniciansTelematique($formationName);
+        }
 
         return $this->render('site/maps/technicians_telematic.html.twig', [
             'mapDonnees' => $mapDonnees,
-            'title' => 'Les techniciens télématiques'
+            'title' => 'Les techniciens télématiques',
+            'form' => $form->createView()
         ]);
     }
 }

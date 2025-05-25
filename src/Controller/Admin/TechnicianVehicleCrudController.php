@@ -3,9 +3,8 @@
 namespace App\Controller\Admin;
 
 use App\Entity\TechnicianVehicle;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
-use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
 class TechnicianVehicleCrudController extends AbstractCrudController
@@ -15,14 +14,19 @@ class TechnicianVehicleCrudController extends AbstractCrudController
         return TechnicianVehicle::class;
     }
 
-    /*
     public function configureFields(string $pageName): iterable
     {
         return [
-            IdField::new('id'),
-            TextField::new('title'),
-            TextEditorField::new('description'),
+            TextField::new('name', 'Nom'),
         ];
     }
-    */
+
+    public function configureCrud(Crud $crud): Crud
+    {
+        return $crud
+            ->setPageTitle('index', 'Liste des véhicules')
+            ->setPageTitle('new', 'Nouveau véhicule')
+            ->setPageTitle('edit', 'Modifier un véhicule')
+            ->setDefaultSort(['name' => 'ASC']);
+    }
 }
