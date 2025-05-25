@@ -146,14 +146,11 @@ class MapsController extends AbstractController
     public function mapTechniciansTelematiqueArea(): Response
     {
         //?on recupere les donnees dans le service
-        $mapDonnees = $this->mapsService->constructionMapOfTelematique();
+        $mapDonnees = $this->mapsService->constructionMapOfTechniciansTelematique();
 
-        $telematicAreas = $this->telematicAreaRepository->findAll();
-
-        return $this->render('site/maps/telematic.html.twig', [
+        return $this->render('site/maps/technicians_telematic.html.twig', [
             'mapDonnees' => $mapDonnees,
-            'title' => 'Zones télématiques MV',
-            'telematicAreas' => $telematicAreas
+            'title' => 'Les techniciens télématiques'
         ]);
     }
 }

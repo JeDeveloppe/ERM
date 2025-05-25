@@ -44,7 +44,7 @@ class TechnicianFormationsService
                 $formation = new TechnicianFormations();
             }
 
-            $formation->setName($toCreate);
+            $formation->setName($toCreate)->setColor('#'.dechex(mt_rand(0, 0xFFFFFF)));
 
             $this->em->persist($formation);
         }
