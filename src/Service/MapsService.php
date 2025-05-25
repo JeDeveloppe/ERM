@@ -2,7 +2,9 @@
 
 namespace App\Service;
 
+use App\Entity\Cgo;
 use App\Entity\City;
+use App\Entity\Manager;
 use Symfony\UX\Map\Map;
 use App\Entity\ShopClass;
 use Symfony\UX\Map\Point;
@@ -13,6 +15,7 @@ use App\Repository\CgoRepository;
 use App\Repository\ShopRepository;
 use App\Repository\ZoneErmRepository;
 use App\Repository\RegionErmRepository;
+use App\Repository\TechnicianRepository;
 use App\Repository\TelematicAreaRepository;
 use Symfony\UX\Map\Bridge\Leaflet\LeafletOptions;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -28,11 +31,12 @@ class MapsService
             private ZoneErmRepository $zoneErmRepository,
             private RegionErmRepository $regionErmRepository,
             private TelematicAreaRepository $telematicAreaRepository,
+            private TechnicianRepository $technicianRepository,
             private CgoRepository $cgoRepository,
             private KernelInterface $kernel
         ){}
 
-    public function constructionMapOfTelematique()
+    public function constructionMapOfZonesTelematique()
     {
 
         //? on recupere l'url de base
@@ -414,12 +418,13 @@ class MapsService
 
         //?on recupere tous les cgos
         $cgos = $this->cgoRepository->findBy(['classErm' => $classErm]);
-        $map = (new Map());
+        $map = (new Map())
+        ->center(new Point(48.8566, 2.3522))
+        ->zoom(4);
+        $map->fitBoundsToMarkers(true);
 
         $iconOfCgo = Icon::url('../../map/images/logoCgo.png')->width(32)->height(32);
-        $iconOfShopUnderCgo = Icon::ux('tabler:truck-filled')->width(14)->height(14)->color('#D22500');
 
-        $map->fitBoundsToMarkers();
 
         foreach($cgos as $cgo)
         {
@@ -437,6 +442,8 @@ class MapsService
 
             foreach($shops as $shop)
             {
+                $iconOfShopUnderCgo = Icon::ux('tabler:truck-filled')->width(14)->height(14)->color($shop->getCgos()->first()->getTerritoryColor());
+
                 $map->addMarker(new Marker(
                     position: new Point($shop->getCity()->getLatitude(), $shop->getCity()->getLongitude()),
                     icon: $iconOfShopUnderCgo,
@@ -449,61 +456,67 @@ class MapsService
             
         }
 
+        $leafletOptions = (new LeafletOptions())
+            ->tileLayer(new TileLayer(
+                url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                options: [
+                    'minZoom' => 6,
+                    'maxZoom' => 10,        
+                ]
+                ));
+        // Add the custom options to the map
+        $map->options($leafletOptions);
 
+        return $map;
+    }
 
+    public function constructionMapOfTechniciansTelematique(?string $formationName)
+    {
 
-        // $locations = []; //? toutes les réponses seront dans ce tableau final
+        //?on recupere tous les techniciens
+        if($formationName !== NULL){
+            $technicians = $this->technicianRepository->findAllTelematicTechniciansByFormationName($formationName);
+        }else{
+            $technicians = $this->technicianRepository->findBy(['isTelematic' => true]);
+        }
 
-        // foreach($cgos as $cgo)
-        // {
-        //     //?le cgo
-        //     $locations[] = 
-        //     [
-        //         "lat" => $cgo->getCity()->getLatitude(),
-        //         "lng" => $cgo->getCity()->getLongitude(),
-        //         "color" => $cgo->getTerritoryColor() ?? $this->randomHexadecimalColor(),
-        //         "name" => $cgo->getName().' ('.$cgo->getCm().')',
-        //         "description" => $cgo->getManager()->getFirstName().' '.$cgo->getManager()->getLastName(),
-        //         "size" => 30,
-        //         "type" => "image",
-        //         "image_url" => "https://erm.je-developpe.fr/map/images/logoCgo.png"
-        //     ];
-            
-        //     $shops = $cgo->getShopsUnderControls();
+        //?on cré un manager et un Cgo fakes
+        $fakeManager = new Manager();
+        $fakeManager->setFirstName('MANAGER NON RENSEIGNÉ')->setPhone("TÉLÉPHONE NON RENSEIGNÉ")->setEmail("EMAIL NON RENSEIGNÉ");
+        $fakeCgo = new Cgo();
+        $fakeCgo->setTerritoryColor('#000000')->setName("PAS DE CGO RENSEIGNÉ")->setManager($fakeManager);
 
-        //     foreach($shops as $shop)
-        //     {
-        //         //?si on a les coordonnees de renseignées dans la base uniquement
-        //         if(!is_null($shop->getCity()))
-        //         {
-    
-        //             if($shop->getManager() !== null){
-    
-        //                 $manager = $shop->getManager();
-        //                 $contactShop = $manager->getFirstName() . ' ' . $manager->getLastName() . ' <br/> ' . $shop->getManager()->getPhone() . '<br/>' . $manager->getEmail();
-                    
-        //             }else{
-    
-        //                 $contactShop = "NON RENSEIGNÉ";
-        //             }
-                    
-        //             $locations[] = 
-        //             [
-        //                 "lat" => $shop->getCity()->getLatitude(),
-        //                 "lng" => $shop->getCity()->getLongitude(),
-        //                 "color" => $cgo->getTerritoryColor() ?? $this->randomHexadecimalColor(),
-        //                 "name" => $shop->getName().' ('.$shop->getCm().')',
-        //                 "description" => $contactShop,
-        //                 "url" => $baseUrl,
-        //                 "size" => 10,
-        //             ];
-        //         }
-        //     }
-        // }
+        //?on construit la map
+        $map = (new Map())->fitBoundsToMarkers(true);
 
-        // //?on encode en json
-        // $jsonLocations = json_encode($locations, JSON_FORCE_OBJECT); 
-        // $donnees['locations'] = $jsonLocations;
+        foreach($technicians as $technician)
+        {
+            $cgo = $technician->getShop()->getCgos()->first();
+            if(!$cgo){
+                $cgo = $fakeCgo;
+            }
+            $iconOfTechnician = Icon::ux('ri:taxi-wifi-fill')->width(24)->height(24)->color($cgo->getTerritoryColor());
+            $formations = '';
+            foreach($technician->getTechnicianFormations() as $formation) {
+                $formations .= '<span class="badge" style="background-color:'.$formation->getColor().'">'.$formation->getName().'</span> ';
+            }
+
+            $map->addMarker(new Marker(
+                position: new Point($technician->getShop()->getCity()->getLatitude(), $technician->getShop()->getCity()->getLongitude()),
+                icon: $iconOfTechnician,
+                title: $technician->getName(),
+                infoWindow: new InfoWindow(
+                    headerContent: strtoupper($technician->getName()).' '.$technician->getFirstName(),
+                    content:
+                        '<p>Centre de: '.$technician->getShop().
+                        '<br/>Tél: '.$technician->getPhone().'<br/>Email: '.$technician->getEmail().
+                        '<br/>Formations: '.$formations.
+                        '</p>
+                        <p>Géré par:<br/>'.$cgo->getName().'<br/>'.$cgo->getManager().'<br/>'.$cgo->getManager()->getPhone().'</p>'
+                )
+            ));
+        }
 
         $leafletOptions = (new LeafletOptions())
             ->tileLayer(new TileLayer(
