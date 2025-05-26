@@ -442,7 +442,8 @@ class MapsService
 
             foreach($shops as $shop)
             {
-                $iconOfShopUnderCgo = Icon::ux('tabler:truck-filled')->width(14)->height(14)->color($shop->getCgos()->first()->getTerritoryColor());
+
+                $iconOfShopUnderCgo = Icon::ux('solar:garage-bold')->width(14)->height(14)->color($cgo->getTerritoryColor());
 
                 $map->addMarker(new Marker(
                     position: new Point($shop->getCity()->getLatitude(), $shop->getCity()->getLongitude()),
@@ -492,7 +493,7 @@ class MapsService
 
         foreach($technicians as $technician)
         {
-            $cgo = $technician->getShop()->getCgos()->first();
+            $cgo = $technician->getControledByCgo();
             if(!$cgo){
                 $cgo = $fakeCgo;
             }
