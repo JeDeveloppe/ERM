@@ -137,7 +137,7 @@ class MapsController extends AbstractController
 
         $telematicAreas = $this->telematicAreaRepository->findAll();
 
-        return $this->render('site/maps/telematic.html.twig', [
+        return $this->render('site/maps/zones_telematic.html.twig', [
             'mapDonnees' => $mapDonnees,
             'title' => 'Zones télématiques MV',
             'telematicAreas' => $telematicAreas
