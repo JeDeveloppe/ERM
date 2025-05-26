@@ -1,4 +1,4 @@
-//JUSTE mettre ces lignes dans la class ux_map dans vendor
+//vendor/symfony/ux-leaflet-map/assets/dist/map_controller.fs
 
 import { Controller } from '@hotwired/stimulus';
 import 'leaflet/dist/leaflet.min.css';
