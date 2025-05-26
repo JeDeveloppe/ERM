@@ -1,5 +1,5 @@
 <?php
-//JUSTE mettre ces lignes dans la class ux_map dans vendor
+//vendor/symfony/ux-map/src/Icon/Icon.php
 
 /*
  * This file is part of the Symfony package.
