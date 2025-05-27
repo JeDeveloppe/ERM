@@ -145,7 +145,7 @@ class MapsController extends AbstractController
     }
 
     #[Route('/maps/techniciens-telematique/{formationName?}', name: 'app_map_technicians_telematique', methods: ['GET', 'POST'])]
-    public function mapTechniciansTelematiqueArea(?string $formationName, Request $request): Response
+    public function mapTechniciansTelematiqueArea(?array $formationNames, Request $request): Response
     {
 
         // Create the form, associating it with the $film object
@@ -157,13 +157,21 @@ class MapsController extends AbstractController
         // Check if the form was submitted and is valid
         if($form->isSubmitted() && $form->isValid()) {
 
-            $formationName = $form->get('name')->getData()->getName();
-            $mapDonnees = $this->mapsService->constructionMapOfTechniciansTelematique($formationName);
+            $formations = $form->get('name')->getData();
+            $formationNamesArray = $formations->toArray();
+
+            $formationNames = [];
+            foreach($formationNamesArray as $formationName){
+                $formationNames[] = $formationName->getName();
+            }
+
+            $mapDonnees = $this->mapsService->constructionMapOfTechniciansTelematique($formationNames);
 
         }else{
             
+            $formationNames = [];
             //?on recupere les donnees dans le service
-            $mapDonnees = $this->mapsService->constructionMapOfTechniciansTelematique($formationName);
+            $mapDonnees = $this->mapsService->constructionMapOfTechniciansTelematique($formationNames);
         }
 
         return $this->render('site/maps/technicians_telematic.html.twig', [

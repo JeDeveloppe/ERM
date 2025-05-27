@@ -17,6 +17,7 @@ use App\Repository\ZoneErmRepository;
 use App\Repository\RegionErmRepository;
 use App\Repository\TechnicianRepository;
 use App\Repository\TelematicAreaRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\UX\Map\Bridge\Leaflet\LeafletOptions;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -472,15 +473,11 @@ class MapsService
         return $map;
     }
 
-    public function constructionMapOfTechniciansTelematique(?string $formationName)
+    public function constructionMapOfTechniciansTelematique(array $formationNames)
     {
 
         //?on recupere tous les techniciens
-        if($formationName !== NULL){
-            $technicians = $this->technicianRepository->findAllTelematicTechniciansByFormationName($formationName);
-        }else{
-            $technicians = $this->technicianRepository->findBy(['isTelematic' => true]);
-        }
+        $technicians = $this->technicianRepository->findAllTelematicTechniciansByFormationName($formationNames);
 
         //?on cré un manager et un Cgo fakes
         $fakeManager = new Manager();

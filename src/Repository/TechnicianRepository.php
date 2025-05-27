@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Technician;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -31,16 +32,30 @@ class TechnicianRepository extends ServiceEntityRepository
     //        ;
     //    }
 
-       public function findAllTelematicTechniciansByFormationName($formationName): ?array
+       public function findAllTelematicTechniciansByFormationName(array $formationNames = []): ?array
        {
-           return $this->createQueryBuilder('t')
-               ->join('t.technicianFormations', 'f')
-               ->where('t.isTelematic = :true')
-               ->andWhere('f.name IN (:formationName)')
-               ->setParameter('true', true)
-               ->setParameter('formationName', $formationName)
-               ->getQuery()
-               ->getResult()
-           ;
+            if(count($formationNames) == 0){
+
+                return $this->createQueryBuilder('t')
+                    ->where('t.isTelematic = :true')
+                    ->setParameter('true', true)
+                    ->getQuery()
+                    ->getResult()
+                    ;
+                    
+            }else{
+
+                return $this->createQueryBuilder('t')
+                    ->join('t.technicianFormations', 'f')
+                    ->where('t.isTelematic = :isTelematic')
+                    ->setParameter('isTelematic', true)
+                    ->andWhere('f.name IN (:formationNames)')
+                    ->setParameter('formationNames', $formationNames)
+                    ->groupBy('t.id') // Group by technician to count their distinct formations
+                    ->having('COUNT(DISTINCT f.name) = :formationCount') // Ensure they have all specified formations
+                    ->setParameter('formationCount', count($formationNames))
+                    ->getQuery()
+                    ->getResult();
+            }
        }
 }
