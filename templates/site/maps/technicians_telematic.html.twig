@@ -13,15 +13,29 @@
 			{# affichage de la carte de France #}
 			{{ ux_map(mapDonnees, {style: 'height: 600px' }) }}
 		</div>
-		<div class="col-11 col-md-10 col-lg-6 mb-3">
-			{{ form_start(form) }} 
-			{{ form_widget(form.name) }}
-			<div class="col-12 text-center my-2">
-				<div class="btn-group" role="group">
-					<button type="submit" class="btn btn-primary">Afficher</button>
-					<a href="{{ path('app_map_technicians_telematique') }}" class="btn btn-warning">Reset</a>
+		<div class="col-11 col-md-10 col-lg-8 col-xl-7 mb-3">
+			{{ form_start(form) }}
+				<div class="checkbox-group-wrapper d-flex flex-wrap justify-content-start">
+					{# Loop through each individual checkbox child of 'favoriteColors' #}
+					{% for child in form.name %}
+						<div class="form-check">
+							{# Render the checkbox input itself #}
+							{{ form_widget(child, {'attr': {'class': 'form-check-input ms-2'}}) }}
+
+							{# Render the label for the individual checkbox #}
+							{{ form_label(child, null, {'label_attr': {'class': 'form-check-label'}}) }}
+
+							{# You can also render individual errors if needed, though often group errors are enough #}
+							{{ form_errors(child) }}
+						</div>
+					{% endfor %}
 				</div>
-			</div>
+				<div class="col-12 text-center my-2">
+					<div class="btn-group" role="group">
+						<button type="submit" class="btn btn-primary">Afficher</button>
+						<a href="{{ path('app_map_technicians_telematique') }}" class="btn btn-warning">Reset</a>
+					</div>
+				</div>
 			{{ form_end(form) }} 
 		</div>
 	</div>

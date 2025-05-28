@@ -21,6 +21,7 @@ class SearchTechnicianFormationsTypeForm extends AbstractType
                 'class' => TechnicianFormations::class,
                 'choice_label' => 'name',
                 'multiple' => true,
+                'expanded' => true,
                 'placeholder' => 'Afficher les techniciens avec la formation...',
                 'attr' => [
                     'class' => 'form-control'   
