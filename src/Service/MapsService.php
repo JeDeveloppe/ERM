@@ -9,18 +9,20 @@ use Symfony\UX\Map\Map;
 use App\Entity\ShopClass;
 use Symfony\UX\Map\Point;
 use Symfony\UX\Map\Marker;
+use Symfony\UX\Map\Polygon;
 use Symfony\UX\Map\Icon\Icon;
 use Symfony\UX\Map\InfoWindow;
 use App\Repository\CgoRepository;
 use App\Repository\ShopRepository;
 use App\Repository\ZoneErmRepository;
 use App\Repository\RegionErmRepository;
+use App\Repository\DepartmentRepository;
 use App\Repository\TechnicianRepository;
 use App\Repository\TelematicAreaRepository;
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\UX\Map\Bridge\Leaflet\LeafletOptions;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\UX\Map\Bridge\Leaflet\Option\TileLayer;
 
 class MapsService
@@ -34,7 +36,8 @@ class MapsService
             private TelematicAreaRepository $telematicAreaRepository,
             private TechnicianRepository $technicianRepository,
             private CgoRepository $cgoRepository,
-            private KernelInterface $kernel
+            private KernelInterface $kernel,
+            private DepartmentRepository $departmentRepository
         ){}
 
     public function constructionMapOfZonesTelematique()
@@ -366,7 +369,7 @@ class MapsService
         
         $map
             ->center(new Point($cityOfIntervention->getLatitude(), $cityOfIntervention->getLongitude()))
-            ->zoom(10);
+            ->fitBoundsToMarkers(true);
 
         $map
             ->addMarker( new Marker(
