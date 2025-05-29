@@ -350,7 +350,7 @@ class MapsService
         return $donnees;
     }
 
-    public function getMapWithInterventionPointAndAllShopsArround(City $cityOfIntervention, array $arrayFromAllShopsNearCityOfIntervention): Map
+    public function getMapWithInterventionPointAndAllShopsArround(City $cityOfIntervention, array $arrayFromAllShopsNearCityOfIntervention, string $option): Map
     {
         $map = (new Map());
         $leafletOptions = (new LeafletOptions())
@@ -397,13 +397,21 @@ class MapsService
                 $cgos = "Aucun cgo rattaché";
             }
 
+            $technicians = "<p>Technicien(s) télématique: <br>";
+            if($option == 'telematique'){ //? options from SearchShopsByCityType
+                foreach ($data['shop']->getTechnicians() as $technician) {
+                    $technicians .= '- '.$technician->getName().': '.$technician->getPhone().'<br>';
+                }
+            }
+            $technicians .= '</p>';
+
             $map
                 ->addMarker( new Marker(
                     position: new Point($data['shop']->getCity()->getLatitude(), $data['shop']->getCity()->getLongitude()),
                     title: $data['shop']->getName(),
                     infoWindow: new InfoWindow(
                         headerContent: $data['shop']->getName().' ('.$data['shop']->getCm().') <br/>'.$data['shop']->getPhone(),
-                        content: '<p>Distance : '.($data['distance'] / 1000).' kms <br>Temps de trajet : '.gmdate("H:i:s", $data['duration']).'</p>'.$cgos
+                        content: $technicians.'<p>Distance : '.($data['distance'] / 1000).' kms <br>Temps de trajet : '.gmdate("H:i:s", $data['duration']).'</p>'.$cgos
                     ),
                     extra: [
                         'icon_mask_url' => 'https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet.svg',
@@ -508,11 +516,11 @@ class MapsService
                 icon: $iconOfTechnician,
                 title: $technician->getName(),
                 infoWindow: new InfoWindow(
-                    headerContent: strtoupper($technician->getName()).' '.$technician->getFirstName(),
+                    headerContent: $technician->getShop(),
                     content:
-                        '<p>Centre de: '.$technician->getShop().
-                        '<br/>Tél: '.$technician->getPhone().'<br/>Email: '.$technician->getEmail().
-                        '<br/>Formations: '.$formations.
+                        '<p>'.strtoupper($technician->getName()).' '.$technician->getFirstName().
+                        '<br/>Tél: '.$technician->getPhone().'<br/>Email: '.$technician->getEmail().'</p>'.
+                        '<p>Formations: '.$formations.
                         '</p>
                         <p>Géré par:<br/>'.$cgo->getName().'<br/>'.$cgo->getManager().'<br/>'.$cgo->getManager()->getPhone().'</p>'
                 )
