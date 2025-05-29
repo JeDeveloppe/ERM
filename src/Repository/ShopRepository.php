@@ -31,6 +31,39 @@ class ShopRepository extends ServiceEntityRepository
         ;
     }
 
+    /**
+     * Undocumented function
+     *
+     * @param array $classErm
+     * @return array
+     */
+    public function findShopsWhereTechnicianIsTelematic(): array
+    {
+
+        $qb = $this->createQueryBuilder('s')
+            ->join('s.technicians', 't')
+            ->where('t.isTelematic = :true')
+            ->setParameter('true', true)
+            ->getQuery()
+            ->getResult()
+        ;
+
+        return array_unique($qb);
+    }
+
+    public function findShopsforDepannage(array $classErm): array
+    {
+        $qp = $this->createQueryBuilder('s')
+            ->join('s.shopClass', 'c')
+            ->where('c.name IN (:classErm)')
+            ->setParameter('classErm', $classErm)
+            ->getQuery()
+            ->getResult()
+        ;
+
+        return array_unique($qp);
+    }
+
     //    /**
     //     * @return Shop[] Returns an array of Shop objects
     //     */
