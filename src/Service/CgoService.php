@@ -251,50 +251,32 @@ class CgoService
         // return $response;
     }
 
-    public function getDistances(City $cityOfIntervention, array $classErm): array
+    public function getShopsByClassErmAndOptionArroundCityOfIntervention(City $cityOfIntervention,array $classErm, string $option): array
     {
 
         $datas = [];
-        $largeRegion = $cityOfIntervention->getDepartment()->getLargeRegion();
-        $departments = $largeRegion->getDepartments();
-        $collectionsOfCities = [];
-        foreach($departments as $department){
-            $collectionsOfCities[] = $department->getCities();
+     
+        if($option == 'telematique'){
+            $shops = $this->shopRepository->findShopsWhereTechnicianIsTelematic();
+        }else if($option == 'depannage'){
+            $shops = $this->shopRepository->findShopsforDepannage($classErm);
         }
-        foreach($collectionsOfCities as $collection){
-            foreach($collection as $city){
-                $cities[] = $city;
-            }
-        }
-
-
-        foreach($cities as $city){
-            //on récupère les magasins de la ville
-            $shops = $city->getShops();
-            $shopsFiltred = [];
-            foreach($shops as $shop){
-                if(in_array($shop->getShopClass()->getName(), $classErm)){
-                    $shopsFiltred[] = $shop;
-                }
-            }
-
-            $shopsByRayonOfIntervention = [];
-            foreach($shopsFiltred as $shopFiltred){
-                if($this->distance($cityOfIntervention,$shopFiltred,'K', $_ENV['RAYON_OF_INTERVENTION']) == true){
-                    $shopsByRayonOfIntervention[] = $shopFiltred;
-                }
-            }
-
-            foreach($shopsByRayonOfIntervention as $i => $shopFiltred){
-                array_push($datas, $this->getDistancesBeetweenDepannageAndShop($cityOfIntervention,$shopFiltred));
-                //on attend 1 seconde tous les 5 appels à l'api
-                if($i > 0 && $i % 5 == 0){
-                    sleep(1);
-                }
+ 
+        $shopsByRayonOfIntervention = [];
+        foreach($shops as $shop){
+            if($this->distance($cityOfIntervention,$shop,'K', $_ENV['RAYON_OF_INTERVENTION']) == true){
+                $shopsByRayonOfIntervention[] = $shop;
             }
         }
 
-        //on tri le tableau en fonction de la distance la plus courte
+        foreach($shopsByRayonOfIntervention as $i => $shop){
+            array_push($datas, $this->getDistancesBeetweenDepannageAndShop($cityOfIntervention,$shop));
+            //on attend 1 seconde tous les 5 appels à l'api
+            if($i > 0 && $i % 5 == 0){
+                sleep(1);
+            }
+        }
+
         array_multisort(array_column($datas, 'distance'), SORT_ASC, $datas);
 
         return $datas;
