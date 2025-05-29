@@ -11,9 +11,18 @@
 			<div class="card-header">Recherche par ville:</div>
 			<div class="card-body">
 				{{ form_start(formSearchByCity) }}
-						<div class="col-11 mb-3">
-							{{ form_widget(formSearchByCity.city) }}
-						</div>
+                    <div class="col-11 mb-3">
+                        {{ form_widget(formSearchByCity.city) }}
+                    </div>
+                     <div class="col-11 mb-3">
+                        {{ form_widget(formSearchByCity.options) }}
+                    </div>
+                    <div class="col-11 text-center mb-2">
+                        <div class="btn-group" role="group">
+                            <button type="submit" class="btn btn-primary">Rechercher</button>
+                            <a href="{{ path('app_home') }}" class="btn btn-warning">Reset</a>
+                        </div>
+                    </div>
 				{{ form_end(formSearchByCity) }}
 			</div>
 		</div>
@@ -59,9 +68,6 @@
                         {% endfor %}
                     </tbody>
                 </table>
-            </div>
-            <div class="col-12 text-center">
-                <a class="btn btn-sm btn-info" href="{{ path('app_home') }}">Reset</a>
             </div>
         </div>
 	{% endif %}
