@@ -175,6 +175,103 @@ class MapsService
         return $donnees;
     }
 
+    public function constructionMapOfAllShopsWithUx()
+    {
+
+        //? on recupere l'url de base
+        $baseUrl = $this->requestStack->getCurrentRequest()->getScheme() . '://' . $this->requestStack->getCurrentRequest()->getHttpHost() . $this->requestStack->getCurrentRequest()->getBasePath();
+        //?on recupere tous les centres
+        $shops = $this->shopRepository->findAll();
+
+        $map = (new Map())
+            ->center(new Point(48.8566, 2.3522))
+            ->zoom(4)
+            ->fitBoundsToMarkers(true);
+
+
+        foreach($shops as $shop)
+        {
+
+            $iconOfShopUnderCgo = Icon::ux('solar:garage-bold')->width(14)->height(14)->color('#0029D2');
+
+            $map->addMarker(new Marker(
+                position: new Point($shop->getCity()->getLatitude(), $shop->getCity()->getLongitude()),
+                icon: $iconOfShopUnderCgo,
+                title: $shop->getName(),
+                infoWindow: new InfoWindow(
+                    content: $shop->getName().'('.$shop->getCm().')<p>'.$shop->getManager()->getFirstNameAndNameOnly().'<br/>'.$shop->getPhone().'</p>',
+                )
+            ));
+        }
+            
+        $leafletOptions = (new LeafletOptions())
+            ->tileLayer(new TileLayer(
+                url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                options: [
+                    'minZoom' => 6,
+                    'maxZoom' => 10,        
+                ]
+                ));
+        // Add the custom options to the map
+        $map->options($leafletOptions);
+
+        return $map;
+
+        // $locations = []; //? toutes les réponses seront dans ce tableau final
+
+        // //?on boucle sur les cgos
+        // foreach($cgos as $cgo){
+        //     $locations[] = 
+        //     [
+        //         "lat" => $cgo->getCity()->getLatitude(),
+        //         "lng" => $cgo->getCity()->getLongitude(),
+        //         "color" => $cgo->getTerritoryColor() ?? $this->randomHexadecimalColor(),
+        //         "name" => $cgo->getName().' ('.$cgo->getCm().')',
+        //         "description" => $cgo->getManager()->getFirstName().' '.$cgo->getManager()->getLastName(),
+        //         "size" => 30,
+        //         "type" => "image",
+        //         "image_url" => "https://erm.je-developpe.fr/map/images/logoCgo.png"
+        //     ];
+        // }
+
+
+        // foreach($shops as $shop)
+        // {
+        //     //?si on a les coordonnees de renseignées dans la base uniquement
+        //     if(!is_null($shop->getCity()))
+        //     {
+
+        //         if($shop->getManager() !== null){
+
+        //             $manager = $shop->getManager();
+        //             $contactShop = $manager->getFirstName() . ' ' . $manager->getLastName() . ' <br/> ' . $shop->getManager()->getPhone() . '<br/>' . $manager->getEmail();
+                
+        //         }else{
+
+        //             $contactShop = "NON RENSEIGNÉ";
+        //         }
+                
+        //         $locations[] = 
+        //         [
+        //             "lat" => $shop->getCity()->getLatitude(),
+        //             "lng" => $shop->getCity()->getLongitude(),
+        //             "color" => "#333",
+        //             "name" => $shop->getName().' ('.$shop->getCm().')',
+        //             "description" => $contactShop,
+        //             "url" => $baseUrl,
+        //             "size" => 10,
+        //         ];
+        //     }
+        // }
+
+        // //?on encode en json
+        // $jsonLocations = json_encode($locations, JSON_FORCE_OBJECT); 
+        // $donnees['locations'] = $jsonLocations;
+
+        // return $donnees;
+    }
+
     public function constructionMapOfRegions()
     {
 
@@ -388,7 +485,7 @@ class MapsService
         foreach($arrayFromAllShopsNearCityOfIntervention as $data){
 
             //?on recupere les cgos pour chaque shop
-            $cgos = "";
+            $cgos = "Cgo(s) rattaché(s): <br>";
             if(count($data['shop']->getCgos()) > 0){
                 foreach ($data['shop']->getCgos() as $cgo) {
                     $cgos .= $cgo->getName().'<br>';
@@ -397,13 +494,15 @@ class MapsService
                 $cgos = "Aucun cgo rattaché";
             }
 
-            $technicians = "<p>Technicien(s) télématique: <br>";
             if($option == 'telematique'){ //? options from SearchShopsByCityType
+                $technicians = "<p>Technicien(s) télématique: <br>";
                 foreach ($data['shop']->getTechnicians() as $technician) {
                     $technicians .= '- '.$technician->getName().': '.$technician->getPhone().'<br>';
                 }
+                $technicians .= '</p>';
+            }else{
+                $technicians = "";
             }
-            $technicians .= '</p>';
 
             $map
                 ->addMarker( new Marker(
