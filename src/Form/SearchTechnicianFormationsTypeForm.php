@@ -20,7 +20,9 @@ class SearchTechnicianFormationsTypeForm extends AbstractType
             ->add('name', EntityType::class, [
                 'class' => TechnicianFormations::class,
                 'choice_label' => 'name',
-                'placeholder' => 'Choisir une formation...',
+                'multiple' => true,
+                'expanded' => true,
+                'placeholder' => 'Afficher les techniciens avec la formation...',
                 'attr' => [
                     'class' => 'form-control'   
                 ],
