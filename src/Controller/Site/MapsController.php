@@ -64,7 +64,8 @@ class MapsController extends AbstractController
     public function mapAllShops(): Response
     {
         //?on recupere les donnees dans le service
-        $mapDonnees = $this->mapsService->constructionMapOfAllShops();
+        // $mapDonnees = $this->mapsService->constructionMapOfAllShops();
+        $mapDonnees = $this->mapsService->constructionMapOfAllShopsWithUx();
 
         return $this->render('site/maps/all_shops.html.twig', [
             'mapDonnees' => $mapDonnees,
