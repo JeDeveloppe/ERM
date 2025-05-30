@@ -34,25 +34,19 @@ class PrimeController extends AbstractController
                 if($form->isSubmitted() && $form->isValid()) {
                     $divider = $form->get('divider')->getData();
                     $fullPs = $form->get('fullPs')->getData();
-                    $psByPerson = $this->primeLevelService->getPsByPerson($fullPs, $divider);
-                    $primeLevel = $this->primeLevelService->getPrimeLevel($psByPerson);
-                    if($primeLevel === null){
-                        
-                        $result = null;
-                        $nextLevel = null;
-                        $infosForNextLevel = null;
-                        
-                    }else{
-                        
-                        $primeByPerson = $this->primeLevelService->getValuePrimeByPerson($psByPerson, $primeLevel);
-                        $nextLevel = $this->primeLevelService->getPrimeLevel($primeLevel->getEnd() + 1);
 
-                        if($nextLevel === null){
-                            $infosForNextLevel = $this->primeLevelService->returnInfosForNextLevel($divider, $fullPs, $primeLevel);
-                        }else{
-                            $infosForNextLevel = $this->primeLevelService->returnInfosForNextLevel($divider, $fullPs, $nextLevel);
-                        }
+                    $psByPersonZone = $this->primeLevelService->getPsByPerson($fullPs, $divider);
+                    $primeLevel = $this->primeLevelService->getPrimeLevel($psByPersonZone);
+
+                    $primeByPerson = $this->primeLevelService->calculateValuePrimeByPerson($psByPersonZone, $primeLevel);
+                    $nextLevel = $this->primeLevelService->getPrimeLevel($primeLevel->getEnd());
+
+                    if($nextLevel === null){
+                        $infosForNextLevel = $this->primeLevelService->returnInfosForNextLevel($divider, $fullPs, $primeLevel);
+                    }else{
+                        $infosForNextLevel = $this->primeLevelService->returnInfosForNextLevel($divider, $fullPs, $nextLevel);
                     }
+                    
                 }
         }
 
@@ -61,6 +55,7 @@ class PrimeController extends AbstractController
             'form' => $form,
             'primeLevels' => $primeLevels,
             'primeByPerson' => $primeByPerson ?? null,
+            'divider' => $divider ?? null,
             'primeLevels' => $primeLevels ?? null,
             'primeLevelFromCalc' => $primeLevel ?? null,
             'nextLevel' => $nextLevel ?? null,
