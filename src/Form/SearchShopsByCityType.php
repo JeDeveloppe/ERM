@@ -7,6 +7,7 @@ use App\Repository\CityRepository;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -17,23 +18,15 @@ class SearchShopsByCityType extends AbstractType
 
         $builder
         ->add('city', SearchShopsByCityAutocompleteField::class)
-        // ->add('city', EntityType::class, [
-        //     'class' => City::class,
-        //     'query_builder' => function (CityRepository $cityRepository) {
-        //         return $cityRepository->createQueryBuilder('c')
-        //             ->orderBy('c.name', 'ASC');
-        //     },
-        //     'choice_label' => 'name',
-        //     'placeholder' => 'Choisir une ville',
-        //     'attr' => [
-        //         'class' => 'form-control'
-        //     ],
-        //     'autocomplete' => true
-        // ])
-        ->add('submit', SubmitType::class, [
-            'label' => 'Rechercher',
+        ->add('options', ChoiceType::class, [
+            'label' => false,
+            'choices' => [
+                'Afficher les centres les plus proches' => 'depannage',
+                'Afficher les téchniciens télématiques les plus proches' => 'telematique',
+            ],
+            'mapped' => false,
             'attr' => [
-                'class' => 'btn btn-primary'
+                'class' => 'form-control mb-3'
             ]
         ]);
     }

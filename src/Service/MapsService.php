@@ -9,17 +9,20 @@ use Symfony\UX\Map\Map;
 use App\Entity\ShopClass;
 use Symfony\UX\Map\Point;
 use Symfony\UX\Map\Marker;
+use Symfony\UX\Map\Polygon;
 use Symfony\UX\Map\Icon\Icon;
 use Symfony\UX\Map\InfoWindow;
 use App\Repository\CgoRepository;
 use App\Repository\ShopRepository;
 use App\Repository\ZoneErmRepository;
 use App\Repository\RegionErmRepository;
+use App\Repository\DepartmentRepository;
 use App\Repository\TechnicianRepository;
 use App\Repository\TelematicAreaRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\UX\Map\Bridge\Leaflet\LeafletOptions;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\UX\Map\Bridge\Leaflet\Option\TileLayer;
 
 class MapsService
@@ -33,7 +36,8 @@ class MapsService
             private TelematicAreaRepository $telematicAreaRepository,
             private TechnicianRepository $technicianRepository,
             private CgoRepository $cgoRepository,
-            private KernelInterface $kernel
+            private KernelInterface $kernel,
+            private DepartmentRepository $departmentRepository
         ){}
 
     public function constructionMapOfZonesTelematique()
@@ -169,6 +173,103 @@ class MapsService
         $donnees['locations'] = $jsonLocations;
 
         return $donnees;
+    }
+
+    public function constructionMapOfAllShopsWithUx()
+    {
+
+        //? on recupere l'url de base
+        $baseUrl = $this->requestStack->getCurrentRequest()->getScheme() . '://' . $this->requestStack->getCurrentRequest()->getHttpHost() . $this->requestStack->getCurrentRequest()->getBasePath();
+        //?on recupere tous les centres
+        $shops = $this->shopRepository->findAll();
+
+        $map = (new Map())
+            ->center(new Point(48.8566, 2.3522))
+            ->zoom(4)
+            ->fitBoundsToMarkers(true);
+
+
+        foreach($shops as $shop)
+        {
+
+            $iconOfShopUnderCgo = Icon::ux('solar:garage-bold')->width(14)->height(14)->color('#0029D2');
+
+            $map->addMarker(new Marker(
+                position: new Point($shop->getCity()->getLatitude(), $shop->getCity()->getLongitude()),
+                icon: $iconOfShopUnderCgo,
+                title: $shop->getName(),
+                infoWindow: new InfoWindow(
+                    content: $shop->getName().'('.$shop->getCm().')<p>'.$shop->getManager()->getFirstNameAndNameOnly().'<br/>'.$shop->getPhone().'</p>',
+                )
+            ));
+        }
+            
+        $leafletOptions = (new LeafletOptions())
+            ->tileLayer(new TileLayer(
+                url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                options: [
+                    'minZoom' => 6,
+                    'maxZoom' => 10,        
+                ]
+                ));
+        // Add the custom options to the map
+        $map->options($leafletOptions);
+
+        return $map;
+
+        // $locations = []; //? toutes les réponses seront dans ce tableau final
+
+        // //?on boucle sur les cgos
+        // foreach($cgos as $cgo){
+        //     $locations[] = 
+        //     [
+        //         "lat" => $cgo->getCity()->getLatitude(),
+        //         "lng" => $cgo->getCity()->getLongitude(),
+        //         "color" => $cgo->getTerritoryColor() ?? $this->randomHexadecimalColor(),
+        //         "name" => $cgo->getName().' ('.$cgo->getCm().')',
+        //         "description" => $cgo->getManager()->getFirstName().' '.$cgo->getManager()->getLastName(),
+        //         "size" => 30,
+        //         "type" => "image",
+        //         "image_url" => "https://erm.je-developpe.fr/map/images/logoCgo.png"
+        //     ];
+        // }
+
+
+        // foreach($shops as $shop)
+        // {
+        //     //?si on a les coordonnees de renseignées dans la base uniquement
+        //     if(!is_null($shop->getCity()))
+        //     {
+
+        //         if($shop->getManager() !== null){
+
+        //             $manager = $shop->getManager();
+        //             $contactShop = $manager->getFirstName() . ' ' . $manager->getLastName() . ' <br/> ' . $shop->getManager()->getPhone() . '<br/>' . $manager->getEmail();
+                
+        //         }else{
+
+        //             $contactShop = "NON RENSEIGNÉ";
+        //         }
+                
+        //         $locations[] = 
+        //         [
+        //             "lat" => $shop->getCity()->getLatitude(),
+        //             "lng" => $shop->getCity()->getLongitude(),
+        //             "color" => "#333",
+        //             "name" => $shop->getName().' ('.$shop->getCm().')',
+        //             "description" => $contactShop,
+        //             "url" => $baseUrl,
+        //             "size" => 10,
+        //         ];
+        //     }
+        // }
+
+        // //?on encode en json
+        // $jsonLocations = json_encode($locations, JSON_FORCE_OBJECT); 
+        // $donnees['locations'] = $jsonLocations;
+
+        // return $donnees;
     }
 
     public function constructionMapOfRegions()
@@ -346,7 +447,7 @@ class MapsService
         return $donnees;
     }
 
-    public function getMapWithInterventionPointAndAllShopsArround(City $cityOfIntervention, array $arrayFromAllShopsNearCityOfIntervention): Map
+    public function getMapWithInterventionPointAndAllShopsArround(City $cityOfIntervention, array $arrayFromAllShopsNearCityOfIntervention, string $option): Map
     {
         $map = (new Map());
         $leafletOptions = (new LeafletOptions())
@@ -365,7 +466,7 @@ class MapsService
         
         $map
             ->center(new Point($cityOfIntervention->getLatitude(), $cityOfIntervention->getLongitude()))
-            ->zoom(10);
+            ->fitBoundsToMarkers(true);
 
         $map
             ->addMarker( new Marker(
@@ -384,7 +485,7 @@ class MapsService
         foreach($arrayFromAllShopsNearCityOfIntervention as $data){
 
             //?on recupere les cgos pour chaque shop
-            $cgos = "";
+            $cgos = "Cgo(s) rattaché(s): <br>";
             if(count($data['shop']->getCgos()) > 0){
                 foreach ($data['shop']->getCgos() as $cgo) {
                     $cgos .= $cgo->getName().'<br>';
@@ -393,13 +494,23 @@ class MapsService
                 $cgos = "Aucun cgo rattaché";
             }
 
+            if($option == 'telematique'){ //? options from SearchShopsByCityType
+                $technicians = "<p>Technicien(s) télématique: <br>";
+                foreach ($data['shop']->getTechnicians() as $technician) {
+                    $technicians .= '- '.$technician->getName().': '.$technician->getPhone().'<br>';
+                }
+                $technicians .= '</p>';
+            }else{
+                $technicians = "";
+            }
+
             $map
                 ->addMarker( new Marker(
                     position: new Point($data['shop']->getCity()->getLatitude(), $data['shop']->getCity()->getLongitude()),
                     title: $data['shop']->getName(),
                     infoWindow: new InfoWindow(
                         headerContent: $data['shop']->getName().' ('.$data['shop']->getCm().') <br/>'.$data['shop']->getPhone(),
-                        content: '<p>Distance : '.($data['distance'] / 1000).' kms <br>Temps de trajet : '.gmdate("H:i:s", $data['duration']).'</p>'.$cgos
+                        content: $technicians.'<p>Distance : '.($data['distance'] / 1000).' kms <br>Temps de trajet : '.gmdate("H:i:s", $data['duration']).'</p>'.$cgos
                     ),
                     extra: [
                         'icon_mask_url' => 'https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet.svg',
@@ -442,7 +553,8 @@ class MapsService
 
             foreach($shops as $shop)
             {
-                $iconOfShopUnderCgo = Icon::ux('tabler:truck-filled')->width(14)->height(14)->color($shop->getCgos()->first()->getTerritoryColor());
+
+                $iconOfShopUnderCgo = Icon::ux('solar:garage-bold')->width(14)->height(14)->color($cgo->getTerritoryColor());
 
                 $map->addMarker(new Marker(
                     position: new Point($shop->getCity()->getLatitude(), $shop->getCity()->getLongitude()),
@@ -471,15 +583,11 @@ class MapsService
         return $map;
     }
 
-    public function constructionMapOfTechniciansTelematique(?string $formationName)
+    public function constructionMapOfTechniciansTelematique(array $formationNames)
     {
 
         //?on recupere tous les techniciens
-        if($formationName !== NULL){
-            $technicians = $this->technicianRepository->findAllTelematicTechniciansByFormationName($formationName);
-        }else{
-            $technicians = $this->technicianRepository->findBy(['isTelematic' => true]);
-        }
+        $technicians = $this->technicianRepository->findAllTelematicTechniciansByFormationName($formationNames);
 
         //?on cré un manager et un Cgo fakes
         $fakeManager = new Manager();
@@ -492,7 +600,7 @@ class MapsService
 
         foreach($technicians as $technician)
         {
-            $cgo = $technician->getShop()->getCgos()->first();
+            $cgo = $technician->getControledByCgo();
             if(!$cgo){
                 $cgo = $fakeCgo;
             }
@@ -507,11 +615,11 @@ class MapsService
                 icon: $iconOfTechnician,
                 title: $technician->getName(),
                 infoWindow: new InfoWindow(
-                    headerContent: strtoupper($technician->getName()).' '.$technician->getFirstName(),
+                    headerContent: $technician->getShop(),
                     content:
-                        '<p>Centre de: '.$technician->getShop().
-                        '<br/>Tél: '.$technician->getPhone().'<br/>Email: '.$technician->getEmail().
-                        '<br/>Formations: '.$formations.
+                        '<p>'.strtoupper($technician->getName()).' '.$technician->getFirstName().
+                        '<br/>Tél: '.$technician->getPhone().'<br/>Email: '.$technician->getEmail().'</p>'.
+                        '<p>Formations: '.$formations.
                         '</p>
                         <p>Géré par:<br/>'.$cgo->getName().'<br/>'.$cgo->getManager().'<br/>'.$cgo->getManager()->getPhone().'</p>'
                 )

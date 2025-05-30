@@ -3,6 +3,7 @@
 namespace App\Controller\Site;
 
 use App\Form\SearchShopsByCityType;
+use App\Repository\ShopRepository;
 use App\Service\CgoService;
 use App\Service\MapsService;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,13 +15,16 @@ class DistanceController extends AbstractController
 {
     public function __construct(
         private CgoService $cgoService,
-        private MapsService $mapsService
+        private MapsService $mapsService,
+        private ShopRepository $shopRepository
     ){}
 
     #[Route('/search-distance', name: 'app_search_distance', methods: ['GET', 'POST'])]
     public function searchDistance(Request $request): Response
     {
 
+        $optionsAccepted = ['depannage','telematique']; //? options from SearchShopsByCityType
+        
         $form = $this->createForm(SearchShopsByCityType::class);
 
         if($request->isMethod('POST')){
@@ -31,9 +35,13 @@ class DistanceController extends AbstractController
             if($form->isSubmitted() && $form->isValid()){
 
                 $cityOfIntervention = $form->get('city')->getData();
-                $datas = $this->cgoService->getDistances($cityOfIntervention, ['MX','MV']);
+                $option = $form->get('options')->getData();
+                    if(!in_array($option, $optionsAccepted)){
+                        $option = 'depannage';
+                    }
 
-                $map = $this->mapsService->getMapWithInterventionPointAndAllShopsArround($cityOfIntervention, $datas);
+                $datas = $this->cgoService->getShopsByClassErmAndOptionArroundCityOfIntervention($cityOfIntervention, ['MX','MV'], $option);
+                $map = $this->mapsService->getMapWithInterventionPointAndAllShopsArround($cityOfIntervention, $datas, $option);
             }
         }
 

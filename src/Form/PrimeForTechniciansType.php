@@ -23,7 +23,7 @@ class PrimeForTechniciansType extends AbstractType
             ->add('divider', NumberType::class, [
                 'label' => 'Diviseur:',
                 'attr' => [
-                    'placeholder' => 'Saisir un nombre',
+                    'placeholder' => 'Saisir un nombre (justif prime M-1)',
                     'class' => 'form-control',
                 ],
             ])
