@@ -9,7 +9,6 @@ use Symfony\UX\Map\Map;
 use App\Entity\ShopClass;
 use Symfony\UX\Map\Point;
 use Symfony\UX\Map\Marker;
-use Symfony\UX\Map\Polygon;
 use Symfony\UX\Map\Icon\Icon;
 use Symfony\UX\Map\InfoWindow;
 use App\Repository\CgoRepository;
@@ -17,9 +16,9 @@ use App\Repository\ShopRepository;
 use App\Repository\ZoneErmRepository;
 use App\Repository\RegionErmRepository;
 use App\Repository\DepartmentRepository;
+use App\Repository\TechnicalAdvisorRepository;
 use App\Repository\TechnicianRepository;
 use App\Repository\TelematicAreaRepository;
-use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\UX\Map\Bridge\Leaflet\LeafletOptions;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -37,7 +36,8 @@ class MapsService
             private TechnicianRepository $technicianRepository,
             private CgoRepository $cgoRepository,
             private KernelInterface $kernel,
-            private DepartmentRepository $departmentRepository
+            private DepartmentRepository $departmentRepository,
+            private TechnicalAdvisorRepository $technicalAdvisorRepository
         ){}
 
     private $COLORS_OF_MARKERS = "#0029D2";
@@ -648,6 +648,74 @@ class MapsService
                         'markerColor' => $color, // Passez votre variable $color ici
                     ],
              ));
+        }
+
+        $leafletOptions = (new LeafletOptions())
+            ->tileLayer(new TileLayer(
+                url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                options: [
+                    'minZoom' => 6,
+                    'maxZoom' => 10,        
+                ]
+                ));
+        // Add the custom options to the map
+        $map->options($leafletOptions);
+
+        return $map;
+    }
+
+    public function constructionMapOfAllShopsWorkedByCtWihUxMap()
+    {
+
+        //?on recupere tous les ct
+        $cts = $this->technicalAdvisorRepository->findAll();
+        $map = (new Map())
+        ->center(new Point(48.8566, 2.3522))
+        ->zoom(4);
+        $map->fitBoundsToMarkers(true);
+    
+
+        foreach($cts as $ct)
+        {
+            $color = $ct->getZoneColor();
+            $iconOfTechnicalAdvisor = Icon::ux('fa6-solid:magnifying-glass-dollar')->width(24)->height(24)->color($color);
+
+
+            $map->addMarker(new Marker(
+                position: new Point($ct->getAttachmentCenter()->getCity()->getLatitude(), $ct->getAttachmentCenter()->getCity()->getLongitude()),
+                icon: $iconOfTechnicalAdvisor,
+                title: $ct->getAttachmentCenter()->getName(),
+                infoWindow: new InfoWindow(
+                    content: $ct->getLastName(),
+                ),
+                extra: [
+                    'markerColor' => $color,
+                ]
+            ));
+
+            //tous les shops du cgo
+            $shops = $ct->getWorkForShops();
+
+            foreach($shops as $shop)
+            {
+
+                $iconOfShopUnderCt = Icon::ux('gravity-ui:target')->width(34)->height(34)->color($color);
+
+                $map->addMarker(new Marker(
+                    position: new Point($shop->getCity()->getLatitude(), $shop->getCity()->getLongitude()),
+                    icon: $iconOfShopUnderCt,
+                    title: $shop->getName(),
+                    infoWindow: new InfoWindow(
+                        content: $shop->getName().'('.$shop->getCm().')<p>'.$shop->getManager()->getFirstNameAndNameOnly().'<br/>'.$shop->getPhone().'</p>',
+                    ),
+                    // Ajoutez la couleur dans le tableau 'extra'
+                    extra: [
+                        'markerColor' => $color, // Passez votre variable $color ici
+                    ],
+                ));
+            }
+            
         }
 
         $leafletOptions = (new LeafletOptions())

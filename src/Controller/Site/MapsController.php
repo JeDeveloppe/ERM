@@ -73,6 +73,19 @@ class MapsController extends AbstractController
         ]);
     }
 
+    #[Route('/maps/france/tous-les-ct', name: 'app_map_all_cts')]
+    public function mapAllCts(): Response
+    {
+        //?on recupere les donnees dans le service
+        // $mapDonnees = $this->mapsService->constructionMapOfAllShops();
+        $mapDonnees = $this->mapsService->constructionMapOfAllShopsWorkedByCtWihUxMap();
+
+        return $this->render('site/maps/all_cts.html.twig', [
+            'mapDonnees' => $mapDonnees,
+            'title' => 'Tous les CT',
+        ]);
+    }
+
     #[Route('/maps/france/centres-sous-cgo-{classeName}', name: 'app_map_all_shops_under_cgo')]
     public function mapAllShopsUnderCgo(string $classeName): Response
     {

@@ -16,6 +16,19 @@ class ManagerRepository extends ServiceEntityRepository
         parent::__construct($registry, Manager::class);
     }
 
+    public function findAoForCtImportation(string $name): ?Manager
+    {
+        return $this->createQueryBuilder('m')
+            ->join('m.managerClass', 'mc')
+            ->where('m.lastName = :lastName')
+            ->andWhere('mc.name = :classManager')
+            ->setParameter('lastName', $name)
+            ->setParameter('classManager', 'AO')
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
+    }
+
     //    /**
     //     * @return Manager[] Returns an array of Manager objects
     //     */
