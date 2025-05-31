@@ -40,6 +40,8 @@ class MapsService
             private DepartmentRepository $departmentRepository
         ){}
 
+    private $COLORS_OF_MARKERS = "#0029D2";
+
     public function constructionMapOfZonesTelematique()
     {
 
@@ -192,7 +194,7 @@ class MapsService
         foreach($shops as $shop)
         {
 
-            $iconOfShopUnderCgo = Icon::ux('solar:garage-bold')->width(14)->height(14)->color('#0029D2');
+            $iconOfShopUnderCgo = Icon::ux('solar:garage-bold')->width(14)->height(14)->color($this->COLORS_OF_MARKERS);
 
             $map->addMarker(new Marker(
                 position: new Point($shop->getCity()->getLatitude(), $shop->getCity()->getLongitude()),
@@ -202,7 +204,7 @@ class MapsService
                     content: $shop->getName().'('.$shop->getCm().')<p>'.$shop->getManager()->getFirstNameAndNameOnly().'<br/>'.$shop->getPhone().'</p>',
                 ),
                 extra: [
-                    'markerColor' => '#0029D2'
+                    'markerColor' => $this->COLORS_OF_MARKERS
                 ]
             ));
         }
@@ -499,24 +501,28 @@ class MapsService
 
             if($option == 'telematique'){ //? options from SearchShopsByCityType
                 $technicians = "<p>Technicien(s) télématique: <br>";
+                $icon = Icon::ux('ri:taxi-wifi-fill')->width(24)->height(24)->color($this->COLORS_OF_MARKERS);
                 foreach ($data['shop']->getTechnicians() as $technician) {
                     $technicians .= '- '.$technician->getName().': '.$technician->getPhone().'<br>';
                 }
                 $technicians .= '</p>';
             }else{
                 $technicians = "";
+                $icon = Icon::ux('solar:garage-bold')->width(24)->height(24)->color($this->COLORS_OF_MARKERS);
             }
 
             $map
                 ->addMarker( new Marker(
                     position: new Point($data['shop']->getCity()->getLatitude(), $data['shop']->getCity()->getLongitude()),
                     title: $data['shop']->getName(),
+                    icon: $icon,
                     infoWindow: new InfoWindow(
                         headerContent: $data['shop']->getName().' ('.$data['shop']->getCm().') <br/>'.$data['shop']->getPhone(),
                         content: $technicians.'<p>Distance : '.($data['distance'] / 1000).' kms <br>Temps de trajet : '.gmdate("H:i:s", $data['duration']).'</p>'.$cgos
                     ),
                     extra: [
-                        'icon_mask_url' => 'https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet.svg',
+                        // 'icon_mask_url' => 'https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet.svg',
+                        'markerColor' => $this->COLORS_OF_MARKERS
                     ],
                 ));
         }
