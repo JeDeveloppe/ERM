@@ -194,7 +194,7 @@ class MapsService
         foreach($shops as $shop)
         {
 
-            $iconOfShopUnderCgo = Icon::ux('solar:garage-bold')->width(14)->height(14)->color($this->COLORS_OF_MARKERS);
+            $iconOfShopUnderCgo = Icon::ux('solar:garage-bold')->width(12)->height(12)->color($this->COLORS_OF_MARKERS);
 
             $map->addMarker(new Marker(
                 position: new Point($shop->getCity()->getLatitude(), $shop->getCity()->getLongitude()),
@@ -215,7 +215,7 @@ class MapsService
                 attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
                 options: [
                     'minZoom' => 6,
-                    'maxZoom' => 10,        
+                    'maxZoom' => 12,        
                 ]
                 ));
         // Add the custom options to the map
