@@ -2,6 +2,8 @@
 
 namespace App\Command;
 
+use App\Entity\TechnicalAdvisor;
+use App\Service\TechnicalAdvisorService;
 use App\Service\TechnicianFormationsService;
 use App\Service\TechnicianService;
 use App\Service\TechnicianVehicleService;
@@ -18,7 +20,8 @@ class InitDataBase2 extends Command
     public function __construct(
         private TechnicianService $technicianService,
         private TechnicianVehicleService $technicianVehicleService,
-        private TechnicianFormationsService $technicianFormationsService
+        private TechnicianFormationsService $technicianFormationsService,
+        private TechnicalAdvisorService $technicalAdvisorService
         )
     {
         parent::__construct();
@@ -34,7 +37,8 @@ class InitDataBase2 extends Command
 
         $this->technicianVehicleService->initDatabase($io);
         $this->technicianFormationsService->initDatabase($io);
-        $this->technicianService->importTechnicians($io);
+        // $this->technicianService->importTechnicians($io);
+        $this->technicalAdvisorService->importCTs($io);
 
         return Command::SUCCESS;
     }

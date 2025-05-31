@@ -53,10 +53,24 @@ class Shop
     #[ORM\OneToMany(targetEntity: Technician::class, mappedBy: 'shop')]
     private Collection $technicians;
 
+    /**
+     * @var Collection<int, TechnicalAdvisor>
+     */
+    #[ORM\OneToMany(targetEntity: TechnicalAdvisor::class, mappedBy: 'attachmentCenter')]
+    private Collection $technicalAdvisors;
+
+    /**
+     * @var Collection<int, TechnicalAdvisor>
+     */
+    #[ORM\ManyToMany(targetEntity: TechnicalAdvisor::class, mappedBy: 'workForShops')]
+    private Collection $technicalAdvisorsWorkingForMe;
+
     public function __construct()
     {
         $this->cgos = new ArrayCollection();
         $this->technicians = new ArrayCollection();
+        $this->technicalAdvisors = new ArrayCollection();
+        $this->technicalAdvisorsWorkingForMe = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -217,6 +231,63 @@ class Shop
             if ($technician->getShop() === $this) {
                 $technician->setShop(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, TechnicalAdvisor>
+     */
+    public function getTechnicalAdvisors(): Collection
+    {
+        return $this->technicalAdvisors;
+    }
+
+    public function addTechnicalAdvisor(TechnicalAdvisor $technicalAdvisor): static
+    {
+        if (!$this->technicalAdvisors->contains($technicalAdvisor)) {
+            $this->technicalAdvisors->add($technicalAdvisor);
+            $technicalAdvisor->setAttachmentCenter($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTechnicalAdvisor(TechnicalAdvisor $technicalAdvisor): static
+    {
+        if ($this->technicalAdvisors->removeElement($technicalAdvisor)) {
+            // set the owning side to null (unless already changed)
+            if ($technicalAdvisor->getAttachmentCenter() === $this) {
+                $technicalAdvisor->setAttachmentCenter(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, TechnicalAdvisor>
+     */
+    public function getTechnicalAdvisorsWorkingForMe(): Collection
+    {
+        return $this->technicalAdvisorsWorkingForMe;
+    }
+
+    public function addTechnicalAdvisorsWorkingForMe(TechnicalAdvisor $technicalAdvisorsWorkingForMe): static
+    {
+        if (!$this->technicalAdvisorsWorkingForMe->contains($technicalAdvisorsWorkingForMe)) {
+            $this->technicalAdvisorsWorkingForMe->add($technicalAdvisorsWorkingForMe);
+            $technicalAdvisorsWorkingForMe->addWorkForShop($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTechnicalAdvisorsWorkingForMe(TechnicalAdvisor $technicalAdvisorsWorkingForMe): static
+    {
+        if ($this->technicalAdvisorsWorkingForMe->removeElement($technicalAdvisorsWorkingForMe)) {
+            $technicalAdvisorsWorkingForMe->removeWorkForShop($this);
         }
 
         return $this;

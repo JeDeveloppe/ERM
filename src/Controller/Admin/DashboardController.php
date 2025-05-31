@@ -13,6 +13,7 @@ use App\Entity\Department;
 use App\Entity\LargeRegion;
 use App\Entity\ManagerClass;
 use App\Entity\Primelevel;
+use App\Entity\TechnicalAdvisor;
 use App\Entity\Technician;
 use App\Entity\TechnicianFormations;
 use App\Entity\TechnicianVehicle;
@@ -53,6 +54,9 @@ class DashboardController extends AbstractDashboardController
             MenuItem::linkToCrud('Liste des techniciens', 'fas fa-list', Technician::class),
             MenuItem::linkToCrud('Liste des formations', 'fas fa-list', TechnicianFormations::class),
             MenuItem::linkToCrud('Liste des véhicules', 'fas fa-list', TechnicianVehicle::class),
+
+            MenuItem::section('CT:'),
+            MenuItem::linkToCrud('Liste des CT', 'fas fa-list', TechnicalAdvisor::class),
 
             MenuItem::section('Les zones / régions ERM:'),
             MenuItem::linkToCrud('Zones télématiques', 'fas fa-list', TelematicArea::class),
