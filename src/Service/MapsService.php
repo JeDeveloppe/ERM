@@ -200,7 +200,10 @@ class MapsService
                 title: $shop->getName(),
                 infoWindow: new InfoWindow(
                     content: $shop->getName().'('.$shop->getCm().')<p>'.$shop->getManager()->getFirstNameAndNameOnly().'<br/>'.$shop->getPhone().'</p>',
-                )
+                ),
+                extra: [
+                    'markerColor' => '#0029D2'
+                ]
             ));
         }
             
@@ -553,8 +556,13 @@ class MapsService
 
             foreach($shops as $shop)
             {
+                $color = $cgo->getTerritoryColor();
+                if (!is_string($color) || empty($color)) {
+                    $color = '#000000'; // Default to black if color is missing/invalid
+                    dump('Warning: Cgo ' . $cgo->getName() . ' has invalid territory color. Defaulting to black.');
+                }
 
-                $iconOfShopUnderCgo = Icon::ux('solar:garage-bold')->width(14)->height(14)->color($cgo->getTerritoryColor());
+                $iconOfShopUnderCgo = Icon::ux('solar:garage-bold')->width(14)->height(14)->color($color);
 
                 $map->addMarker(new Marker(
                     position: new Point($shop->getCity()->getLatitude(), $shop->getCity()->getLongitude()),
@@ -562,7 +570,11 @@ class MapsService
                     title: $shop->getName(),
                     infoWindow: new InfoWindow(
                         content: $shop->getName().'('.$shop->getCm().')<p>'.$shop->getManager()->getFirstNameAndNameOnly().'<br/>'.$shop->getPhone().'</p>',
-                    )
+                    ),
+                    // Ajoutez la couleur dans le tableau 'extra'
+                    extra: [
+                        'markerColor' => $color, // Passez votre variable $color ici
+                    ],
                 ));
             }
             
@@ -604,26 +616,32 @@ class MapsService
             if(!$cgo){
                 $cgo = $fakeCgo;
             }
-            $iconOfTechnician = Icon::ux('ri:taxi-wifi-fill')->width(24)->height(24)->color($cgo->getTerritoryColor());
+
+            $color = $cgo->getTerritoryColor();
+
+            $iconOfTechnician = Icon::ux('ri:taxi-wifi-fill')->width(24)->height(24)->color($color);
             $formations = '';
             foreach($technician->getTechnicianFormations() as $formation) {
                 $formations .= '<span class="badge" style="background-color:'.$formation->getColor().'">'.$formation->getName().'</span> ';
             }
 
-            $map->addMarker(new Marker(
-                position: new Point($technician->getShop()->getCity()->getLatitude(), $technician->getShop()->getCity()->getLongitude()),
-                icon: $iconOfTechnician,
-                title: $technician->getName(),
-                infoWindow: new InfoWindow(
-                    headerContent: $technician->getShop(),
-                    content:
-                        '<p>'.strtoupper($technician->getName()).' '.$technician->getFirstName().
-                        '<br/>Tél: '.$technician->getPhone().'<br/>Email: '.$technician->getEmail().'</p>'.
+             $map->addMarker(new Marker(
+                    position: new Point($technician->getShop()->getCity()->getLatitude(), $technician->getShop()->getCity()->getLongitude()),
+                    icon: $iconOfTechnician,
+                    title: $technician->getName(),
+                    infoWindow: new InfoWindow(
+                        content:
+                         '<p>'.strtoupper($technician->getName()).' '.$technician->getFirstName().
+                         '<br/>Tél: '.$technician->getPhone().'<br/>Email: '.$technician->getEmail().'</p>'.
                         '<p>Formations: '.$formations.
-                        '</p>
-                        <p>Géré par:<br/>'.$cgo->getName().'<br/>'.$cgo->getManager().'<br/>'.$cgo->getManager()->getPhone().'</p>'
-                )
-            ));
+                         '</p>
+                         <p>Géré par:<br/>'.$cgo->getName().'<br/>'.$cgo->getManager().'<br/>'.$cgo->getManager()->getPhone().'</p>'
+                    ),
+                    // Ajoutez la couleur dans le tableau 'extra'
+                    extra: [
+                        'markerColor' => $color, // Passez votre variable $color ici
+                    ],
+             ));
         }
 
         $leafletOptions = (new LeafletOptions())

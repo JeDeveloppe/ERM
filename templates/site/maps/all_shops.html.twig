@@ -10,9 +10,6 @@
 		<h1 class="col-12 text-center my-5">{{ title }}</h1>
 		<div class="col-12 col-md-10 col-lg-8 col-xl-6">
 			{# affichage de la carte de France #}
-			{# // <script type="text/javascript" src="{{ asset('map/mapdata_france.js') }}"></script>
-			// <script type="text/javascript" src="{{ asset('map/countrymap_france.js') }}"></script>
-			// <div id="map"></div> #}
 			{{ ux_map(mapDonnees, {'data-controller': 'mymap', 'controller_id': false, style: 'height: 600px' }) }}
 		</div>
 	</div>
