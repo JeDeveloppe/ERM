@@ -1,50 +1,63 @@
 // assets/controllers/mymap_controller.js
 
 import { Controller } from '@hotwired/stimulus';
-import L from 'leaflet';
 
 export default class extends Controller {
 
-    // PROPRIÉTÉ DU CONTRÔLEUR POUR STOCKER TEMPORAIREMENT LA COULEUR
-    tempMarkerColor = null;
+    markerColorMap = new Map();
 
     connect() {
-        this.element.addEventListener('ux:map:marker:before-create', this._onMarkerBeforeCreate);
-        this.element.addEventListener('ux:map:marker:after-create', this._onMarkerAfterCreate);
-        this.element.addEventListener('ux:map:info-window:before-create', this._onInfoWindowBeforeCreate);
-        this.element.addEventListener('ux:map:polygon:before-create', this._onPolygonBeforeCreate);
-        this.element.addEventListener('ux:map:polyline:before-create', this._onPolylineBeforeCreate);
+        this.element.addEventListener('ux:map:pre-connect', this._onPreConnect.bind(this));
+        this.element.addEventListener('ux:map:connect', this._onConnect.bind(this));
+        this.element.addEventListener('ux:map:marker:before-create', this._onMarkerBeforeCreate.bind(this));
+        this.element.addEventListener('ux:map:marker:after-create', this._onMarkerAfterCreate.bind(this));
+        this.element.addEventListener('ux:map:info-window:before-create', this._onInfoWindowBeforeCreate.bind(this));
+        this.element.addEventListener('ux:map:info-window:after-create', this._onInfoWindowAfterCreate.bind(this));
+        this.element.addEventListener('ux:map:polygon:before-create', this._onPolygonBeforeCreate.bind(this));
+        this.element.addEventListener('ux:map:polygon:after-create', this._onPolygonAfterCreate.bind(this));
+        this.element.addEventListener('ux:map:polyline:before-create', this._onPolylineBeforeCreate.bind(this));
+        this.element.addEventListener('ux:map:polyline:after-create', this._onPolylineAfterCreate.bind(this));
     }
+
+    disconnect() {
+        this.element.removeEventListener('ux:map:pre-connect', this._onPreConnect.bind(this));
+        this.element.removeEventListener('ux:map:connect', this._onConnect.bind(this));
+        this.element.removeEventListener('ux:map:marker:before-create', this._onMarkerBeforeCreate.bind(this));
+        this.element.removeEventListener('ux:map:marker:after-create', this._onMarkerAfterCreate.bind(this));
+        this.element.removeEventListener('ux:map:info-window:before-create', this._onInfoWindowBeforeCreate.bind(this));
+        this.element.removeEventListener('ux:map:info-window:after-create', this._onInfoWindowAfterCreate.bind(this));
+        this.element.removeEventListener('ux:map:polygon:before-create', this._onPolygonBeforeCreate.bind(this));
+        this.element.removeEventListener('ux:map:polygon:after-create', this._onPolygonAfterCreate.bind(this));
+        this.element.removeEventListener('ux:map:polyline:before-create', this._onPolylineBeforeCreate.bind(this));
+        this.element.removeEventListener('ux:map:polyline:after-create', this._onPolylineAfterCreate.bind(this));
+    }
+
+    _onPreConnect(event) { }
+    _onConnect(event) { }
 
     _onMarkerBeforeCreate(event) {
         const definition = event.detail.definition;
 
-        if (!definition) {
-            return;
+        if (definition && definition['@id'] && definition.extra && definition.extra.markerColor) {
+            this.markerColorMap.set(definition['@id'], definition.extra.markerColor);
         }
 
-        const markerExtra = definition.extra;
-        const markerColor = (markerExtra && markerExtra.markerColor) ? markerExtra.markerColor : '#000000';
-
-        // STOCKAGE DE LA COULEUR DANS LA PROPRIÉTÉ DU CONTRÔLEUR
-        this.tempMarkerColor = markerColor;
-
-        // Autres options Leaflet standard
+        // Assurez-vous que l'ID est passé aux rawOptions de Leaflet
+        // pour qu'il soit accessible via markerInstance.options['@id']
         definition.rawOptions = definition.rawOptions || {};
-        definition.rawOptions.riseOnHover = true;
-
-        event.detail.definition = definition;
+        definition.rawOptions['@id'] = definition['@id'];
     }
 
     _onMarkerAfterCreate(event) {
         const markerInstance = event.detail.marker;
+        // Récupère l'ID depuis les options de l'instance Leaflet du marqueur
+        const markerId = markerInstance.options ? markerInstance.options['@id'] : undefined;
 
-        if (!markerInstance) {
+        if (!markerInstance || !markerId) {
             return;
         }
 
-        // Récupération de la couleur stockée depuis la propriété du contrôleur
-        const markerColor = this.tempMarkerColor;
+        const markerColor = this.markerColorMap.get(markerId);
 
         if (markerColor) {
             setTimeout(() => {
@@ -55,33 +68,23 @@ export default class extends Controller {
                 }
 
                 const svgElement = markerElement.querySelector('svg');
-
                 if (svgElement) {
-                    // Applique la propriété 'color' sur l'élément SVG (pour currentColor)
                     svgElement.style.setProperty('color', markerColor, 'important');
-
                     const pathElement = svgElement.querySelector('path');
                     if (pathElement) {
-                        // Applique aussi 'fill' directement sur le path pour une robustesse maximale
                         pathElement.style.setProperty('fill', markerColor, 'important');
                     }
                 }
             }, 0);
         }
 
-        // Réinitialiser la couleur pour le prochain marqueur (si vous avez plusieurs marqueurs)
-        this.tempMarkerColor = null;
+        this.markerColorMap.delete(markerId);
     }
 
-    _onInfoWindowBeforeCreate(event) {
-        // Logique de l'InfoWindow si nécessaire
-    }
-
-    _onPolygonBeforeCreate(event) {
-        // Logique du Polygon si nécessaire
-    }
-
-    _onPolylineBeforeCreate(event) {
-        // Logique de la Polyline si nécessaire
-    }
+    _onInfoWindowBeforeCreate(event) { }
+    _onInfoWindowAfterCreate(event) { }
+    _onPolygonBeforeCreate(event) { }
+    _onPolygonAfterCreate(event) { }
+    _onPolylineBeforeCreate(event) { }
+    _onPolylineAfterCreate(event) { }
 }
