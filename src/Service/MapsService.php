@@ -186,11 +186,7 @@ class MapsService
         //?on recupere tous les centres
         $shops = $this->shopRepository->findAll();
 
-        $map = (new Map())
-            ->center(new Point(48.8566, 2.3522))
-            ->zoom(4)
-            ->fitBoundsToMarkers(true);
-
+        $map = $this->generationUxMapWithBaseOptions();
 
         foreach($shops as $shop)
         {
@@ -209,80 +205,13 @@ class MapsService
                 ]
             ));
         }
-            
-        $leafletOptions = (new LeafletOptions())
-            ->tileLayer(new TileLayer(
-                url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-                options: [
-                    'minZoom' => 6,
-                    'maxZoom' => 12,        
-                ]
-                ));
-        // Add the custom options to the map
-        $map->options($leafletOptions);
 
         return $map;
-
-        // $locations = []; //? toutes les réponses seront dans ce tableau final
-
-        // //?on boucle sur les cgos
-        // foreach($cgos as $cgo){
-        //     $locations[] = 
-        //     [
-        //         "lat" => $cgo->getCity()->getLatitude(),
-        //         "lng" => $cgo->getCity()->getLongitude(),
-        //         "color" => $cgo->getTerritoryColor() ?? $this->randomHexadecimalColor(),
-        //         "name" => $cgo->getName().' ('.$cgo->getCm().')',
-        //         "description" => $cgo->getManager()->getFirstName().' '.$cgo->getManager()->getLastName(),
-        //         "size" => 30,
-        //         "type" => "image",
-        //         "image_url" => "https://erm.je-developpe.fr/map/images/logoCgo.png"
-        //     ];
-        // }
-
-
-        // foreach($shops as $shop)
-        // {
-        //     //?si on a les coordonnees de renseignées dans la base uniquement
-        //     if(!is_null($shop->getCity()))
-        //     {
-
-        //         if($shop->getManager() !== null){
-
-        //             $manager = $shop->getManager();
-        //             $contactShop = $manager->getFirstName() . ' ' . $manager->getLastName() . ' <br/> ' . $shop->getManager()->getPhone() . '<br/>' . $manager->getEmail();
-                
-        //         }else{
-
-        //             $contactShop = "NON RENSEIGNÉ";
-        //         }
-                
-        //         $locations[] = 
-        //         [
-        //             "lat" => $shop->getCity()->getLatitude(),
-        //             "lng" => $shop->getCity()->getLongitude(),
-        //             "color" => "#333",
-        //             "name" => $shop->getName().' ('.$shop->getCm().')',
-        //             "description" => $contactShop,
-        //             "url" => $baseUrl,
-        //             "size" => 10,
-        //         ];
-        //     }
-        // }
-
-        // //?on encode en json
-        // $jsonLocations = json_encode($locations, JSON_FORCE_OBJECT); 
-        // $donnees['locations'] = $jsonLocations;
-
-        // return $donnees;
     }
 
     public function constructionMapOfRegions()
     {
 
-        //? on recupere l'url de base
-        $baseUrl = $this->requestStack->getCurrentRequest()->getScheme() . '://' . $this->requestStack->getCurrentRequest()->getHttpHost() . $this->requestStack->getCurrentRequest()->getBasePath();
         //?on recupere tous les centres
         $regionErms = $this->regionErmRepository->findAll();
         //?on fait un tableau des couleurs des régions
@@ -330,9 +259,6 @@ class MapsService
 
     public function constructionMapOfZonesByClasse(string $classeName)
     {
-
-        //? on recupere l'url de base
-        $baseUrl = $this->requestStack->getCurrentRequest()->getScheme() . '://' . $this->requestStack->getCurrentRequest()->getHttpHost() . $this->requestStack->getCurrentRequest()->getBasePath();
 
         $states = []; //? toutes les réponses seront dans ce tableau final
 
@@ -455,25 +381,11 @@ class MapsService
 
     public function getMapWithInterventionPointAndAllShopsArround(City $cityOfIntervention, array $arrayFromAllShopsNearCityOfIntervention, string $option): Map
     {
-        $map = (new Map());
-        $leafletOptions = (new LeafletOptions())
-            ->tileLayer(new TileLayer(
-                url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-                options: [
-                    'minZoom' => 8,
-                    'maxZoom' => 10,
-                ]
-            ));
-        // Add the custom options to the map
-        $map->options($leafletOptions);
+
+        $map = $this->generationUxMapWithBaseOptions();
 
         $iconOfIntervention = Icon::ux('tabler:truck-filled')->width(42)->height(42);
         
-        $map
-            ->center(new Point($cityOfIntervention->getLatitude(), $cityOfIntervention->getLongitude()))
-            ->fitBoundsToMarkers(true);
-
         $map
             ->addMarker( new Marker(
                 position: new Point($cityOfIntervention->getLatitude(), $cityOfIntervention->getLongitude()),
@@ -534,15 +446,10 @@ class MapsService
     public function constructionMapOfAllShopsUnderCgoWithUxMap(ShopClass $classErm)
     {
 
-        //? on recupere l'url de base
-        $baseUrl = $this->requestStack->getCurrentRequest()->getScheme() . '://' . $this->requestStack->getCurrentRequest()->getHttpHost() . $this->requestStack->getCurrentRequest()->getBasePath();
-
         //?on recupere tous les cgos
         $cgos = $this->cgoRepository->findBy(['classErm' => $classErm]);
-        $map = (new Map())
-        ->center(new Point(48.8566, 2.3522))
-        ->zoom(4);
-        $map->fitBoundsToMarkers(true);
+
+        $map = $this->generationUxMapWithBaseOptions();
 
         $iconOfCgo = Icon::url('../../map/images/logoCgo.png')->width(32)->height(32);
 
@@ -587,18 +494,6 @@ class MapsService
             
         }
 
-        $leafletOptions = (new LeafletOptions())
-            ->tileLayer(new TileLayer(
-                url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-                options: [
-                    'minZoom' => 6,
-                    'maxZoom' => 10,        
-                ]
-                ));
-        // Add the custom options to the map
-        $map->options($leafletOptions);
-
         return $map;
     }
 
@@ -615,7 +510,7 @@ class MapsService
         $fakeCgo->setTerritoryColor('#000000')->setName("PAS DE CGO RENSEIGNÉ")->setManager($fakeManager);
 
         //?on construit la map
-        $map = (new Map())->fitBoundsToMarkers(true);
+        $map = $this->generationUxMapWithBaseOptions();
 
         foreach($technicians as $technician)
         {
@@ -651,25 +546,13 @@ class MapsService
              ));
         }
 
-        $leafletOptions = (new LeafletOptions())
-            ->tileLayer(new TileLayer(
-                url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-                options: [
-                    'minZoom' => 6,
-                    'maxZoom' => 10,        
-                ]
-                ));
-        // Add the custom options to the map
-        $map->options($leafletOptions);
-
         return $map;
     }
 
     public function constructionMapOfAllCtWihUxMap(string $optionName)
     {
-        $mapOnlyWithShops = new Map();    
-        $mapOnlyWithCts = new Map();
+        $mapOnlyWithShops = $this->generationUxMapWithBaseOptions();    
+        $mapOnlyWithCts = $this->generationUxMapWithBaseOptions();
         
         //?on recupere tous les ct
         $cts = $this->technicalAdvisorRepository->findAll();
@@ -727,16 +610,6 @@ class MapsService
             
         }
 
-        $leafletOptions = (new LeafletOptions())
-            ->tileLayer(new TileLayer(
-                url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-                options: [
-                    'minZoom' => 6,
-                    'maxZoom' => 10,        
-                ]
-                ));
-
         //! choices from the form
         if($optionName == 'cts')
         {
@@ -747,8 +620,23 @@ class MapsService
             $map =  $mapOnlyWithShops;
         }
 
+        return $map;
+    }
+
+    public function generationUxMapWithBaseOptions()
+    {
+        $map = new Map()->center(new Point(48.8566, 2.3522))->zoom(4)->fitBoundsToMarkers(true);
+
+        $leafletOptions = (new LeafletOptions())
+            ->tileLayer(new TileLayer(
+                url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                options: [
+                    'minZoom' => 6,
+                    'maxZoom' => 10,        
+                ]
+                ));
         // Add the custom options to the map
-        $map->center(new Point(48.8566, 2.3522))->zoom(4)->fitBoundsToMarkers(true);
         $map->options($leafletOptions);
 
         return $map;
