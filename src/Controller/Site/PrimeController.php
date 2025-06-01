@@ -12,11 +12,15 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class PrimeController extends AbstractController
 {
+    private int $primeMax;
+
     public function __construct(
         private PrimeLevelService $primeLevelService,
         private PrimelevelRepository $primelevelRepository,
+
     )
     {
+        $this->primeMax = 600;
     }
 
     #[Route('/prime/calcul-prime-mensuelle', name: 'app_prime')]
@@ -38,15 +42,21 @@ class PrimeController extends AbstractController
                     $psByPersonZone = $this->primeLevelService->getPsByPerson($fullPs, $divider);
                     $primeLevel = $this->primeLevelService->getPrimeLevel($psByPersonZone);
 
-                    $primeByPerson = $this->primeLevelService->calculateValuePrimeByPerson($psByPersonZone, $primeLevel);
-                    $nextLevel = $this->primeLevelService->getPrimeLevel($primeLevel->getEnd());
+                    $primeByPerson = $this->primeLevelService->calculateValuePrimeByPerson($psByPersonZone, $primeLevel, $this->primeMax);
 
-                    if($nextLevel === null){
-                        $infosForNextLevel = $this->primeLevelService->returnInfosForNextLevel($divider, $fullPs, $primeLevel);
+                    if($primeByPerson >= $this->primeMax){
+                        $nextLevel = null;
+                        $infosForNextLevel = [
+                            'nextPsForNextLevel' => 'Maximum atteint !',
+                            'psDifference' => 'Maximum atteint !',
+                            'startPrime' => $this->primeMax,
+                            'endPrime' => $this->primeMax
+                        ];
+
                     }else{
-                        $infosForNextLevel = $this->primeLevelService->returnInfosForNextLevel($divider, $fullPs, $nextLevel);
+                        $nextLevel = $this->primeLevelService->getPrimeLevel($primeLevel->getEnd());
+                        $infosForNextLevel = $this->primeLevelService->returnInfosForNextLevel($divider, $fullPs, $nextLevel, $this->primeMax);
                     }
-                    
                 }
         }
 
