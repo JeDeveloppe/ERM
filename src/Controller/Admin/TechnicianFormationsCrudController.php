@@ -5,9 +5,11 @@ namespace App\Controller\Admin;
 use App\Entity\TechnicianFormations;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ColorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use PHPUnit\Util\Color;
 
 class TechnicianFormationsCrudController extends AbstractCrudController
 {
@@ -21,6 +23,7 @@ class TechnicianFormationsCrudController extends AbstractCrudController
     {
         return [
             TextField::new('name', 'Nom'),
+            ColorField::new('color', 'Couleur'),
         ];
     }
 

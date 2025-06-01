@@ -8,9 +8,20 @@
 	
 	<div class="row g-0 justify-content-center align-items-center mb-5">
 		<h1 class="col-12 text-center my-5">{{ title }}</h1>
-		<div class="col-11 col-md-10 col-lg-8">
+		<div class="col-11 col-md-10 col-lg-8 mb-3">
 			{# affichage de la carte de France #}
-			{{ ux_map(mapDonnees, {'data-controller': 'mymap', 'controller_id': false, style: 'height: 600px' }) }}
+			{{ ux_map(mapDonnees, {'data-controller': 'mymap', 'controller_id': false, style: 'height: 600px; border: 2px solid black' }) }}
+		</div>
+		<div class="col-11 col-md-6 col-lg-5 mb-3">
+			{{ form_start(form) }}
+				{{ form_widget(form.options) }}
+				<div class="col-12 text-center my-2">
+					<div class="btn-group" role="group">
+						<button type="submit" class="btn btn-primary">Afficher</button>
+						<a href="{{ path('app_map_technicians_telematique') }}" class="btn btn-warning">Reset</a>
+					</div>
+				</div>
+			{{ form_end(form) }} 
 		</div>
 	</div>
 

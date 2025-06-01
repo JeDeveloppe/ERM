@@ -25,8 +25,9 @@ class SearchShopsByCityType extends AbstractType
                 'Afficher les téchniciens télématiques les plus proches' => 'telematique',
             ],
             'mapped' => false,
+            'placeholder' => 'Choisir une option...',
             'attr' => [
-                'class' => 'form-control mb-3'
+                'class' => 'form-control mb-3',
             ]
         ]);
     }
