@@ -625,7 +625,7 @@ class MapsService
 
     public function generationUxMapWithBaseOptions()
     {
-        $map = new Map()->center(new Point(48.8566, 2.3522))->zoom(4)->fitBoundsToMarkers(true);
+        $map = (new Map())->center(new Point(48.8566, 2.3522))->zoom(4)->fitBoundsToMarkers(true);
 
         $leafletOptions = (new LeafletOptions())
             ->tileLayer(new TileLayer(
