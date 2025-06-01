@@ -20,6 +20,12 @@ class PrimelevelRepository extends ServiceEntityRepository
     public function findPrimeLevelWherePsByPersonIsBetweenStartAndEnd(int $psByPerson)
     {
 
+        $primeLevels = $this->findAll();
+        
+        if($psByPerson > end($primeLevels)->getEnd()){
+            return end($primeLevels);
+        }
+
         $query = $this->createQueryBuilder('p')
             ->where('p.start <= :val')
             ->andWhere('p.end > :val')

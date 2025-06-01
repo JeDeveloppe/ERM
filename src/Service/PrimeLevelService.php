@@ -37,18 +37,25 @@ class PrimeLevelService
         return $fullPs / $divider;
     }
 
-    public function calculateValuePrimeByPerson(float $psByPersonZone, Primelevel $primeLevel): float
+    public function calculateValuePrimeByPerson(float $psByPersonZone, Primelevel $primeLevel, int $max): float
     {
-        return $primeLevel->getPercentage() / 100 * $psByPersonZone;
+
+        $calculatedValue = $primeLevel->getPercentage() / 100 * $psByPersonZone;
+
+        if($calculatedValue > $max){
+            $calculatedValue = $max;
+        }
+
+        return $calculatedValue;
     }
 
-    public function returnInfosForNextLevel(float $divider, int $fullPs, Primelevel $nextLevel): array
+    public function returnInfosForNextLevel(float $divider, int $fullPs, Primelevel $nextLevel, int $max): array
     {
         $start = $nextLevel->getStart();
         $nextPsForNextLevel = $start * $divider;
         $psDifference = $nextPsForNextLevel - $fullPs;
-        $startPrime = $this->calculateValuePrimeByPerson($nextLevel->getStart(), $nextLevel);
-        $endPrime = $this->calculateValuePrimeByPerson($nextLevel->getEnd(), $nextLevel);
+        $startPrime = $this->calculateValuePrimeByPerson($nextLevel->getStart(), $nextLevel, $max);
+        $endPrime = $this->calculateValuePrimeByPerson($nextLevel->getEnd(), $nextLevel, $max);
 
         //? If the endPrime is greater than 600, we set it to 600
         if($endPrime > 600){
