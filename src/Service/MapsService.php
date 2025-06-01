@@ -23,6 +23,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\UX\Map\Bridge\Leaflet\LeafletOptions;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\UX\Map\Bridge\Leaflet\Option\TileLayer;
+use Symfony\UX\Map\MapOptionsInterface;
 
 class MapsService
 {
@@ -665,29 +666,37 @@ class MapsService
         return $map;
     }
 
-    public function constructionMapOfAllShopsWorkedByCtWihUxMap()
+    public function constructionMapOfAllCtWihUxMap(string $optionName)
     {
-
+        $mapOnlyWithShops = new Map();    
+        $mapOnlyWithCts = new Map();
+        
         //?on recupere tous les ct
         $cts = $this->technicalAdvisorRepository->findAll();
-        $map = (new Map())
-        ->center(new Point(48.8566, 2.3522))
-        ->zoom(4);
-        $map->fitBoundsToMarkers(true);
-    
 
+        //?on construit la map
         foreach($cts as $ct)
         {
+
             $color = $ct->getZoneColor();
             $iconOfTechnicalAdvisor = Icon::ux('fa6-solid:magnifying-glass-dollar')->width(24)->height(24)->color($color);
+            $workForShops = '<p>Fait les inspections pour:<br/>';
+            foreach($ct->getWorkForShops() as $shop) {
+                if($shop){
+                    $workForShops .= '<span class="badge" style="background-color:'.$ct->getZoneColor().'">'.$shop->getName().'</span> ';
+                }else{
+                    'AUCUN POUR LE MOMENT...';
+                }
+            }
+            $workForShops .= '</p>';
 
-
-            $map->addMarker(new Marker(
+            $mapOnlyWithCts->addMarker(new Marker(
                 position: new Point($ct->getAttachmentCenter()->getCity()->getLatitude(), $ct->getAttachmentCenter()->getCity()->getLongitude()),
                 icon: $iconOfTechnicalAdvisor,
                 title: $ct->getAttachmentCenter()->getName(),
                 infoWindow: new InfoWindow(
-                    content: $ct->getLastName(),
+                    headerContent: $ct->getFirstName().' '.$ct->getLastName(),
+                    content: '<p>Tél: '.$ct->getPhone().'<br/>Email: '.$ct->getEmail().'</p>'.$workForShops,
                 ),
                 extra: [
                     'markerColor' => $color,
@@ -702,7 +711,7 @@ class MapsService
 
                 $iconOfShopUnderCt = Icon::ux('gravity-ui:target')->width(34)->height(34)->color($color);
 
-                $map->addMarker(new Marker(
+                $mapOnlyWithShops->addMarker(new Marker(
                     position: new Point($shop->getCity()->getLatitude(), $shop->getCity()->getLongitude()),
                     icon: $iconOfShopUnderCt,
                     title: $shop->getName(),
@@ -727,9 +736,22 @@ class MapsService
                     'maxZoom' => 10,        
                 ]
                 ));
+
+        //! choices from the form
+        if($optionName == 'cts')
+        {
+            $map =  $mapOnlyWithCts;
+        }
+        else if($optionName == 'shops')
+        {
+            $map =  $mapOnlyWithShops;
+        }
+
         // Add the custom options to the map
+        $map->center(new Point(48.8566, 2.3522))->zoom(4)->fitBoundsToMarkers(true);
         $map->options($leafletOptions);
 
         return $map;
     }
+
 }

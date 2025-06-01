@@ -38,6 +38,8 @@ security:
     access_control:
         - { path: ^/admin, roles: ROLE_ADMIN }
         - { path: ^/maps, roles: ROLE_USER }
+        - { path: ^/prime, roles: ROLE_USER }
+        - { path: ^/distance, roles: ROLE_USER }
     role_hierarchy:
         ROLE_SUPER_ADMIN: ROLE_ADMIN
         ROLE_ADMIN: ROLE_USER

@@ -19,7 +19,7 @@ class PrimeController extends AbstractController
     {
     }
 
-    #[Route('/prime', name: 'app_prime')]
+    #[Route('/prime/calcul-prime-mensuelle', name: 'app_prime')]
     public function prime(Request $request): Response
     {
         //on récupere le formulaire par la request

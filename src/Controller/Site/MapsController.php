@@ -3,6 +3,7 @@
 namespace App\Controller\Site;
 
 use App\Form\SearchTechnicianFormationsTypeForm;
+use App\Form\TechnicianAdvisorMapOptionsTypeForm;
 use App\Service\MapsService;
 use App\Repository\ShopClassRepository;
 use App\Repository\TelematicAreaRepository;
@@ -25,37 +26,83 @@ class MapsController extends AbstractController
     public function mapsChoices(): Response
     {
         $routes = [];
-        $routes[] = [
-            'url' => $this->generateUrl('app_map_all_shops'),
-            'name' => 'Tous les centres'
-        ];
-        $routes[] = [
-            'url' => $this->generateUrl('app_map_all_shops_under_cgo', ['classeName' => 'mv']),
-            'name' => 'Tous les centres sous cgo MV'
-        ];
-        $routes[] = [
-            'url' => $this->generateUrl('app_map_all_shops_under_cgo', ['classeName' => 'vl']),
-            'name' => 'Tous les centres sous cgo VL'
-        ];
-        $routes[] = [
-            'url' => $this->generateUrl('app_map_all_regions'),
-            'name' => 'Toutes les régions'
-        ];
-        $routes[] = [
-            'url' => $this->generateUrl('app_map_all_zones', ['classeName' => 'mv']),
-            'name' => 'Toutes les zones MV'
-        ];
-        $routes[] = [
-            'url' => $this->generateUrl('app_map_all_zones', ['classeName' => 'vl']),
-            'name' => 'Toutes les zones VL'
-        ];
-        $routes[] = [
-            'url' => $this->generateUrl('app_map_zones_telematique'),
-            'name' => 'Toutes les zones télématiques'
-        ];
 
-        return $this->render('site/maps/choices.html.twig', [
-            'title' => 'Les cartes',
+          $carte = [
+            'title' => 'Cartes:',
+            'routes' => [
+                [
+                'url' => $this->generateUrl('app_map_all_shops'),
+                'name' => 'Tous les centres',
+                'icon' => 'solar:garage-bold'
+                ],
+                [
+                'url' => $this->generateUrl('app_map_all_shops_under_cgo', ['classeName' => 'mv']),
+                'name' => 'Tous les centres sous cgo MV',
+                'icon' => 'solar:garage-bold'
+                ],
+                [
+                'url' => $this->generateUrl('app_map_all_shops_under_cgo', ['classeName' => 'vl']),
+                'name' => 'Tous les centres sous cgo VL',
+                'icon' => 'solar:garage-bold'
+                ]
+            ]
+         ];
+        $routes[] = $carte;
+
+        $zone = [
+            'title' => 'Zones:',
+            'routes' => [
+                [
+                'url' => $this->generateUrl('app_map_all_regions'),
+                'name' => 'Toutes les régions'
+                ],
+                [
+                'url' => $this->generateUrl('app_map_all_zones', ['classeName' => 'mv']),
+                'name' => 'Toutes les zones MV'
+                ],
+                [
+                'url' => $this->generateUrl('app_map_all_zones', ['classeName' => 'vl']),
+                'name' => 'Toutes les zones VL'
+                ]
+            ]
+        ];
+        $routes[] = $zone;
+
+        $telematic = [
+            'title' => 'Télématique:',
+            'routes' => [
+                [
+                    'url' => $this->generateUrl('app_map_zones_telematique'),
+                    'name' => 'Toutes les zones télématiques'
+                ],
+                [
+                    'url' => $this->generateUrl('app_search_distance'),
+                    'name' => 'Calculer une distance pour une intervention',
+                    'icon' => 'game-icons:path-distance'
+                ],
+                [
+                    'url' => $this->generateUrl('app_map_technicians_telematique'),
+                    'name' => 'Carte des téchniciens télématiques',
+                    'icon' => 'ri:taxi-wifi-fill'
+                ],
+            ]
+        ];
+        $routes[] = $telematic;
+
+        $ct = [
+            'title' => 'CT:',
+            'routes' => [
+                [
+                'url' => $this->generateUrl('app_map_all_cts'),
+                'name' => 'Carte des CT',
+                'icon' => 'fa6-solid:magnifying-glass-dollar'
+                ]
+            ]
+        ];
+        $routes[] = $ct;
+
+        return $this->render('site/maps/home.html.twig', [
+            'title' => 'Accueil',
             'routes' => $routes
         ]);
     }
@@ -73,16 +120,37 @@ class MapsController extends AbstractController
         ]);
     }
 
-    #[Route('/maps/france/tous-les-ct', name: 'app_map_all_cts')]
-    public function mapAllCts(): Response
+    #[Route('/maps/france/ct/{optionNameChoice?}', name: 'app_map_all_cts')]
+    public function mapAllCts(Request $request, ?string $optionNameChoice): Response
     {
-        //?on recupere les donnees dans le service
-        // $mapDonnees = $this->mapsService->constructionMapOfAllShops();
-        $mapDonnees = $this->mapsService->constructionMapOfAllShopsWorkedByCtWihUxMap();
+
+        $form = $this->createForm(TechnicianAdvisorMapOptionsTypeForm::class);
+
+        // Handle the form submission
+        $form->handleRequest($request);
+
+        // Check if the form was submitted and is valid
+        if($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+            $optionName = $data['options'];
+            $optionsNamePossibilities = ['cts', 'shops']; //! choices from the form
+
+            if(!in_array($optionName, $optionsNamePossibilities)){
+                $optionName = 'cts';
+            }
+
+            //?on recupere les donnees dans le service
+            $mapDonnees = $this->mapsService->constructionMapOfAllCtWihUxMap($optionName);
+
+        }else{
+            //?on recupere les donnees dans le service
+            $mapDonnees = $this->mapsService->constructionMapOfAllCtWihUxMap('cts');
+        }
 
         return $this->render('site/maps/all_cts.html.twig', [
             'mapDonnees' => $mapDonnees,
-            'title' => 'Tous les CT',
+            'title' => 'Carte des CT',
+            'form' => $form
         ]);
     }
 

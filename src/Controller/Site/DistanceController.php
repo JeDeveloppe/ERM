@@ -19,7 +19,7 @@ class DistanceController extends AbstractController
         private ShopRepository $shopRepository
     ){}
 
-    #[Route('/search-distance', name: 'app_search_distance', methods: ['GET', 'POST'])]
+    #[Route('/distance/search-distance', name: 'app_search_distance', methods: ['GET', 'POST'])]
     public function searchDistance(Request $request): Response
     {
 
