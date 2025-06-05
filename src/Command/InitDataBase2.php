@@ -3,6 +3,8 @@
 namespace App\Command;
 
 use App\Entity\TechnicalAdvisor;
+use App\Repository\DepartmentRepository;
+use App\Service\DepartmentService;
 use App\Service\TechnicalAdvisorService;
 use App\Service\TechnicianFormationsService;
 use App\Service\TechnicianService;
@@ -21,7 +23,8 @@ class InitDataBase2 extends Command
         private TechnicianService $technicianService,
         private TechnicianVehicleService $technicianVehicleService,
         private TechnicianFormationsService $technicianFormationsService,
-        private TechnicalAdvisorService $technicalAdvisorService
+        private TechnicalAdvisorService $technicalAdvisorService,
+        private DepartmentService $departmentService
         )
     {
         parent::__construct();
@@ -39,6 +42,8 @@ class InitDataBase2 extends Command
         $this->technicianFormationsService->initDatabase($io);
         // $this->technicianService->importTechnicians($io);
         $this->technicalAdvisorService->importCTs($io);
+        $this->departmentService->importDepartmentsWithGpsPoints($io);
+
 
         return Command::SUCCESS;
     }

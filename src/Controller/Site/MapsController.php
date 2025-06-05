@@ -197,7 +197,8 @@ class MapsController extends AbstractController
         if($classe){
 
             //?on recupere les donnees dans le service
-            $mapDonnees = $this->mapsService->constructionMapOfZonesByClasse($classe->getName());
+            // $mapDonnees = $this->mapsService->constructionMapOfZonesByClasse($classe->getName());
+            $mapDonnees = $this->mapsService->constructionMapOfZonesByClasseWithUx($classe->getName());
     
             return $this->render('site/maps/all_zones.html.twig', [
                 'mapDonnees' => $mapDonnees,

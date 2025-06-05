@@ -16,6 +16,14 @@ class DepartmentRepository extends ServiceEntityRepository
         parent::__construct($registry, Department::class);
     }
 
+     public function findAllGpsPoints(): array
+    {
+        return $this->createQueryBuilder('d')
+            ->select('d.gpsPoints') // Sélectionne uniquement la propriété gpsPoints
+            ->where('d.gpsPoints IS NOT NULL') // Optionnel: pour exclure les départements sans points GPS
+            ->getQuery()
+            ->getSingleColumnResult(); // Récupère un tableau de valeurs directement
+    }
     //    /**
     //     * @return Department[] Returns an array of Department objects
     //     */

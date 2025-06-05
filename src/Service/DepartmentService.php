@@ -70,4 +70,54 @@ class DepartmentService
 
         return $departement;
     }
+
+    public function importDepartmentsWithGpsPoints(SymfonyStyle $io): void
+    {
+        $io->title('Importation des points GPS des départements Francais');
+            $totals = $this->readCsvFile();
+
+            $io->progressStart(count($totals));
+
+            foreach($totals as $arrayTotal){
+
+                $io->progressAdvance();
+                $entity = $this->createOrUpdate($arrayTotal);
+                $this->em->persist($entity);
+                $this->em->flush();
+            }
+            
+
+            $io->progressFinish();
+        
+
+        $io->success('Importation terminée');
+    }
+
+    private function readCsvFile(): Reader
+    {
+        $csv = Reader::createFromPath('%kernel.root.dir%/../import/departmentsBordures.csv','r');
+        $csv->setDelimiter(';');
+        $csv->setHeaderOffset(0);
+
+        return $csv;
+    }
+
+    private function createOrUpdate(array $array): Department
+    {
+        $department = $this->departmentRepository->findOneByCode($array['Code INSEE Département']);
+
+        if($department){
+            $datas = $array['geo_shape'];
+            $data = json_decode($datas, true);
+            if (json_last_error() != JSON_ERROR_NONE) {
+                dd( "Erreur lors du décodage JSON : " . json_last_error_msg());
+            }
+            $department->setGpsPoints($data);
+        }else{
+            dump('no department for ' . $array['Code Officiel Courant Departement']);
+        }
+
+
+        return $department;
+    }
 }
