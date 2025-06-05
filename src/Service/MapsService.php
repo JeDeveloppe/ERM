@@ -9,21 +9,23 @@ use Symfony\UX\Map\Map;
 use App\Entity\ShopClass;
 use Symfony\UX\Map\Point;
 use Symfony\UX\Map\Marker;
+use Symfony\UX\Map\Polygon;
 use Symfony\UX\Map\Icon\Icon;
 use Symfony\UX\Map\InfoWindow;
 use App\Repository\CgoRepository;
 use App\Repository\ShopRepository;
 use App\Repository\ZoneErmRepository;
 use App\Repository\RegionErmRepository;
+use Symfony\UX\Map\MapOptionsInterface;
 use App\Repository\DepartmentRepository;
-use App\Repository\TechnicalAdvisorRepository;
 use App\Repository\TechnicianRepository;
 use App\Repository\TelematicAreaRepository;
+use App\Repository\TechnicalAdvisorRepository;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\UX\Map\Bridge\Leaflet\LeafletOptions;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Serializer\Encoder\JsonDecode;
 use Symfony\UX\Map\Bridge\Leaflet\Option\TileLayer;
-use Symfony\UX\Map\MapOptionsInterface;
 
 class MapsService
 {
@@ -304,6 +306,45 @@ class MapsService
         $donnees['states'] = $jsonStates;
 
         return $donnees;
+    }
+
+    public function constructionMapOfZonesByClasseWithUx(string $classeName)
+    {
+
+        $map = $this->generationUxMapWithBaseOptions();
+        $gpsPoints = $this->departmentRepository->findAllGpsPoints();
+        $points = [];
+
+        foreach($gpsPoints as $gpsPoint){
+            $data = json_decode($gpsPoint, true);
+            if($data['type'] === 'Polygon'){
+                $coordinates = $data['coordinates'];
+                foreach($coordinates as $coordinate){
+                    foreach($coordinate as $coord){
+                        $points[] = new Point($coord[1], $coord[0]);
+                    }
+                }
+
+            }else{
+                $coordinates = $data['coordinates'];
+                foreach($coordinates as $coordinate){
+                    foreach($coordinate as $coord){
+                        if(is_float($coord[0]) && is_float($coord[1])){
+                            $points[] = new Point($coord[1], $coord[0]);
+                        }else{
+                            foreach($coord as $coord2){
+                                $points[] = new Point($coord2[1], $coord2[0]);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        $map->addPolygon(new Polygon(
+            points: $points
+            ));
+
+        return $map;
     }
 
     public function randomHexadecimalColor()

@@ -40,6 +40,9 @@ class Department
     #[ORM\ManyToOne(inversedBy: 'departments')]
     private ?TelematicArea $telematicArea = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?array $gpsPoints = null;
+
     public function __construct()
     {
         $this->cities = new ArrayCollection();
@@ -153,6 +156,18 @@ class Department
     public function setTelematicArea(?TelematicArea $telematicArea): static
     {
         $this->telematicArea = $telematicArea;
+
+        return $this;
+    }
+
+    public function getGpsPoints(): ?array
+    {
+        return $this->gpsPoints;
+    }
+
+    public function setGpsPoints(?array $gpsPoints): static
+    {
+        $this->gpsPoints = $gpsPoints;
 
         return $this;
     }
