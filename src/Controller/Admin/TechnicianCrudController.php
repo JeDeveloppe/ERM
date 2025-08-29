@@ -55,11 +55,12 @@ class TechnicianCrudController extends AbstractCrudController
                     $queryBuilder
                         ->orderBy('entity.name', 'ASC')
                     ),
-            AssociationField::NEW('technicianFormations', 'Formations')
+            AssociationField::NEW('technicianFormations', 'Formations:')
                 ->setQueryBuilder(fn(QueryBuilder $queryBuilder) => 
                     $queryBuilder
                         ->orderBy('entity.name', 'ASC')
                     ),
+            AssociationField::new('fonctions', 'Fonction:'),
             TextEditorField::new('informations', 'Informations')->hideOnIndex(),
         ];
     }
@@ -67,7 +68,10 @@ class TechnicianCrudController extends AbstractCrudController
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
-            ->setDefaultSort(['name' => 'ASC']);
+            ->setDefaultSort(['name' => 'ASC'])
+            ->setPageTitle('index', 'Liste des techniciens')
+            ->setPageTitle('new', 'Nouveau technicien')
+            ->setPageTitle('edit', 'Modifier un technicien');
     }
 
     // public function createIndexQueryBuilder(SearchDto $searchDto, EntityDto $entityDto, FieldCollection $fields, FilterCollection $filters): QueryBuilder
@@ -86,6 +90,7 @@ class TechnicianCrudController extends AbstractCrudController
         return $filters
             ->add('isTelematic')
             ->add('technicianFormations')
+            ->add('fonctions')
             ->add('shop')
             ->add('vehicle')
             ->add('controledByCgo')

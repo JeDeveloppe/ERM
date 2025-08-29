@@ -2,7 +2,7 @@
 
 namespace App\Controller\Site;
 
-use App\Form\SearchTechnicianFormationsTypeForm;
+use App\Form\SearchTechnicianByDetailsTypeForm;
 use App\Form\TechnicianAdvisorMapOptionsTypeForm;
 use App\Service\MapsService;
 use App\Repository\ShopClassRepository;
@@ -28,19 +28,23 @@ class MapsController extends AbstractController
         $routes = [];
 
           $carte = [
+            'isGranted' => 'ROLE_ERM',
             'title' => 'Cartes:',
             'routes' => [
                 [
+                'isGranted' => 'ROLE_ERM',
                 'url' => $this->generateUrl('app_map_all_shops'),
                 'name' => 'Tous les centres',
                 'icon' => 'solar:garage-bold'
                 ],
                 [
+                'isGranted' => 'ROLE_ERM',
                 'url' => $this->generateUrl('app_map_all_shops_under_cgo', ['classeName' => 'mv']),
                 'name' => 'Tous les centres sous cgo MV',
                 'icon' => 'solar:garage-bold'
                 ],
                 [
+                'isGranted' => 'ROLE_ERM',
                 'url' => $this->generateUrl('app_map_all_shops_under_cgo', ['classeName' => 'vl']),
                 'name' => 'Tous les centres sous cgo VL',
                 'icon' => 'solar:garage-bold'
@@ -50,17 +54,21 @@ class MapsController extends AbstractController
         $routes[] = $carte;
 
         $zone = [
+            'isGranted' => 'ROLE_ERM',
             'title' => 'Zones:',
             'routes' => [
                 [
+                'isGranted' => 'ROLE_ERM',
                 'url' => $this->generateUrl('app_map_all_regions'),
                 'name' => 'Toutes les régions'
                 ],
                 [
+                'isGranted' => 'ROLE_ERM',
                 'url' => $this->generateUrl('app_map_all_zones', ['classeName' => 'mv']),
                 'name' => 'Toutes les zones MV'
                 ],
                 [
+                'isGranted' => 'ROLE_ERM',
                 'url' => $this->generateUrl('app_map_all_zones', ['classeName' => 'vl']),
                 'name' => 'Toutes les zones VL'
                 ]
@@ -69,18 +77,22 @@ class MapsController extends AbstractController
         $routes[] = $zone;
 
         $telematic = [
+            'isGranted' => 'ROLE_MCF',
             'title' => 'Télématique:',
             'routes' => [
                 [
+                    'isGranted' => 'ROLE_MCF',
                     'url' => $this->generateUrl('app_map_zones_telematique'),
                     'name' => 'Toutes les zones télématiques'
                 ],
                 [
+                    'isGranted' => 'ROLE_MCF',
                     'url' => $this->generateUrl('app_search_distance'),
                     'name' => 'Calculer une distance pour une intervention',
                     'icon' => 'game-icons:path-distance'
                 ],
                 [
+                    'isGranted' => 'ROLE_MCF',
                     'url' => $this->generateUrl('app_map_technicians_telematique'),
                     'name' => 'Carte des téchniciens télématiques',
                     'icon' => 'ri:taxi-wifi-fill'
@@ -90,12 +102,14 @@ class MapsController extends AbstractController
         $routes[] = $telematic;
 
         $ct = [
+            'isGranted' => 'ROLE_ERM',
             'title' => 'CT:',
             'routes' => [
                 [
-                'url' => $this->generateUrl('app_map_all_cts'),
-                'name' => 'Carte des CT',
-                'icon' => 'fa6-solid:magnifying-glass-dollar'
+                    'isGranted' => 'ROLE_ERM',
+                    'url' => $this->generateUrl('app_map_all_cts'),
+                    'name' => 'Carte des CT',
+                    'icon' => 'fa6-solid:magnifying-glass-dollar'
                 ]
             ]
         ];
@@ -232,7 +246,7 @@ class MapsController extends AbstractController
     {
 
         // Create the form, associating it with the $film object
-        $form = $this->createForm(SearchTechnicianFormationsTypeForm::class);
+        $form = $this->createForm(SearchTechnicianByDetailsTypeForm::class);
 
         // Handle the form submission
         $form->handleRequest($request);
@@ -240,21 +254,30 @@ class MapsController extends AbstractController
         // Check if the form was submitted and is valid
         if($form->isSubmitted() && $form->isValid()) {
 
-            $formations = $form->get('name')->getData();
+            $formations = $form->get('formations')->getData();
             $formationNamesArray = $formations->toArray();
+
+            $functions = $form->get('fonctions')->getData();
+            $functionNamesArray = $functions->toArray();
 
             $formationNames = [];
             foreach($formationNamesArray as $formationName){
                 $formationNames[] = $formationName->getName();
             }
 
-            $mapDonnees = $this->mapsService->constructionMapOfTechniciansTelematique($formationNames);
+            $functionNames = [];
+            foreach($functionNamesArray as $functionName){
+                $functionNames[] = $functionName->getName();
+            }
+
+            $mapDonnees = $this->mapsService->constructionMapOfTechniciansTelematique($formationNames, $functionNames);
 
         }else{
             
             $formationNames = [];
+            $functionNames = [];
             //?on recupere les donnees dans le service
-            $mapDonnees = $this->mapsService->constructionMapOfTechniciansTelematique($formationNames);
+            $mapDonnees = $this->mapsService->constructionMapOfTechniciansTelematique($formationNames, $functionNames);
         }
 
         return $this->render('site/maps/technicians_telematic.html.twig', [

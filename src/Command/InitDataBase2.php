@@ -6,6 +6,7 @@ use App\Entity\TechnicalAdvisor;
 use App\Repository\DepartmentRepository;
 use App\Service\DepartmentService;
 use App\Service\TechnicalAdvisorService;
+use App\Service\TechnicianFonctionService;
 use App\Service\TechnicianFormationsService;
 use App\Service\TechnicianService;
 use App\Service\TechnicianVehicleService;
@@ -21,10 +22,11 @@ class InitDataBase2 extends Command
 {
     public function __construct(
         private TechnicianService $technicianService,
-        private TechnicianVehicleService $technicianVehicleService,
         private TechnicianFormationsService $technicianFormationsService,
+        private TechnicianVehicleService $technicianVehicleService,
         private TechnicalAdvisorService $technicalAdvisorService,
-        private DepartmentService $departmentService
+        private DepartmentService $departmentService,
+        private TechnicianFonctionService $technicianFonctionService
         )
     {
         parent::__construct();
@@ -38,9 +40,10 @@ class InitDataBase2 extends Command
 
         $io = new SymfonyStyle($input,$output);
 
+        $this->technicianFonctionService->initDatabase($io);
         $this->technicianVehicleService->initDatabase($io);
         $this->technicianFormationsService->initDatabase($io);
-        // $this->technicianService->importTechnicians($io);
+        $this->technicianService->importTechnicians($io);
         $this->technicalAdvisorService->importCTs($io);
         $this->departmentService->importDepartmentsWithGpsPoints($io);
 

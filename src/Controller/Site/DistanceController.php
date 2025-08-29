@@ -24,8 +24,28 @@ class DistanceController extends AbstractController
     {
 
         $optionsAccepted = ['depannage','telematique']; //? options from SearchShopsByCityType
+        $isSearchDone = false;
+
+        $isMCF = $this->isGranted('ROLE_MCF') && !$this->isGranted('ROLE_ERM');
+
+        if($isMCF){
+            $formOptions = [
+                'choices' => ['Afficher les téchniciens télématiques les plus proches' => 'telematique'],
+                'placeholder' => false
+            ];
+        }else{
+            $formOptions = [
+                'choices' => [
+                    'Afficher les centres MV et MX les plus proches' => 'depannage',
+                    'Afficher les téchniciens télématiques les plus proches' => 'telematique'
+                ],
+                'placeholder' => 'Choisir une option...'
+            ];
+        }
         
-        $form = $this->createForm(SearchShopsByCityType::class);
+        $form = $this->createForm(SearchShopsByCityType::class, null, [
+            'formOptions' => $formOptions
+        ]);
 
         if($request->isMethod('POST')){
 
@@ -34,13 +54,20 @@ class DistanceController extends AbstractController
 
             if($form->isSubmitted() && $form->isValid()){
 
+                $isSearchDone = true;
                 $cityOfIntervention = $form->get('city')->getData();
                 $option = $form->get('options')->getData();
+                $classErm = ['MX','MV']; //?on cherche un dépannage par default
+
                     if(!in_array($option, $optionsAccepted)){
                         $option = 'depannage';
+                    }else{
+                        if($option == 'telematique'){
+                            $classErm = ['MX','MV','VL'];//?on cherche un telematique
+                        }
                     }
 
-                $datas = $this->cgoService->getShopsByClassErmAndOptionArroundCityOfIntervention($cityOfIntervention, ['MX','MV'], $option);
+                $datas = $this->cgoService->getShopsByClassErmAndOptionArroundCityOfIntervention($cityOfIntervention, $classErm, $option);
                 $map = $this->mapsService->getMapWithInterventionPointAndAllShopsArround($cityOfIntervention, $datas, $option);
             }
         }
@@ -49,6 +76,7 @@ class DistanceController extends AbstractController
             'formSearchByCity' => $form->createView(),
             'datas' => $datas ?? null,
             'map' => $map ?? null,
+            'isSearchDone' => $isSearchDone,
             'title' => 'Recherche de distance'
         ]);
     }

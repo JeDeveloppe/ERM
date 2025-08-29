@@ -61,7 +61,7 @@ class PrimeController extends AbstractController
         }
 
         return $this->render('site/prime/prime.html.twig', [
-            'title' => 'Estimation prime mensuelle',
+            'title' => 'Calcul prime mensuelle',
             'form' => $form,
             'primeLevels' => $primeLevels,
             'primeByPerson' => $primeByPerson ?? null,

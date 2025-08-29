@@ -4,26 +4,43 @@
 
 {% block body %}
 
-    {# <div class="js-locations" data-locations="{{ mapDonnees.locations }}"></div> #}
-	
-	<div class="row g-0 justify-content-center align-items-center mb-5">
-		<h1 class="col-12 text-center my-5">{{ title }}</h1>
-		<div class="col-11 col-md-10 col-lg-8 mb-3">
-			{# affichage de la carte de France #}
-			{{ ux_map(mapDonnees, {'data-controller': 'mymap', 'controller_id': false, style: 'height: 600px; border: 2px solid black' }) }}
-		</div>
-		<div class="col-11 col-md-6 col-lg-5 mb-3">
-			{{ form_start(form) }}
-				{{ form_widget(form.options) }}
-				<div class="col-12 text-center my-2">
-					<div class="btn-group" role="group">
-						<button type="submit" class="btn btn-primary">Afficher</button>
-						<a href="{{ path('app_map_technicians_telematique') }}" class="btn btn-warning">Reset</a>
-					</div>
-				</div>
-			{{ form_end(form) }} 
-		</div>
-	</div>
+<div class="container my-5">
+    <h1 class="text-center mb-4">{{ title }}</h1>
 
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-10 col-lg-8">
+
+            <div class="card shadow-sm mb-4">
+                <div class="card-body p-0">
+                    {% if mapDonnees is not empty %}
+                        {{ ux_map(mapDonnees, {'data-controller': 'mymap', 'controller_id': false, style: 'height: 600px; border-radius: 8px;' }) }}
+                    {% else %}
+                        <div class="alert alert-info text-center m-4" role="alert">
+                            <strong>Aucun technicien trouvé.</strong> Le formulaire ci-dessous permet de lancer une recherche.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-center mb-3">Options d'affichage</h5>
+                    {{ form_start(form) }}
+                        <div class="row justify-content-center">
+                            <div class="col-12 col-sm-8 mb-3">
+                                {{ form_label(form.options, 'Type d\'affichage:', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.options, {'attr': {'class': 'form-select'}}) }}
+                            </div>
+                        </div>
+                        <div class="text-center mt-2">
+                            <button type="submit" class="btn btn-primary btn-lg me-2">Afficher</button>
+                            <a href="{{ path('app_map_technicians_telematique') }}" class="btn btn-warning btn-lg">Réinitialiser</a>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock %}
