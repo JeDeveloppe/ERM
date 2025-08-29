@@ -15,6 +15,7 @@ use App\Entity\ManagerClass;
 use App\Entity\Primelevel;
 use App\Entity\TechnicalAdvisor;
 use App\Entity\Technician;
+use App\Entity\TechnicianFonction;
 use App\Entity\TechnicianFormations;
 use App\Entity\TechnicianVehicle;
 use App\Entity\TelematicArea;
@@ -47,12 +48,13 @@ class DashboardController extends AbstractDashboardController
         return [
 
             MenuItem::linkToDashboard('Dashboard', 'fa fa-home'),
-            MenuItem::linkToRoute('Site', 'fa fa-globe', 'app_home'),
+            MenuItem::linkToRoute('Site', 'fa fa-globe', 'app_maps_choices'),
             // MenuItem::linkToCrud('Zones opérationnelles (par centres)', 'fas fa-list', CgoOperationalAreaByShops::class),
             // MenuItem::linkToCrud('Zones télématiques', 'fas fa-list', CgoTelematicArea::class),
             MenuItem::section('Télématique:'),
             MenuItem::linkToCrud('Liste des techniciens', 'fas fa-list', Technician::class),
             MenuItem::linkToCrud('Liste des formations', 'fas fa-list', TechnicianFormations::class),
+            MenuItem::linkToCrud('Liste des fonctions', 'fas fa-list', TechnicianFonction::class),
             MenuItem::linkToCrud('Liste des véhicules', 'fas fa-list', TechnicianVehicle::class),
 
             MenuItem::section('CT:'),

@@ -4,72 +4,106 @@
 
 {% block body %}
 
-	<h1 class="col-12 text-center h3 my-5">{{ title }}</h1>
+<div class="container my-5">
+    <h1 class="text-center mb-4">{{ title }}</h1>
+    
+    <div class="row justify-content-center mb-4">
+        <div class="col-12 col-md-8 col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header text-center bg-primary text-white">
+                    <h5 class="my-1">Rechercher les centres à proximité</h5>
+                </div>
+                <div class="card-body">
+                    {{ form_start(formSearchByCity, {'attr': {'class': 'd-flex flex-column align-items-center'}}) }}
+                        <div class="w-100 mb-3">
+                            {{ form_label(formSearchByCity.city, 'Ville d\'intervention', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(formSearchByCity.city, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        <div class="w-100 mb-4">
+                            {{ form_label(formSearchByCity.options, 'Type de recherche', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(formSearchByCity.options, {'attr': {'class': 'form-select'}}) }}
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary btn-lg me-2">Rechercher</button>
+                            <a href="{{ path('app_search_distance') }}" class="btn btn-warning btn-lg">Réinitialiser</a>
+                        </div>
+                    {{ form_end(formSearchByCity) }}
+                </div>
+            </div>
+        </div>
+    </div>
 
-	<div class="row justify-content-around mt-5 mb-3">
-		<div class="card col-11 col-md-5 p-0">
-			<div class="card-header">Recherche par ville:</div>
-			<div class="card-body">
-				{{ form_start(formSearchByCity) }}
-                    <div class="col-11 mb-3">
-                        {{ form_widget(formSearchByCity.city) }}
-                    </div>
-                     <div class="col-11 mb-3">
-                        {{ form_widget(formSearchByCity.options) }}
-                    </div>
-                    <div class="col-11 text-center mb-2">
-                        <div class="btn-group" role="group">
-                            <button type="submit" class="btn btn-primary">Rechercher</button>
-                            <a href="{{ path('app_home') }}" class="btn btn-warning">Reset</a>
+    {% if isSearchDone %}
+        {% if datas | length > 0 %}
+            <div class="row justify-content-center">
+                <div class="col-12 col-xl-10">
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="my-1">Résultats de la recherche ({{ datas | length }} centre(s) trouvé(s))</h5>
+                        </div>
+                        <div class="card-body p-0 table-responsive">
+                            <table class="table text-center align-middle table-striped mb-0">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th class="py-3">Centre</th>
+                                        <th class="py-3">Distance (ALLER)</th>
+                                        <th class="py-3">Temps de trajet (ALLER)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for data in datas %}
+                                        {% set dureeEnSecondes = data.duration %}
+                                        {% set hours = (dureeEnSecondes / 3600) | round(0, 'floor') %}
+                                        {% set minutes = (dureeEnSecondes / 60) % 60 | round(0, 'floor') %}
+                                        <tr>
+                                            <td class="text-start ps-4">{{ data.shop.cm }} - {{ data.shop.name }}</td>
+                                            <td>{{ (data.distance / 1000) | round(1) }} KMS</td>
+                                            <td>
+                                                {% if hours > 0 %}
+                                                    <span class="fw-bold">{{ hours }}</span> H
+                                                {% endif %}
+                                                <span class="fw-bold">{{ minutes }}</span> min
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
-				{{ form_end(formSearchByCity) }}
-			</div>
-		</div>
-	</div>
-    {# s'il y a une recherche #}
-    {% if datas | length > 0 %}
+                </div>
+            </div>
 
-        <div class="row justify-content-center mb-3">
-            <div class="col-12 col-md-10">
-                {{ ux_map(map, {'data-controller': 'mymap', 'controller_id': false, style: 'height: 600px; border: 2px solid black'}) }}
+            <div class="row justify-content-center">
+                <div class="col-12 col-xl-10">
+                    <div class="card shadow-sm mb-5">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="my-1">Carte des résultats</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            {{ ux_map(map, {'data-controller': 'mymap', 'controller_id': false, style: 'height: 650px; border-radius: 0 0 8px 8px;'}) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-8 col-lg-6">
+                    <div class="alert alert-info text-center shadow-sm" role="alert">
+                        Aucun résultat trouvé pour votre recherche.
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-8 col-lg-6">
+                <div class="alert alert-info text-center shadow-sm" role="alert">
+                    Veuillez choisir une ville et un type de recherche.
+                </div>
             </div>
         </div>
+    {% endif %}
 
-        <div class="row justify-content-center mb-3">
-            <div class="col-12 text-center mb-2 fw-bolder">Résultat(s):</div>
-            <div class="col-12 col-md-10 mb-4">
-                <table class="table text-center align-middle table-striped mb-3">
-                    <thead>
-                        <th>Depuis:</th>
-                        {# <th>Type de centre:</th> #}
-                        <th>Distance:<br/>(ALLER)</th>
-                        <th>Temps de trajet:<br/>(ALLER)</th>
-                    </thead>
-                    <tbody>
-                        {% for key, data in datas %}
-                            {% set dureeEnSecondes = data.duration %}
-                            {% set hours = (dureeEnSecondes / 3600) %60 | round %}
-                            {% set minutes = (dureeEnSecondes / 60) %60 | round %}
-                            <tr>
-                                <td>{{ data.shop.cm }} - {{ data.shop.name }}</td>
-                                {# <td><span class="badge" style="color:{{ data.state.textColor }}; background-color:{{ data.state.backgroundColor }};"> {{ data.state.name }} </span></td> #}
-                                <td>{{ data.distance / 1000 }}
-                                    KMS</td>
-                                <td>
-                                    {% if hours > 0 %}
-                                        {{ hours }}
-                                        H
-                                    {% endif %}
-                                    {{ minutes }}
-                                    min
-                                </td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-	{% endif %}
+</div>
 
 {% endblock %}

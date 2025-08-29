@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: TechnicianRepository::class)]
 class Technician
@@ -23,9 +24,16 @@ class Technician
     private ?string $firstName = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\Regex(
+        pattern: '/^(?:0)[1-9](?:[\s.-]*\d{2}){4}$/',
+        message: 'Le numéro de téléphone n\'est pas au format valide. Il doit commencer par 0 et être composé de 10 chiffres.'
+    )]
     private ?string $phone = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\Email(
+        message: 'L\'email "{{ value }}" n\'est pas un email valide.'
+    )]
     private ?string $email = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -51,9 +59,17 @@ class Technician
     #[ORM\ManyToOne(inversedBy: 'technicians')]
     private ?Cgo $controledByCgo = null;
 
+    /**
+     * @var Collection<int, TechnicianFonction>
+     */
+    #[ORM\ManyToMany(targetEntity: TechnicianFonction::class, inversedBy: 'technicians')]
+    private Collection $fonctions;
+
     public function __construct()
     {
         $this->technicianFormations = new ArrayCollection();
+        $this->fonctions = new ArrayCollection();
+
     }
 
     public function getId(): ?int
@@ -87,7 +103,11 @@ class Technician
 
     public function getPhone(): ?string
     {
-        return $this->phone;
+        if(empty($this->phone)){ 
+            return 'Tél. non renseigné';
+        }else{
+            return $this->phone;
+        }
     }
 
     public function setPhone(string $phone): static
@@ -191,5 +211,43 @@ class Technician
         $this->controledByCgo = $controledByCgo;
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, TechnicianFonction>
+     */
+    public function getFonctions(): Collection
+    {
+        return $this->fonctions;
+    }
+
+    public function addFonction(TechnicianFonction $fonction): static
+    {
+        if (!$this->fonctions->contains($fonction)) {
+            $this->fonctions->add($fonction);
+        }
+
+        return $this;
+    }
+
+    public function removeFonction(TechnicianFonction $fonction): static
+    {
+        $this->fonctions->removeElement($fonction);
+
+        return $this;
+    }
+
+    public function getNameAndFirstName(): ?string
+    {
+        // Concatène le nom et le prénom
+        $fullName = trim($this->getName() . ' ' . $this->getFirstName());
+
+        // Si la chaîne est vide, retourne null
+        if (empty($fullName)) {
+            return 'Tech. non renseigné';
+        }
+
+        // Sinon, retourne le nom complet
+        return $fullName;
     }
 }

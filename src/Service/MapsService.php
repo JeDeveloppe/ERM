@@ -443,9 +443,11 @@ class MapsService
 
         foreach($arrayFromAllShopsNearCityOfIntervention as $data){
 
+            $shop = $data['shop'];
+
             //?on recupere les cgos pour chaque shop
             $cgos = "Cgo(s) rattaché(s): <br>";
-            if(count($data['shop']->getCgos()) > 0){
+            if(count($shop->getCgos()) > 0){
                 foreach ($data['shop']->getCgos() as $cgo) {
                     $cgos .= $cgo->getName().'<br>';
                 }
@@ -453,15 +455,29 @@ class MapsService
                 $cgos = "Aucun cgo rattaché";
             }
 
+
             if($option == 'telematique'){ //? options from SearchShopsByCityType
-                $technicians = "<p>Technicien(s) télématique: <br>";
                 $icon = Icon::ux('ri:taxi-wifi-fill')->width(24)->height(24)->color($this->COLORS_OF_MARKERS);
-                foreach ($data['shop']->getTechnicians() as $technician) {
-                    $technicians .= '- '.$technician->getName().': '.$technician->getPhone().'<br>';
+                $techniciansDetails = "";
+                
+                foreach ($shop->getTechnicians() as $technician) {
+                    $techniciansDetails .= "<p>";
+                    $formations = '';
+                    foreach($technician->getTechnicianFormations() as $formation) {
+                        $formations .= '<span class="badge" style="background-color:'.$formation->getColor().'">'.$formation->getName().'</span> ';
+                    }
+                    $functions = '';
+                    foreach($technician->getFonctions() as $function) {
+                        $functions .= '<span class="badge" style="background-color:'.$function->getColor().'">'.$function->getName().'</span> ';
+                    }
+                    $techniciansDetails .= '- <b>'.$technician->getNameAndFirstName().'</b> : '.$technician->getPhone().'<br>';
+                    $techniciansDetails .= '<br/>Formations : '.$formations;
+                    $techniciansDetails .= '<br/>Fonctions : '.$functions;
+                    $techniciansDetails .= '<hr/>';  
+                    $techniciansDetails .= '</p>';
                 }
-                $technicians .= '</p>';
             }else{
-                $technicians = "";
+                $techniciansDetails = "";
                 $icon = Icon::ux('solar:garage-bold')->width(24)->height(24)->color($this->COLORS_OF_MARKERS);
             }
 
@@ -471,8 +487,8 @@ class MapsService
                     title: $data['shop']->getName(),
                     icon: $icon,
                     infoWindow: new InfoWindow(
-                        headerContent: $data['shop']->getName().' ('.$data['shop']->getCm().') <br/>'.$data['shop']->getPhone(),
-                        content: $technicians.'<p>Distance : '.($data['distance'] / 1000).' kms <br>Temps de trajet : '.gmdate("H:i:s", $data['duration']).'</p>'.$cgos
+                        headerContent: $shop->getName().' ('.$shop->getCm().') <br/>'.$shop->getPhone(),
+                        content: $techniciansDetails.'<p>Distance : '.($data['distance'] / 1000).' kms <br>Temps de trajet : '.gmdate("H:i:s", $data['duration']).'</p>'.$cgos
                     ),
                     extra: [
                         // 'icon_mask_url' => 'https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet.svg',
@@ -538,11 +554,11 @@ class MapsService
         return $map;
     }
 
-    public function constructionMapOfTechniciansTelematique(array $formationNames)
+    public function constructionMapOfTechniciansTelematique(array $formationNames, array $functionNames)
     {
 
         //?on recupere tous les techniciens
-        $technicians = $this->technicianRepository->findAllTelematicTechniciansByFormationName($formationNames);
+        $technicians = $this->technicianRepository->findAllTelematicTechnicians($formationNames, $functionNames);
 
         //?on cré un manager et un Cgo fakes
         $fakeManager = new Manager();
@@ -567,6 +583,10 @@ class MapsService
             foreach($technician->getTechnicianFormations() as $formation) {
                 $formations .= '<span class="badge" style="background-color:'.$formation->getColor().'">'.$formation->getName().'</span> ';
             }
+            $functions = '';
+            foreach($technician->getFonctions() as $function) {
+                $functions .= '<span class="badge" style="background-color:'.$function->getColor().'">'.$function->getName().'</span> ';
+            }
 
              $map->addMarker(new Marker(
                     position: new Point($technician->getShop()->getCity()->getLatitude(), $technician->getShop()->getCity()->getLongitude()),
@@ -574,10 +594,9 @@ class MapsService
                     title: $technician->getName(),
                     infoWindow: new InfoWindow(
                         content:
-                         '<p>'.strtoupper($technician->getName()).' '.$technician->getFirstName().
-                         '<br/>Tél: '.$technician->getPhone().'<br/>Email: '.$technician->getEmail().'</p>'.
-                        '<p>Formations: '.$formations.
-                         '</p>
+                        '<p>'.strtoupper($technician->getName()).' '.$technician->getFirstName().'<br/>Tél: '.$technician->getPhone().'<br/>Email: '.$technician->getEmail().'</p>'.
+                        '<p>Formations:<br/>'.$formations.'</p>
+                         <p>Fonction:<br/>'.$functions.'</p>
                          <p>Géré par:<br/>'.$cgo->getName().'<br/>'.$cgo->getManager().'<br/>'.$cgo->getManager()->getPhone().'</p>'
                     ),
                     // Ajoutez la couleur dans le tableau 'extra'
@@ -666,7 +685,7 @@ class MapsService
 
     public function generationUxMapWithBaseOptions()
     {
-        $map = (new Map())->center(new Point(48.8566, 2.3522))->zoom(4)->fitBoundsToMarkers(true);
+        $map = (new Map())->zoom(4)->fitBoundsToMarkers(true);
 
         $leafletOptions = (new LeafletOptions())
             ->tileLayer(new TileLayer(

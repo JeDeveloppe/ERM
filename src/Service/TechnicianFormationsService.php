@@ -29,11 +29,13 @@ class TechnicianFormationsService
             "FROID",
             "PTO",
             "ADR",
-            "TACHOFRESH",
+            "TACHO / TACHYGRAPHE",
             "M120",
             "BUS",
             "HYBRIDE ELECTRIQUE",
-            "DEBRIEF TELEMATIQUE"
+            "DEBRIEF",
+            "ISF BOX",
+            'JALETEST'
         ];
 
         foreach($formations as $toCreate) {

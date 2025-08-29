@@ -4,41 +4,76 @@
 
 {% block body %}
 
-    {# <div class="js-locations" data-locations="{{ mapDonnees.locations }}"></div> #}
-    {# <div class="js-states" data-states="{{ donnees.states }}"></div> #}
-	
-	<div class="row g-0 justify-content-center align-items-center mb-3">
-		<h1 class="col-12 text-center my-5">{{ title }}</h1>
-		<div class="col-11 col-md-10 col-lg-8 col-xl-7 mb-3">
-			{# affichage de la carte de France #}
-			{{ ux_map(mapDonnees, { 'data-controller': 'mymap', 'controller_id': false, style: 'height: 600px; border: 2px solid black' }) }}
-		</div>
-		<div class="col-11 col-md-10 col-lg-8 col-xl-7 mb-3">
-			{{ form_start(form) }}
-				<div class="d-flex flex-wrap justify-content-start border border-black rounded p-2">
-					{# Loop through each individual checkbox child of 'favoriteColors' #}
-					{% for child in form.name %}
-						<div class="form-check">
-							{# Render the checkbox input itself #}
-							{{ form_widget(child, {'attr': {'class': 'form-check-input ms-2'}}) }}
+<div class="container my-5">
+    <h1 class="text-center mb-4">{{ title }}</h1>
 
-							{# Render the label for the individual checkbox #}
-							{{ form_label(child, null, {'label_attr': {'class': 'form-check-label'}}) }}
+    <div class="row justify-content-center">
+        <div class="col-12 col-xl-10">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body p-3">
+                    {% if mapDonnees is not empty %}
+                        {{ ux_map(mapDonnees, { 'data-controller': 'mymap', 'controller_id': false, style: 'height: 600px; border: 2px solid black; border-radius: 8px;' }) }}
+                    {% else %}
+                        <div class="alert alert-warning text-center" role="alert">
+                            <strong>Aucun technicien trouvé.</strong> Veuillez ajuster vos critères de recherche.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
 
-							{# You can also render individual errors if needed, though often group errors are enough #}
-							{{ form_errors(child) }}
-						</div>
-					{% endfor %}
-				</div>
-				<div class="col-12 text-center my-2">
-					<div class="btn-group" role="group">
-						<button type="submit" class="btn btn-primary">Afficher</button>
-						<a href="{{ path('app_map_technicians_telematique') }}" class="btn btn-warning">Reset</a>
-					</div>
-				</div>
-			{{ form_end(form) }} 
-		</div>
-	</div>
+        <div class="col-12 col-xl-10">
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <h3 class="card-title text-center mb-4">Filtrer les techniciens télématiques</h3>
+                    {{ form_start(form) }}
+                        <div class="row">
+                            <div class="col-12 col-lg-4 mb-4">
+                                <div class="p-3 border border-primary rounded-lg h-100 d-flex flex-column" style="background-color: #e3f2fd;">
+                                    <h5 class="w-100 text-primary">Formations</h5>
+                                    {% for child in form.formations %}
+                                        <div class="form-check my-1">
+                                            {{ form_widget(child, {'attr': {'class': 'form-check-input'}}) }}
+                                            {{ form_label(child, null, {'label_attr': {'class': 'form-check-label'}}) }}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
 
+                            <div class="col-12 col-lg-4 mb-4">
+                                <div class="p-3 border border-secondary rounded-lg h-100 d-flex flex-column" style="background-color: #f1f8e9;">
+                                    <h5 class="w-100 text-secondary">Fonctions</h5>
+                                    {% for child in form.fonctions %}
+                                        <div class="form-check my-1">
+                                            {{ form_widget(child, {'attr': {'class': 'form-check-input'}}) }}
+                                            {{ form_label(child, null, {'label_attr': {'class': 'form-check-label'}}) }}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <div class="col-12 col-lg-4 mb-4">
+                                <div class="p-3 border border-info rounded-lg h-100 d-flex flex-column" style="background-color: #e1f5fe;">
+                                    <h5 class="w-100 text-info">Véhicules</h5>
+                                    {% for child in form.vehicles %}
+                                        <div class="form-check my-1">
+                                            {{ form_widget(child, {'attr': {'class': 'form-check-input'}}) }}
+                                            {{ form_label(child, null, {'label_attr': {'class': 'form-check-label'}}) }}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-3">
+                            <button type="submit" class="btn btn-primary btn-lg me-3">Afficher la carte</button>
+                            <a href="{{ path('app_map_technicians_telematique') }}" class="btn btn-warning btn-lg">Réinitialiser</a>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 {% endblock %}
