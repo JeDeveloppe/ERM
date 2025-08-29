@@ -211,8 +211,8 @@ class MapsController extends AbstractController
         if($classe){
 
             //?on recupere les donnees dans le service
-            // $mapDonnees = $this->mapsService->constructionMapOfZonesByClasse($classe->getName());
-            $mapDonnees = $this->mapsService->constructionMapOfZonesByClasseWithUx($classe->getName());
+            $mapDonnees = $this->mapsService->constructionMapOfZonesByClasse($classe->getName());
+            //$mapDonnees = $this->mapsService->constructionMapOfZonesByClasseWithUx($classe->getName());
     
             return $this->render('site/maps/all_zones.html.twig', [
                 'mapDonnees' => $mapDonnees,
@@ -260,6 +260,9 @@ class MapsController extends AbstractController
             $functions = $form->get('fonctions')->getData();
             $functionNamesArray = $functions->toArray();
 
+            $vehicles = $form->get('vehicles')->getData();
+            $vehicleNamesArray = $vehicles->toArray();
+
             $formationNames = [];
             foreach($formationNamesArray as $formationName){
                 $formationNames[] = $formationName->getName();
@@ -270,14 +273,20 @@ class MapsController extends AbstractController
                 $functionNames[] = $functionName->getName();
             }
 
-            $mapDonnees = $this->mapsService->constructionMapOfTechniciansTelematique($formationNames, $functionNames);
+            $vehicleNames = [];
+            foreach($vehicleNamesArray as $vehicleName){
+                $vehicleNames[] = $vehicleName->getName();
+            }
+
+            $mapDonnees = $this->mapsService->constructionMapOfTechniciansTelematique($formationNames, $functionNames, $vehicleNames);
 
         }else{
             
             $formationNames = [];
             $functionNames = [];
+            $vehicleNames = [];
             //?on recupere les donnees dans le service
-            $mapDonnees = $this->mapsService->constructionMapOfTechniciansTelematique($formationNames, $functionNames);
+            $mapDonnees = $this->mapsService->constructionMapOfTechniciansTelematique($formationNames, $functionNames, $vehicleNames);
         }
 
         return $this->render('site/maps/technicians_telematic.html.twig', [
