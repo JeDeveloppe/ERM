@@ -554,11 +554,11 @@ class MapsService
         return $map;
     }
 
-    public function constructionMapOfTechniciansTelematique(array $formationNames, array $functionNames)
+    public function constructionMapOfTechniciansTelematique(array $formationNames, array $functionNames, array $vehicleNames)
     {
 
         //?on recupere tous les techniciens
-        $technicians = $this->technicianRepository->findAllTelematicTechnicians($formationNames, $functionNames);
+        $technicians = $this->technicianRepository->findAllTelematicTechnicians($formationNames, $functionNames, $vehicleNames);
 
         //?on cré un manager et un Cgo fakes
         $fakeManager = new Manager();

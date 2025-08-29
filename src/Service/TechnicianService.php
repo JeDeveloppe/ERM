@@ -4,21 +4,14 @@ namespace App\Service;
 
 use League\Csv\Reader;
 use App\Entity\Technician;
-use App\Entity\Largeregion;
-use App\Entity\Granderegion;
-use App\Entity\Shop;
-use App\Entity\TechnicianFormations;
 use App\Repository\CgoRepository;
 use App\Repository\TechnicianRepository;
-use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
-use App\Repository\LargeRegionRepository;
 use App\Repository\ShopRepository;
 use App\Repository\TechnicianFonctionRepository;
 use App\Repository\TechnicianFormationsRepository;
 use App\Repository\TechnicianVehicleRepository;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\String\Slugger\SluggerInterface;
 
 class TechnicianService
 {
@@ -155,7 +148,7 @@ class TechnicianService
 
     }
 
-    private function testFormationIsOkorKo(string $formationName, string $okOrKo, Technician $technician)
+    private function testFormationIsOkorKo(string $formationName, ?string $okOrKo = 'INDEFINIE', Technician $technician)
     {
         $formationEntity = $this->technicianFormationsRepository->findOneBy(['name' => $formationName]);
         $m400vl = $this->technicianFormationsRepository->findOneBy(['name' => 'M400+HMI+CAN VL']);
