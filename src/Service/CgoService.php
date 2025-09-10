@@ -18,6 +18,7 @@ use App\Repository\ZoneErmRepository;
 use App\Repository\RegionErmRepository;
 
 use App\Repository\ShopClassRepository;
+use App\Repository\TechnicianRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -35,7 +36,8 @@ class CgoService
         private ManagerClassRepository $managerClassRepository,
         private MapsService $mapsService,
         private ShopRepository $shopRepository,
-        private HttpClientInterface $client
+        private HttpClientInterface $client,
+        private TechnicianRepository $technicianRepository
         ){
     }
 
@@ -229,36 +231,96 @@ class CgoService
         return $cgo;
     }
 
+    /**
+     * @param City $cityOfIntervention
+     * @param Shop $shop
+     * @return array
+     */
     public function getDistancesBeetweenDepannageAndShop(City $cityOfIntervention, Shop $shop): array
     {
         $interventionLatitude = $cityOfIntervention->getLatitude();
         $interventionLongitude = $cityOfIntervention->getLongitude();
+        
+        $shopLatitude = $shop->getCity()->getLatitude();
+        $shopLongitude = $shop->getCity()->getLongitude();
 
-        $response = $this->client->request(
-            'GET',
-            'https://api.tomtom.com/routing/1/calculateRoute/'.$interventionLatitude.','.$interventionLongitude.':'.$shop->getCity()->getLatitude().','.$shop->getCity()->getLongitude().'/json?key='.$_ENV['TOMTOM_API_KEY']
+        // 1. Construct the API endpoint cleanly
+        $endpoint = sprintf(
+            'https://api.tomtom.com/routing/1/calculateRoute/%s,%s:%s,%s/json',
+            $interventionLatitude,
+            $interventionLongitude,
+            $shopLatitude,
+            $shopLongitude
         );
 
-        $array_reponse = $response->toArray();
+        // 2. Use a try-catch block for robust error handling
+        try {
+            $response = $this->client->request('GET', $endpoint, [
+                'query' => [
+                    'key' => $_ENV['TOMTOM_API_KEY'],
+                ],
+            ]);
 
-        $filtredResponse = [
-            'shop'     => $shop,
-            'distance' => $array_reponse['routes'][0]['summary']['lengthInMeters'],
-            'duration' => $array_reponse['routes'][0]['summary']['travelTimeInSeconds']
-        ];
+            // If the request was not successful, it will throw an exception
+            $response->getStatusCode();
 
-        return $filtredResponse;
-        // return $response;
+            $array_reponse = $response->toArray();
+            
+            // 3. Add checks for missing data
+            if (!isset($array_reponse['routes'][0]['summary'])) {
+                // You can log this or return a specific error structure
+                // For this example, we return a default failure array
+                return [
+                    'shop'     => $shop,
+                    'distance' => null,
+                    'duration' => null,
+                    'error'    => 'TomTom API response missing route summary.'
+                ];
+            }
+
+            $summary = $array_reponse['routes'][0]['summary'];
+
+            return [
+                'shop'     => $shop,
+                'distance' => $summary['lengthInMeters'],
+                'duration' => $summary['travelTimeInSeconds'],
+            ];
+
+        } catch (\Exception $e) {
+            // Log the error
+            // $this->logger->error('TomTom API request failed: ' . $e->getMessage());
+            
+            // Return an array with error information
+            return [
+                'shop'     => $shop,
+                'distance' => null,
+                'duration' => null,
+                'error'    => 'TomTom API request failed: ' . $e->getMessage()
+            ];
+        }
     }
 
-    public function getShopsByClassErmAndOptionArroundCityOfIntervention(City $cityOfIntervention,array $classErm, string $option): array
+    public function getShopsByClassErmAndOptionArroundCityOfIntervention(City $cityOfIntervention, array $classErm, string $option, array $optionsTelematique = []): array
     {
 
         $datas = [];
-     
         if($option == 'telematique'){
-            $shops = $this->shopRepository->findShopsWhereTechnicianIsTelematic();
-        }else if($option == 'depannage'){
+             // 1. On trouve d'abord les techniciens qui correspondent EXACTEMENT aux critères
+            $formations = $optionsTelematique['formations'] ?? [];
+            // $fonctions = $optionsTelematique['fonctions'] ?? [];
+            // $vehicles = $optionsTelematique['vehicles'] ?? [];
+
+            $formationsNames = $formations->map(fn($f) => $f->getName())->toArray();
+            // $fonctionsNames = $fonctions->map(fn($f) => $f->getName())->toArray();
+            // $vehiclesNames = $vehicles->map(fn($v) => $v->getName())->toArray();
+
+            $matchingTechnicians = $this->technicianRepository->findAllTelematicTechnicians(
+                $formationsNames);
+
+            // 2. On utilise les techniciens trouvés pour chercher les boutiques
+            $shops = $this->shopRepository->findShopsByTechnicians($matchingTechnicians);
+
+        }else{
             $shops = $this->shopRepository->findShopsforDepannage($classErm);
         }
  

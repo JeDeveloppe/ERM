@@ -2,10 +2,11 @@
 
 namespace App\Repository;
 
-use App\Entity\Department;
 use App\Entity\Shop;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use App\Entity\Department;
+use App\Entity\Technician;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @extends ServiceEntityRepository<Shop>
@@ -31,25 +32,28 @@ class ShopRepository extends ServiceEntityRepository
         ;
     }
 
-    /**
-     * Undocumented function
-     *
-     * @param array $classErm
-     * @return array
-     */
-    public function findShopsWhereTechnicianIsTelematic(): array
+    public function findShopsByTechnicians(array $technicians): array
     {
+        // Si la liste de techniciens est vide, on retourne un tableau vide pour éviter une erreur
+        if (empty($technicians)) {
+            return [];
+        }
 
-        $qb = $this->createQueryBuilder('s')
-            ->join('s.technicians', 't')
-            ->where('t.isTelematic = :true')
-            ->setParameter('true', true)
-            ->getQuery()
-            ->getResult()
-        ;
+        $qb = $this->createQueryBuilder('s');
+        
+        // On fait un innerJoin sur les techniciens de la boutique
+        $qb->innerJoin('s.technicians', 't');
 
-        return array_unique($qb);
+        // On filtre sur les techniciens qui sont dans la liste fournie
+        $qb->where('t.id IN (:technicianIds)')
+           ->setParameter('technicianIds', array_map(fn(Technician $tech) => $tech->getId(), $technicians));
+
+        // On regroupe par boutique pour avoir un résultat unique
+        $qb->groupBy('s.id');
+
+        return $qb->getQuery()->getResult();
     }
+
 
     public function findShopsforDepannage(array $classErm): array
     {

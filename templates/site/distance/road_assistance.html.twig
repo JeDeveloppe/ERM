@@ -5,27 +5,29 @@
 {% block body %}
 
 <div class="container my-5">
-    <h1 class="text-center mb-4">{{ title }}</h1>
     
     <div class="row justify-content-center mb-4">
         <div class="col-12 col-md-8 col-lg-6">
-            <div class="card shadow-sm">
-                <div class="card-header text-center bg-primary text-white">
-                    <h5 class="my-1">Rechercher les centres à proximité</h5>
+            <div class="card shadow-lg border-0">
+                <div class="card-header text-center bg-primary text-white py-3">
+                    <h5 class="my-1"><i class="fas fa-search-location me-2"></i> Rechercher les centres à proximité</h5>
                 </div>
                 <div class="card-body">
                     {{ form_start(formSearchByCity, {'attr': {'class': 'd-flex flex-column align-items-center'}}) }}
                         <div class="w-100 mb-3">
                             {{ form_label(formSearchByCity.city, 'Ville d\'intervention', {'label_attr': {'class': 'form-label'}}) }}
-                            {{ form_widget(formSearchByCity.city, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_widget(formSearchByCity.city, {'attr': {'class': 'form-control', 'placeholder': 'Entrez une ville'}}) }}
                         </div>
                         <div class="w-100 mb-4">
                             {{ form_label(formSearchByCity.options, 'Type de recherche', {'label_attr': {'class': 'form-label'}}) }}
                             {{ form_widget(formSearchByCity.options, {'attr': {'class': 'form-select'}}) }}
                         </div>
                         <div class="text-center">
-                            <button type="submit" class="btn btn-primary btn-lg me-2">Rechercher</button>
-                            <a href="{{ path('app_search_distance') }}" class="btn btn-warning btn-lg">Réinitialiser</a>
+                            <button type="submit" class="btn btn-primary btn-lg me-2" id="submit-button">
+                                <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                                <span class="button-text"><i class="fas fa-search me-2"></i> Rechercher</span>
+                            </button>
+                            <a href="{{ path('app_search_distance_for_road_assistance') }}" class="btn btn-warning btn-lg"><i class="fas fa-undo me-2"></i> Réinitialiser</a>
                         </div>
                     {{ form_end(formSearchByCity) }}
                 </div>
@@ -37,9 +39,9 @@
         {% if datas | length > 0 %}
             <div class="row justify-content-center">
                 <div class="col-12 col-xl-10">
-                    <div class="card shadow-sm mb-4">
-                        <div class="card-header bg-success text-white">
-                            <h5 class="my-1">Résultats de la recherche ({{ datas | length }} centre(s) trouvé(s))</h5>
+                    <div class="card shadow-lg mb-4">
+                        <div class="card-header bg-success text-white py-3">
+                            <h5 class="my-1"><i class="fas fa-list-ul me-2"></i> Résultats de la recherche ({{ datas | length }} centre(s) trouvé(s))</h5>
                         </div>
                         <div class="card-body p-0 table-responsive">
                             <table class="table text-center align-middle table-striped mb-0">
@@ -56,9 +58,16 @@
                                         {% set hours = (dureeEnSecondes / 3600) | round(0, 'floor') %}
                                         {% set minutes = (dureeEnSecondes / 60) % 60 | round(0, 'floor') %}
                                         <tr>
-                                            <td class="text-start ps-4">{{ data.shop.cm }} - {{ data.shop.name }}</td>
-                                            <td>{{ (data.distance / 1000) | round(1) }} KMS</td>
+                                            <td class="text-start ps-4">
+                                                <i class="fas fa-store me-2 text-muted"></i>
+                                                <span class="fw-bold">{{ data.shop.cm }}</span> - {{ data.shop.name }}
+                                            </td>
                                             <td>
+                                                <i class="fas fa-route me-2 text-success"></i>
+                                                <span class="fw-bold">{{ (data.distance / 1000) | round(1) }}</span> KMS
+                                            </td>
+                                            <td>
+                                                <i class="fas fa-clock me-2 text-info"></i>
                                                 {% if hours > 0 %}
                                                     <span class="fw-bold">{{ hours }}</span> H
                                                 {% endif %}
@@ -75,9 +84,9 @@
 
             <div class="row justify-content-center">
                 <div class="col-12 col-xl-10">
-                    <div class="card shadow-sm mb-5">
-                        <div class="card-header bg-info text-white">
-                            <h5 class="my-1">Carte des résultats</h5>
+                    <div class="card shadow-lg mb-5">
+                        <div class="card-header bg-info text-white py-3">
+                            <h5 class="my-1"><i class="fas fa-map me-2"></i> Carte des résultats</h5>
                         </div>
                         <div class="card-body p-0">
                             {{ ux_map(map, {'data-controller': 'mymap', 'controller_id': false, style: 'height: 650px; border-radius: 0 0 8px 8px;'}) }}
@@ -88,8 +97,8 @@
         {% else %}
             <div class="row justify-content-center">
                 <div class="col-12 col-md-8 col-lg-6">
-                    <div class="alert alert-info text-center shadow-sm" role="alert">
-                        Aucun résultat trouvé pour votre recherche.
+                    <div class="alert alert-info text-center shadow-lg" role="alert">
+                        <i class="fas fa-info-circle me-2"></i> Aucun résultat trouvé pour votre recherche.
                     </div>
                 </div>
             </div>
@@ -97,8 +106,8 @@
     {% else %}
         <div class="row justify-content-center">
             <div class="col-12 col-md-8 col-lg-6">
-                <div class="alert alert-info text-center shadow-sm" role="alert">
-                    Veuillez choisir une ville et un type de recherche.
+                <div class="alert alert-info text-center shadow-lg" role="alert">
+                    <i class="fas fa-info-circle me-2"></i> Veuillez choisir une ville et un type de recherche.
                 </div>
             </div>
         </div>
@@ -106,4 +115,26 @@
 
 </div>
 
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            const submitButton = document.getElementById('submit-button');
+            
+            // S'assurer que les éléments existent
+            if (form && submitButton) {
+                form.addEventListener('submit', function(event) {
+                    // Affiche le spinner et désactive le bouton
+                    submitButton.querySelector('.spinner-border').classList.remove('d-none');
+                    submitButton.querySelector('.button-text').classList.add('d-none');
+                    submitButton.disabled = true;
+                    
+                    // Le formulaire continuera sa soumission normalement
+                });
+            }
+        });
+    </script>
 {% endblock %}

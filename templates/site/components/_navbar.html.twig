@@ -1,71 +1,73 @@
 <nav class="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
-	<div class="container-fluid">
-		<a class="navbar-brand" href="{{ path('app_maps_choices') }}">ERM</a>
-		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
-			<span class="navbar-toggler-icon"></span>
-		</button>
-		<div class="collapse navbar-collapse" id="navbarColor01">
-			{% if is_granted('ROLE_USER') %}
-				<ul class="navbar-nav me-auto">
-					{% if is_granted('ROLE_ERM') %}
-						<li class="nav-item dropdown">
-							<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Cartes</a>
-							<div class="dropdown-menu">
-								<a class="dropdown-item" href="{{ path('app_map_all_shops') }}">Tous les centres</a>
-								<a class="dropdown-item" href="{{ path('app_map_all_shops_under_cgo', {'classeName': 'mv'}) }}">Centres sous CGO MV</a>
-								<a class="dropdown-item" href="{{ path('app_map_all_shops_under_cgo', {'classeName': 'vl'}) }}">Centres sous CGO VL</a>
-							</div>
-						</li>
-						<li class="nav-item dropdown">
-							<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Zones</a>
-							<div class="dropdown-menu">
-								<a class="dropdown-item" href="{{ path('app_map_all_regions') }}">Toutes les régions</a>
-								<a class="dropdown-item" href="{{ path('app_map_all_zones', {'classeName': 'mv'}) }}">Toutes les zones MV</a>
-								<a class="dropdown-item" href="{{ path('app_map_all_zones', {'classeName': 'vl'}) }}">Toutes les zones VL</a>
-							</div>
-						</li>
-						<li class="nav-item dropdown">
-							<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">CT</a>
-							<div class="dropdown-menu">
-								<a class="dropdown-item" href="{{ path('app_map_all_cts') }}">Carte des CT</a>
-							</div>
-						</li>
-						<li class="nav-item">
-							<a class="nav-link" href="{{ path('app_prime') }}">Calcul prime mensuelle</a>
-						</li>
-					{% endif %}
-					{% if is_granted('ROLE_MCF') %}
-						<li class="nav-item dropdown">
-							<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Télématique</a>
-							<div class="dropdown-menu">
-								<a class="dropdown-item" href="{{ path('app_map_zones_telematique') }}">Les zones télématiques</a>
-								<a class="dropdown-item" href="{{ path('app_map_technicians_telematique') }}">Carte des techniciens télématiques</a>
-							</div>
-						</li>
-					{% endif %}
-
-					<li class="nav-item">
-						<a class="nav-link" href="{{ path('app_search_distance') }}">Calcul distance</a>
-					</li>
-
-				</ul>
-			{% endif %}
-			<ul class="navbar-nav ms-auto">
-				<li class="nav-item dropdown dropstart">
-					<a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa-solid fa-user"></i></a>
-					<div class="dropdown-menu">
-						{% if is_granted('ROLE_USER') %}
-							{% if is_granted('ROLE_ADMIN') %}
-								<a class="dropdown-item" href="{{ path('admin') }}"><i class="fa-solid fa-gear"></i> ADMIN</a>
-								<div class="dropdown-divider"></div>
-							{% endif %}
-							<a class="dropdown-item" href="{{ path('app_logout')}}"><i class="fa-solid fa-lock-open text-warning"></i> Déconnexion</a>
-						{% else %}
-							<a class="dropdown-item" href="{{ path('app_login')}}"><i class="fa-solid fa-lock text-warning"></i> Se connecter</a>
-						{% endif %}
-					</div>
-				</li>
-			</ul>
-		</div>
-	</div>
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{{ path('app_maps_choices') }}">ERM</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarColor01">
+            {% if is_granted('ROLE_USER') %}
+                <ul class="navbar-nav me-auto">
+                    {% if is_granted('ROLE_ERM') %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"><i class="fas fa-map-marked-alt"></i> Cartes</a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="{{ path('app_map_all_shops') }}"><i class="fas fa-store"></i> Tous les centres</a>
+                                <a class="dropdown-item" href="{{ path('app_map_all_shops_under_cgo', {'classeName': 'mv'}) }}"><i class="fas fa-truck-moving"></i> Centres sous CGO MV</a>
+                                <a class="dropdown-item" href="{{ path('app_map_all_shops_under_cgo', {'classeName': 'vl'}) }}"><i class="fas fa-car-side"></i> Centres sous CGO VL</a>
+                            </div>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"><i class="fas fa-chart-area"></i> Zones</a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="{{ path('app_map_all_regions') }}"><i class="fas fa-globe-europe"></i> Toutes les régions</a>
+                                <a class="dropdown-item" href="{{ path('app_map_all_zones', {'classeName': 'mv'}) }}"><i class="fas fa-truck-moving"></i> Toutes les zones MV</a>
+                                <a class="dropdown-item" href="{{ path('app_map_all_zones', {'classeName': 'vl'}) }}"><i class="fas fa-car-side"></i> Toutes les zones VL</a>
+                            </div>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"><i class="fas fa-car-crash"></i> CT</a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="{{ path('app_map_all_cts') }}"><i class="fas fa-map-marker-alt"></i> Carte des CT</a>
+                            </div>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('app_prime') }}"><i class="fas fa-euro-sign"></i> Calcul prime mensuelle</a>
+                        </li>
+                    {% endif %}
+                    {% if is_granted('ROLE_MCF') %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"><i class="fas fa-satellite-dish"></i> Télématique</a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="{{ path('app_map_zones_telematique') }}"><i class="fas fa-map-pin"></i> Les zones télématiques</a>
+                                <a class="dropdown-item" href="{{ path('app_map_technicians_telematique') }}"><i class="fas fa-user-hard-hat"></i> Carte des techniciens télématiques</a>
+                                <hr class="dropdown-divider">
+                                <a class="dropdown-item" href="{{ path('app_search_distance_for_telematic_assistance') }}"><i class="fas fa-street-view"></i> Télématiciens les plus proches</a>
+                            </div>
+                        </li>
+                    {% endif %}
+                    {% if is_granted('ROLE_ERM') %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('app_search_distance_for_road_assistance') }}"><i class="fas fa-road"></i> Dépanneur le plus proche</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            {% endif %}
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item dropdown dropstart">
+                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"><i class="fas fa-user-circle"></i></a>
+                    <div class="dropdown-menu">
+                        {% if is_granted('ROLE_USER') %}
+                            {% if is_granted('ROLE_ADMIN') %}
+                                <a class="dropdown-item" href="{{ path('admin') }}"><i class="fas fa-cog"></i> ADMIN</a>
+                                <div class="dropdown-divider"></div>
+                            {% endif %}
+                            <a class="dropdown-item" href="{{ path('app_logout')}}"><i class="fas fa-sign-out-alt text-warning"></i> Déconnexion</a>
+                        {% else %}
+                            <a class="dropdown-item" href="{{ path('app_login')}}"><i class="fas fa-sign-in-alt text-warning"></i> Se connecter</a>
+                        {% endif %}
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
 </nav>
