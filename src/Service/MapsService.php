@@ -26,6 +26,7 @@ use Symfony\UX\Map\Bridge\Leaflet\LeafletOptions;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Serializer\Encoder\JsonDecode;
 use Symfony\UX\Map\Bridge\Leaflet\Option\TileLayer;
+use Twig\Environment;
 
 class MapsService
 {
@@ -40,7 +41,8 @@ class MapsService
             private CgoRepository $cgoRepository,
             private KernelInterface $kernel,
             private DepartmentRepository $departmentRepository,
-            private TechnicalAdvisorRepository $technicalAdvisorRepository
+            private TechnicalAdvisorRepository $technicalAdvisorRepository,
+            private Environment $twig
         ){}
 
     private $COLORS_OF_MARKERS = "#0029D2";
@@ -426,6 +428,10 @@ class MapsService
         $map = $this->generationUxMapWithBaseOptions();
 
         $iconOfIntervention = Icon::ux('tabler:truck-filled')->width(42)->height(42);
+        $infoWindowInterventionPointContent = $this->twig->render(
+            'site/maps/popups/interventionPoint_infowindow.html.twig',
+            ['city' => $cityOfIntervention]
+        );
         
         $map
             ->addMarker( new Marker(
@@ -433,7 +439,7 @@ class MapsService
                 title: $cityOfIntervention->getName(),
                 infoWindow: new InfoWindow(
                     headerContent: $cityOfIntervention->getName(),
-                    content: 'Lieu de l\'intervention'
+                    content: $infoWindowInterventionPointContent
                 ),
                 icon: $iconOfIntervention,
                 // extra: [
@@ -442,44 +448,24 @@ class MapsService
             ));
 
         foreach($arrayFromAllShopsNearCityOfIntervention as $data){
-
             $shop = $data['shop'];
 
-            //?on recupere les cgos pour chaque shop
-            $cgos = "Cgo(s) rattaché(s): <br>";
-            if(count($shop->getCgos()) > 0){
-                foreach ($data['shop']->getCgos() as $cgo) {
-                    $cgos .= $cgo->getName().'<br>';
-                }
-            }else{
-                $cgos = "Aucun cgo rattaché";
-            }
-
-
-            if($option == 'telematique'){ //? options from SearchShopsByCityType
+            if($option == 'telematique'){ 
                 $icon = Icon::ux('ri:taxi-wifi-fill')->width(24)->height(24)->color($this->COLORS_OF_MARKERS);
-                $techniciansDetails = "";
-                
-                foreach ($shop->getTechnicians() as $technician) {
-                    $techniciansDetails .= "<p>";
-                    $formations = '';
-                    foreach($technician->getTechnicianFormations() as $formation) {
-                        $formations .= '<span class="badge" style="background-color:'.$formation->getColor().'">'.$formation->getName().'</span> ';
-                    }
-                    $functions = '';
-                    foreach($technician->getFonctions() as $function) {
-                        $functions .= '<span class="badge" style="background-color:'.$function->getColor().'">'.$function->getName().'</span> ';
-                    }
-                    $techniciansDetails .= '- <b>'.$technician->getNameAndFirstName().'</b> : '.$technician->getPhone().'<br>';
-                    $techniciansDetails .= '<br/>Formations : '.$formations;
-                    $techniciansDetails .= '<br/>Fonctions : '.$functions;
-                    $techniciansDetails .= '<hr/>';  
-                    $techniciansDetails .= '</p>';
-                }
-            }else{
-                $techniciansDetails = "";
+            } else {
                 $icon = Icon::ux('solar:garage-bold')->width(24)->height(24)->color($this->COLORS_OF_MARKERS);
             }
+
+            // Render the Twig template and pass the necessary data
+            $infoWindowContent = $this->twig->render(
+                'site/maps/popups/technicians_infowindow.html.twig',
+                [
+                    'shop' => $shop,
+                    'data' => $data,
+                    'cityOfIntervention' => $cityOfIntervention,
+                    'option' => $option,
+                ]
+            );
 
             $map
                 ->addMarker( new Marker(
@@ -487,11 +473,10 @@ class MapsService
                     title: $data['shop']->getName(),
                     icon: $icon,
                     infoWindow: new InfoWindow(
-                        headerContent: $shop->getName().' ('.$shop->getCm().') <br/>'.$shop->getPhone(),
-                        content: $techniciansDetails.'<p>Distance : '.($data['distance'] / 1000).' kms <br>Temps de trajet : '.gmdate("H:i:s", $data['duration']).'</p>'.$cgos
+                        // headerContent: $shop->getName().' ('.$shop->getCm().')',
+                        content: $infoWindowContent
                     ),
                     extra: [
-                        // 'icon_mask_url' => 'https://maps.gstatic.com/mapfiles/place_api/icons/v2/tree_pinlet.svg',
                         'markerColor' => $this->COLORS_OF_MARKERS
                     ],
                 ));
@@ -579,26 +564,13 @@ class MapsService
             $color = $cgo->getTerritoryColor();
 
             $iconOfTechnician = Icon::ux('ri:taxi-wifi-fill')->width(24)->height(24)->color($color);
-            $formations = '';
-            foreach($technician->getTechnicianFormations() as $formation) {
-                $formations .= '<span class="badge" style="background-color:'.$formation->getColor().'">'.$formation->getName().'</span> ';
-            }
-            $functions = '';
-            foreach($technician->getFonctions() as $function) {
-                $functions .= '<span class="badge" style="background-color:'.$function->getColor().'">'.$function->getName().'</span> ';
-            }
+            $infoWindowContent = $this->getInfoWindowContentForTechnicianTelematic($technician, $cgo);
 
              $map->addMarker(new Marker(
                     position: new Point($technician->getShop()->getCity()->getLatitude(), $technician->getShop()->getCity()->getLongitude()),
                     icon: $iconOfTechnician,
                     title: $technician->getName(),
-                    infoWindow: new InfoWindow(
-                        content:
-                        '<p>'.strtoupper($technician->getName()).' '.$technician->getFirstName().'<br/>Tél: '.$technician->getPhone().'<br/>Email: '.$technician->getEmail().'</p>'.
-                        '<p>Formations:<br/>'.$formations.'</p>
-                         <p>Fonction:<br/>'.$functions.'</p>
-                         <p>Géré par:<br/>'.$cgo->getName().'<br/>'.$cgo->getManager().'<br/>'.$cgo->getManager()->getPhone().'</p>'
-                    ),
+                    infoWindow: new InfoWindow(content: $infoWindowContent),
                     // Ajoutez la couleur dans le tableau 'extra'
                     extra: [
                         'markerColor' => $color, // Passez votre variable $color ici
@@ -700,6 +672,13 @@ class MapsService
         $map->options($leafletOptions);
 
         return $map;
+    }
+
+    public function getInfoWindowContentForTechnicianTelematic($technician): string
+    {
+        return $this->twig->render('site/maps/popups/technician_telematic_infowindow.html.twig', [
+            'technician' => $technician
+        ]);
     }
 
 }

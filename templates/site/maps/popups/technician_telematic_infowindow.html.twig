@@ -1,0 +1,49 @@
+<div class="p-2">
+    <div class="d-flex align-items-center mb-2">
+        <i class="fas fa-user-circle fa-2x text-primary me-2"></i>
+        <div>
+            <h6 class="mb-0 fw-bold text-uppercase">{{ technician.name }} {{ technician.firstName }}</h6>
+            <small class="text-muted">{{ technician.shop.name }} ({{ technician.shop.cm }})</small>
+        </div>
+    </div>
+    
+    <ul class="list-unstyled mb-0">
+        <li class="d-flex align-items-center mb-1">
+            <i class="fas fa-phone me-2 text-success"></i>
+            <a href="tel:{{ technician.phone|replace({' ': ''}) }}">{{ technician.phone }}</a>
+        </li>
+        <li class="d-flex align-items-center mb-1">
+            <i class="fas fa-envelope me-2 text-info"></i>
+            <a href="mailto:{{ technician.email }}">{{ technician.email }}</a>
+        </li>
+    </ul>
+
+    <hr>
+    
+    <h6 class="fw-bold mb-1"><i class="fas fa-graduation-cap me-2 text-primary"></i> Formations</h6>
+    <div class="d-flex flex-wrap gap-1 mb-2">
+        {% for formation in technician.technicianFormations %}
+            <span class="badge" style="background-color:{{ formation.color }}">{{ formation.name }}</span>
+        {% else %}
+            <span class="text-muted fst-italic">Aucune formation</span>
+        {% endfor %}
+    </div>
+
+    <h6 class="fw-bold mb-1"><i class="fas fa-cogs me-2 text-secondary"></i> Fonctions</h6>
+    <div class="d-flex flex-wrap gap-1 mb-2">
+        {% for function in technician.fonctions %}
+            <span class="badge" style="background-color:{{ function.color }}">{{ function.name }}</span> 
+        {% else %}
+            <span class="text-muted fst-italic">Aucune fonction</span>
+        {% endfor %}
+    </div>
+
+    {# <hr>
+    
+    <h6 class="fw-bold mb-1"><i class="fas fa-handshake me-2 text-success"></i> Géré par</h6>
+    <p class="mb-0">
+        {{ technician.controledByCgo.name }}<br/>
+        <i class="fas fa-user-tie me-1 text-muted"></i> {{ technician.controledByCgo.manager.name }}<br/>
+        <i class="fas fa-phone me-1 text-muted"></i> <a href="tel:{{ technician.controledByCgo.manager.phone|replace({' ': ''}) }}">{{ technician.controledByCgo.manager.phone }}</a>
+    </p> #}
+</div>

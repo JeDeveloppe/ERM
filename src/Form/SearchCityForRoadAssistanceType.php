@@ -3,24 +3,23 @@
 namespace App\Form;
 
 use Symfony\Component\Form\AbstractType;
+use App\Form\SearchCityAutocompleteFieldType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
-class SearchShopsByCityType extends AbstractType
+class SearchCityForRoadAssistanceType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
 
-        $options = $options['formOptions'];
-
         $builder
-        ->add('city', SearchShopsByCityAutocompleteField::class)
+        ->add('city', SearchCityAutocompleteFieldType::class)
         ->add('options', ChoiceType::class, [
             'label' => false,
-            'choices' => $options['choices'],
+            'choices' => ['Afficher les centres MV et MX les plus proches' => 'depannage'],
             'mapped' => false,
-            'placeholder' => $options['placeholder'],
+            'placeholder' => false,
             'attr' => [
                 'class' => 'form-control mb-3',
             ]

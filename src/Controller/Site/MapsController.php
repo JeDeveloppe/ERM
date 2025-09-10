@@ -87,7 +87,7 @@ class MapsController extends AbstractController
                 ],
                 [
                     'isGranted' => 'ROLE_MCF',
-                    'url' => $this->generateUrl('app_search_distance'),
+                    'url' => $this->generateUrl('app_search_distance_for_road_assistance'),
                     'name' => 'Calculer une distance pour une intervention',
                     'icon' => 'game-icons:path-distance'
                 ],
@@ -226,73 +226,4 @@ class MapsController extends AbstractController
         }
     }
 
-    #[Route('/maps/zones-telematique', name: 'app_map_zones_telematique')]
-    public function mapZonesTelematiqueArea(): Response
-    {
-        //?on recupere les donnees dans le service
-        $mapDonnees = $this->mapsService->constructionMapOfZonesTelematique();
-
-        $telematicAreas = $this->telematicAreaRepository->findAll();
-
-        return $this->render('site/maps/zones_telematic.html.twig', [
-            'mapDonnees' => $mapDonnees,
-            'title' => 'Zones télématiques MV',
-            'telematicAreas' => $telematicAreas
-        ]);
-    }
-
-    #[Route('/maps/techniciens-telematique/{formationName?}', name: 'app_map_technicians_telematique', methods: ['GET', 'POST'])]
-    public function mapTechniciansTelematiqueArea(?array $formationNames, Request $request): Response
-    {
-
-        // Create the form, associating it with the $film object
-        $form = $this->createForm(SearchTechnicianByDetailsTypeForm::class);
-
-        // Handle the form submission
-        $form->handleRequest($request);
-
-        // Check if the form was submitted and is valid
-        if($form->isSubmitted() && $form->isValid()) {
-
-            $formations = $form->get('formations')->getData();
-            $formationNamesArray = $formations->toArray();
-
-            $functions = $form->get('fonctions')->getData();
-            $functionNamesArray = $functions->toArray();
-
-            $vehicles = $form->get('vehicles')->getData();
-            $vehicleNamesArray = $vehicles->toArray();
-
-            $formationNames = [];
-            foreach($formationNamesArray as $formationName){
-                $formationNames[] = $formationName->getName();
-            }
-
-            $functionNames = [];
-            foreach($functionNamesArray as $functionName){
-                $functionNames[] = $functionName->getName();
-            }
-
-            $vehicleNames = [];
-            foreach($vehicleNamesArray as $vehicleName){
-                $vehicleNames[] = $vehicleName->getName();
-            }
-
-            $mapDonnees = $this->mapsService->constructionMapOfTechniciansTelematique($formationNames, $functionNames, $vehicleNames);
-
-        }else{
-            
-            $formationNames = [];
-            $functionNames = [];
-            $vehicleNames = [];
-            //?on recupere les donnees dans le service
-            $mapDonnees = $this->mapsService->constructionMapOfTechniciansTelematique($formationNames, $functionNames, $vehicleNames);
-        }
-
-        return $this->render('site/maps/technicians_telematic.html.twig', [
-            'mapDonnees' => $mapDonnees,
-            'title' => 'Les techniciens télématiques',
-            'form' => $form->createView()
-        ]);
-    }
 }

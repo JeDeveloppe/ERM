@@ -5,17 +5,17 @@
 {% block body %}
 
 <div class="container my-5">
-    <h1 class="text-center mb-4">{{ title }}</h1>
+    <h1 class="text-center mb-4"><i class="fas fa-map-marked-alt me-2 text-primary"></i>{{ title }}</h1>
 
     <div class="row justify-content-center">
         <div class="col-12 col-xl-10">
-            <div class="card shadow-sm mb-4">
-                <div class="card-body p-3">
+            <div class="card shadow-lg mb-4 border-0">
+                <div class="card-body p-0">
                     {% if mapDonnees is not empty %}
-                        {{ ux_map(mapDonnees, { 'data-controller': 'mymap', 'controller_id': false, style: 'height: 600px; border: 2px solid black; border-radius: 8px;' }) }}
+                        {{ ux_map(mapDonnees, { 'data-controller': 'mymap', 'controller_id': false, style: 'height: 600px; border-radius: 8px;' }) }}
                     {% else %}
-                        <div class="alert alert-warning text-center" role="alert">
-                            <strong>Aucun technicien trouvé.</strong> Veuillez ajuster vos critères de recherche.
+                        <div class="alert alert-warning text-center rounded-0 rounded-top" role="alert">
+                            <i class="fas fa-exclamation-triangle me-2"></i><strong>Aucun technicien trouvé.</strong> Veuillez ajuster vos critères de recherche.
                         </div>
                     {% endif %}
                 </div>
@@ -23,51 +23,90 @@
         </div>
 
         <div class="col-12 col-xl-10">
-            <div class="card shadow-sm">
+            <div class="card shadow-lg border-0">
                 <div class="card-body p-4">
-                    <h3 class="card-title text-center mb-4">Filtrer les techniciens télématiques</h3>
+                    <h3 class="card-title text-center mb-4"><i class="fas fa-filter me-2"></i>Filtrer les techniciens télématiques</h3>
                     {{ form_start(form) }}
-                        <div class="row">
-                            <div class="col-12 col-lg-4 mb-4">
-                                <div class="p-3 border border-primary rounded-lg h-100 d-flex flex-column" style="background-color: #e3f2fd;">
-                                    <h5 class="w-100 text-primary">Formations</h5>
-                                    {% for child in form.formations %}
-                                        <div class="form-check my-1">
-                                            {{ form_widget(child, {'attr': {'class': 'form-check-input'}}) }}
-                                            {{ form_label(child, null, {'label_attr': {'class': 'form-check-label'}}) }}
-                                        </div>
-                                    {% endfor %}
+                        <div class="row g-4">
+                            {# Formations Section #}
+                            <div class="col-12 col-lg-4">
+                                <div class="p-3 border border-primary rounded h-100">
+                                    <h5 class="w-100 text-primary"><i class="fas fa-graduation-cap me-2"></i>Formations</h5>
+                                    <div class="d-flex flex-wrap gap-2 mt-2">
+                                        {% for child in form.formations %}
+                                            <div class="form-check">
+                                                <input type="checkbox"
+                                                    id="{{ child.vars.id }}"
+                                                    name="{{ child.vars.full_name }}"
+                                                    value="{{ child.vars.value }}"
+                                                    {{ child.vars.checked ? 'checked' : '' }}
+                                                    class="btn-check"
+                                                    autocomplete="off">
+                                                <label class="btn btn-outline-primary" for="{{ child.vars.id }}">
+                                                    {{ child.vars.label }}
+                                                </label>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
                                 </div>
+                                {% do form.formations.setRendered() %}
                             </div>
 
-                            <div class="col-12 col-lg-4 mb-4">
-                                <div class="p-3 border border-secondary rounded-lg h-100 d-flex flex-column" style="background-color: #f1f8e9;">
-                                    <h5 class="w-100 text-secondary">Fonctions</h5>
-                                    {% for child in form.fonctions %}
-                                        <div class="form-check my-1">
-                                            {{ form_widget(child, {'attr': {'class': 'form-check-input'}}) }}
-                                            {{ form_label(child, null, {'label_attr': {'class': 'form-check-label'}}) }}
-                                        </div>
-                                    {% endfor %}
+                            {# Fonctions Section #}
+                            <div class="col-12 col-lg-4">
+                                <div class="p-3 border border-secondary rounded h-100">
+                                    <h5 class="w-100 text-secondary"><i class="fas fa-cogs me-2"></i>Fonctions</h5>
+                                    <div class="d-flex flex-wrap gap-2 mt-2">
+                                        {% for child in form.fonctions %}
+                                            <div class="form-check">
+                                                <input type="checkbox"
+                                                    id="{{ child.vars.id }}"
+                                                    name="{{ child.vars.full_name }}"
+                                                    value="{{ child.vars.value }}"
+                                                    {{ child.vars.checked ? 'checked' : '' }}
+                                                    class="btn-check"
+                                                    autocomplete="off">
+                                                <label class="btn btn-outline-secondary" for="{{ child.vars.id }}">
+                                                    {{ child.vars.label }}
+                                                </label>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
                                 </div>
+                                {% do form.fonctions.setRendered() %}
                             </div>
 
-                            <div class="col-12 col-lg-4 mb-4">
-                                <div class="p-3 border border-info rounded-lg h-100 d-flex flex-column" style="background-color: #e1f5fe;">
-                                    <h5 class="w-100 text-info">Véhicules</h5>
-                                    {% for child in form.vehicles %}
-                                        <div class="form-check my-1">
-                                            {{ form_widget(child, {'attr': {'class': 'form-check-input'}}) }}
-                                            {{ form_label(child, null, {'label_attr': {'class': 'form-check-label'}}) }}
-                                        </div>
-                                    {% endfor %}
+                            {# Véhicules Section #}
+                            <div class="col-12 col-lg-4">
+                                <div class="p-3 border border-info rounded h-100">
+                                    <h5 class="w-100 text-info"><i class="fas fa-car-side me-2"></i>Véhicules</h5>
+                                    <div class="d-flex flex-wrap gap-2 mt-2">
+                                        {% for child in form.vehicles %}
+                                            <div class="form-check">
+                                                <input type="checkbox"
+                                                    id="{{ child.vars.id }}"
+                                                    name="{{ child.vars.full_name }}"
+                                                    value="{{ child.vars.value }}"
+                                                    {{ child.vars.checked ? 'checked' : '' }}
+                                                    class="btn-check"
+                                                    autocomplete="off">
+                                                <label class="btn btn-outline-info" for="{{ child.vars.id }}">
+                                                    {{ child.vars.label }}
+                                                </label>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
                                 </div>
+                                {% do form.vehicles.setRendered() %}
                             </div>
                         </div>
 
-                        <div class="text-center mt-3">
-                            <button type="submit" class="btn btn-primary btn-lg me-3">Afficher la carte</button>
-                            <a href="{{ path('app_map_technicians_telematique') }}" class="btn btn-warning btn-lg">Réinitialiser</a>
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg me-3" id="submit-button">
+                                <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                                <span class="button-text"><i class="fas fa-search me-2"></i> Afficher la carte</span>
+                            </button>
+                            <a href="{{ path('app_map_technicians_telematique') }}" class="btn btn-warning btn-lg"><i class="fas fa-undo me-2"></i> Réinitialiser</a>
                         </div>
                     {{ form_end(form) }}
                 </div>
@@ -76,4 +115,22 @@
     </div>
 </div>
 
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            const submitButton = document.getElementById('submit-button');
+            
+            if (form && submitButton) {
+                form.addEventListener('submit', function(event) {
+                    submitButton.querySelector('.spinner-border').classList.remove('d-none');
+                    submitButton.querySelector('.button-text').classList.add('d-none');
+                    submitButton.disabled = true;
+                });
+            }
+        });
+    </script>
 {% endblock %}
