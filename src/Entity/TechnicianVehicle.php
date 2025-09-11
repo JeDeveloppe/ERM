@@ -24,6 +24,12 @@ class TechnicianVehicle
     #[ORM\OneToMany(targetEntity: Technician::class, mappedBy: 'vehicle')]
     private Collection $technicians;
 
+    #[ORM\ManyToOne(inversedBy: 'technicianVehiclesUpdated')]
+    private ?User $updatedBy = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $updatedAt = null;
+
     public function __construct()
     {
         $this->technicians = new ArrayCollection();
@@ -79,5 +85,29 @@ class TechnicianVehicle
     public function __toString(): string
     {
         return $this->getName();
+    }
+
+    public function getUpdatedBy(): ?User
+    {
+        return $this->updatedBy;
+    }
+
+    public function setUpdatedBy(?User $updatedBy): static
+    {
+        $this->updatedBy = $updatedBy;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
     }
 }

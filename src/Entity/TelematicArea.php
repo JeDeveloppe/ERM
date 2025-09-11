@@ -32,6 +32,12 @@ class TelematicArea
     #[ORM\OneToMany(targetEntity: Cgo::class, mappedBy: 'telematicArea')]
     private Collection $cgos;
 
+    #[ORM\ManyToOne(inversedBy: 'telematicAreaUpdated')]
+    private ?User $updatedBy = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $updatedAt = null;
+
     public function __construct()
     {
         $this->departments = new ArrayCollection();
@@ -111,6 +117,30 @@ class TelematicArea
                 $cgo->setTelematicArea(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getUpdatedBy(): ?User
+    {
+        return $this->updatedBy;
+    }
+
+    public function setUpdatedBy(?User $updatedBy): static
+    {
+        $this->updatedBy = $updatedBy;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
 
         return $this;
     }
