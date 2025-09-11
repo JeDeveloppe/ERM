@@ -27,6 +27,12 @@ class TechnicianFonction
     #[ORM\Column(length: 15)]
     private ?string $color = null;
 
+    #[ORM\ManyToOne(inversedBy: 'technicianFonctionsUpdated')]
+    private ?User $updatedBy = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $updatedAt = null;
+
     public function __construct()
     {
         $this->technicians = new ArrayCollection();
@@ -91,5 +97,29 @@ class TechnicianFonction
     public function __toString(): string
     {
         return $this->name;
+    }
+
+    public function getUpdatedBy(): ?User
+    {
+        return $this->updatedBy;
+    }
+
+    public function setUpdatedBy(?User $updatedBy): static
+    {
+        $this->updatedBy = $updatedBy;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
     }
 }

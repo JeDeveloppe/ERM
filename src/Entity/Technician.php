@@ -65,6 +65,12 @@ class Technician
     #[ORM\ManyToMany(targetEntity: TechnicianFonction::class, inversedBy: 'technicians')]
     private Collection $fonctions;
 
+    #[ORM\ManyToOne(inversedBy: 'techniciansUpdated')]
+    private ?User $updatedBy = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $updatedAt = null;
+
     public function __construct()
     {
         $this->technicianFormations = new ArrayCollection();
@@ -250,4 +256,29 @@ class Technician
         // Sinon, retourne le nom complet
         return $fullName;
     }
+
+    public function getUpdatedBy(): ?User
+    {
+        return $this->updatedBy;
+    }
+
+    public function setUpdatedBy(?User $updatedBy): static
+    {
+        $this->updatedBy = $updatedBy;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
 }

@@ -38,12 +38,13 @@ security:
     access_control:
         - { path: ^/admin, roles: ROLE_ADMIN }
         - { path: ^/maps, roles: ROLE_USER }
-        - { path: ^/prime, roles: ROLE_USER }
-        - { path: ^/distance, roles: ROLE_USER }
+        - { path: ^/prime, roles: ROLE_ERM }
+        - { path: ^/distance, roles: ROLE_ERM }
+        - { path: ^/telematique, roles: ROLE_MCF }
     role_hierarchy:
-        ROLE_SUPER_ADMIN: ROLE_ADMIN
-        ROLE_ADMIN: ROLE_USER
-        ROLE_MCF: ROLE_USER
+        ROLE_SUPER_ADMIN: ROLE_ADMIN,ROLE_MCF_ADMIN,ROLE_ERM_ADMIN
+        ROLE_MCF_ADMIN: ROLE_ADMIN,ROLE_MCF
+        ROLE_ERM_ADMIN: ROLE_ADMIN,ROLE_ERM
 
 when@test:
     security:
