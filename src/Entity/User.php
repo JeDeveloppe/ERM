@@ -69,6 +69,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: TechnicianVehicle::class, mappedBy: 'updatedBy')]
     private Collection $technicianVehiclesUpdated;
 
+    /**
+     * @var Collection<int, ApiLog>
+     */
+    #[ORM\OneToMany(targetEntity: ApiLog::class, mappedBy: 'user')]
+    private Collection $apiLogs;
+
     public function __construct()
     {
         $this->techniciansUpdated = new ArrayCollection();
@@ -76,6 +82,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->technicianFonctionsUpdated = new ArrayCollection();
         $this->telematicAreaUpdated = new ArrayCollection();
         $this->technicianVehiclesUpdated = new ArrayCollection();
+        $this->apiLogs = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -326,6 +333,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($technicianVehiclesUpdated->getUpdatedBy() === $this) {
                 $technicianVehiclesUpdated->setUpdatedBy(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ApiLog>
+     */
+    public function getApiLogs(): Collection
+    {
+        return $this->apiLogs;
+    }
+
+    public function addApiLog(ApiLog $apiLog): static
+    {
+        if (!$this->apiLogs->contains($apiLog)) {
+            $this->apiLogs->add($apiLog);
+            $apiLog->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeApiLog(ApiLog $apiLog): static
+    {
+        if ($this->apiLogs->removeElement($apiLog)) {
+            // set the owning side to null (unless already changed)
+            if ($apiLog->getUser() === $this) {
+                $apiLog->setUser(null);
             }
         }
 

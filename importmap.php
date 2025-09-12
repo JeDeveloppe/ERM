@@ -68,4 +68,12 @@ return [
     '@googlemaps/js-api-loader' => [
         'version' => '1.16.8',
     ],
+    'tom-select/dist/css/tom-select.default.css' => [
+        'version' => '2.4.3',
+        'type' => 'css',
+    ],
+    'tom-select/dist/css/tom-select.bootstrap4.css' => [
+        'version' => '2.4.3',
+        'type' => 'css',
+    ],
 ];

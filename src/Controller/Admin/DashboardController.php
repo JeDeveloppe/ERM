@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\ApiLog;
 use App\Entity\Cgo;
 use App\Entity\City;
 use App\Entity\Shop;
@@ -84,6 +85,10 @@ class DashboardController extends AbstractDashboardController
 
             MenuItem::section('Calcul des primes:')->setPermission('ROLE_SUPER_ADMIN'),
             MenuItem::linkToCrud('Les paliers de prime', 'fas fa-list', Primelevel::class)->setPermission('ROLE_SUPER_ADMIN'),
+
+            MenuItem::section('Logs')->setPermission('ROLE_SUPER_ADMIN'),
+            MenuItem::linkToCrud('Les logs', 'fas fa-list', ApiLog::class)->setPermission('ROLE_SUPER_ADMIN'),
+
         ];
 
     }
