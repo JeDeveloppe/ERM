@@ -7,19 +7,18 @@ use App\Entity\City;
 use App\Entity\Shop;
 use League\Csv\Reader;
 use App\Entity\Manager;
-use App\Entity\ZoneErm;
 use App\Entity\RegionErm;
 use App\Repository\CgoRepository;
+use App\Service\GeocodingService;
 use App\Repository\CityRepository;
-use App\Repository\ManagerClassRepository;
 use App\Repository\ShopRepository;
 use App\Repository\ManagerRepository;
 use App\Repository\ZoneErmRepository;
 use App\Repository\RegionErmRepository;
-
 use App\Repository\ShopClassRepository;
 use App\Repository\TechnicianRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\ManagerClassRepository;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -37,7 +36,8 @@ class CgoService
         private MapsService $mapsService,
         private ShopRepository $shopRepository,
         private HttpClientInterface $client,
-        private TechnicianRepository $technicianRepository
+        private TechnicianRepository $technicianRepository,
+        private GeocodingService $geocodingService
         ){
     }
 
@@ -231,75 +231,6 @@ class CgoService
         return $cgo;
     }
 
-    /**
-     * @param City $cityOfIntervention
-     * @param Shop $shop
-     * @return array
-     */
-    public function getDistancesBeetweenDepannageAndShop(City $cityOfIntervention, Shop $shop): array
-    {
-        $interventionLatitude = $cityOfIntervention->getLatitude();
-        $interventionLongitude = $cityOfIntervention->getLongitude();
-        
-        $shopLatitude = $shop->getCity()->getLatitude();
-        $shopLongitude = $shop->getCity()->getLongitude();
-
-        // 1. Construct the API endpoint cleanly
-        $endpoint = sprintf(
-            'https://api.tomtom.com/routing/1/calculateRoute/%s,%s:%s,%s/json',
-            $interventionLatitude,
-            $interventionLongitude,
-            $shopLatitude,
-            $shopLongitude
-        );
-
-        // 2. Use a try-catch block for robust error handling
-        try {
-            $response = $this->client->request('GET', $endpoint, [
-                'query' => [
-                    'key' => $_ENV['TOMTOM_API_KEY'],
-                ],
-            ]);
-
-            // If the request was not successful, it will throw an exception
-            $response->getStatusCode();
-
-            $array_reponse = $response->toArray();
-            
-            // 3. Add checks for missing data
-            if (!isset($array_reponse['routes'][0]['summary'])) {
-                // You can log this or return a specific error structure
-                // For this example, we return a default failure array
-                return [
-                    'shop'     => $shop,
-                    'distance' => null,
-                    'duration' => null,
-                    'error'    => 'TomTom API response missing route summary.'
-                ];
-            }
-
-            $summary = $array_reponse['routes'][0]['summary'];
-
-            return [
-                'shop'     => $shop,
-                'distance' => $summary['lengthInMeters'],
-                'duration' => $summary['travelTimeInSeconds'],
-            ];
-
-        } catch (\Exception $e) {
-            // Log the error
-            // $this->logger->error('TomTom API request failed: ' . $e->getMessage());
-            
-            // Return an array with error information
-            return [
-                'shop'     => $shop,
-                'distance' => null,
-                'duration' => null,
-                'error'    => 'TomTom API request failed: ' . $e->getMessage()
-            ];
-        }
-    }
-
     public function getShopsByClassErmAndOptionArroundCityOfIntervention(City $cityOfIntervention, array $classErm, string $option, array $optionsTelematique = []): array
     {
 
@@ -326,13 +257,13 @@ class CgoService
  
         $shopsByRayonOfIntervention = [];
         foreach($shops as $shop){
-            if($this->distance($cityOfIntervention,$shop,'K', $_ENV['RAYON_OF_INTERVENTION']) == true){
+            if($this->geocodingService->testDistance($cityOfIntervention,$shop,'K', $_ENV['RAYON_OF_INTERVENTION']) == true){
                 $shopsByRayonOfIntervention[] = $shop;
             }
         }
 
         foreach($shopsByRayonOfIntervention as $i => $shop){
-            array_push($datas, $this->getDistancesBeetweenDepannageAndShop($cityOfIntervention,$shop));
+            array_push($datas, $this->geocodingService->getDistancesBeetweenDepannageAndShopWithOSRM($cityOfIntervention,$shop));
             //on attend 1 seconde tous les 5 appels à l'api
             if($i > 0 && $i % 5 == 0){
                 sleep(1);
@@ -342,39 +273,5 @@ class CgoService
         array_multisort(array_column($datas, 'distance'), SORT_ASC, $datas);
 
         return $datas;
-    }
-
-    private function distance(City $cityOfIntervention, Shop $shop, string $unit, int $rayonOfIntervention):bool 
-    {
-        $lat1 = $cityOfIntervention->getLatitude();
-        $lon1 = $cityOfIntervention->getLongitude();
-        $lat2 = $shop->getCity()->getLatitude();
-        $lon2 = $shop->getCity()->getLongitude();
-
-        if (($lat1 == $lat2) && ($lon1 == $lon2)) {
-            $rayon = 0;
-        }
-        else {
-            $theta = $lon1 - $lon2;
-            $dist = sin(deg2rad($lat1)) * sin(deg2rad($lat2)) +  cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * cos(deg2rad($theta));
-            $dist = acos($dist);
-            $dist = rad2deg($dist);
-            $miles = $dist * 60 * 1.1515;
-            $unit = strtoupper($unit);
-        
-            if($unit == "K") {
-                $rayon = ($miles * 1.609344);
-            } else if ($unit == "N") {
-                $rayon = ($miles * 0.8684);
-            } else {
-                $rayon =  $miles;
-            }
-        }
-
-        if($rayon <= $rayonOfIntervention){
-            return true;
-        }else{
-            return false;
-        }
     }
 }
