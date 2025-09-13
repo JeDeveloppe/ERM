@@ -234,8 +234,11 @@ class CgoService
     public function getShopsByClassErmAndOptionArroundCityOfIntervention(City $cityOfIntervention, array $classErm, string $option, array $optionsTelematique = []): array
     {
 
+        $rayonOfIntervention = $_ENV['RAYON_OF_ROAD_INTERVENTION'];
+
         $datas = [];
         if($option == 'telematique'){
+            $rayonOfIntervention = $_ENV['RAYON_OF_TELEMATIC_INTERVENTION'];
              // 1. On trouve d'abord les techniciens qui correspondent EXACTEMENT aux critères
             $formations = $optionsTelematique['formations'] ?? [];
             // $fonctions = $optionsTelematique['fonctions'] ?? [];
@@ -257,7 +260,7 @@ class CgoService
  
         $shopsByRayonOfIntervention = [];
         foreach($shops as $shop){
-            if($this->geocodingService->testDistance($cityOfIntervention,$shop,'K', $_ENV['RAYON_OF_INTERVENTION']) == true){
+            if($this->geocodingService->testDistance($cityOfIntervention,$shop,'K', $rayonOfIntervention) == true){
                 $shopsByRayonOfIntervention[] = $shop;
             }
         }
@@ -265,9 +268,9 @@ class CgoService
         foreach($shopsByRayonOfIntervention as $i => $shop){
             array_push($datas, $this->geocodingService->getDistancesBeetweenDepannageAndShopWithOSRM($cityOfIntervention,$shop));
             //on attend 1 seconde tous les 5 appels à l'api
-            if($i > 0 && $i % 5 == 0){
-                sleep(1);
-            }
+            // if($i > 0 && $i % 5 == 0){
+            //     sleep(1);
+            // }
         }
 
         array_multisort(array_column($datas, 'distance'), SORT_ASC, $datas);

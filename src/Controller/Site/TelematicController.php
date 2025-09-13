@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Form\SearchTechnicianByDetailsTypeForm;
+use App\Service\ApiLogService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class TelematicController extends AbstractController
@@ -21,7 +22,8 @@ class TelematicController extends AbstractController
         private ShopClassRepository $shopClassRepository,
         private TelematicAreaRepository $telematicAreaRepository,
         private CgoService $cgoService,
-        private ShopRepository $shopRepository
+        private ShopRepository $shopRepository,
+        private ApiLogService $apiLogService
     ){}
 
     #[Route('/telematique/map/', name: 'app_map_zones_telematique')]
@@ -109,6 +111,8 @@ class TelematicController extends AbstractController
 
             if($form->isSubmitted() && $form->isValid()){
 
+                $startTime = microtime(true);
+
                 $isSearchDone = true;
                 $cityOfIntervention = $form->get('city')->getData();
                 $option = 'telematique';
@@ -126,6 +130,10 @@ class TelematicController extends AbstractController
 
                 $datas = $this->cgoService->getShopsByClassErmAndOptionArroundCityOfIntervention($cityOfIntervention, $classErm, $option, $optionsTelematique);
                 $map = $this->mapsService->getMapWithInterventionPointAndAllShopsArround($cityOfIntervention, $datas, $option);
+
+                
+                $this->apiLogService->saveApiLog('MCF_SEARCH', $startTime, 'app_search_distance_for_telematic_assistance', 'success', null);
+                
             }
         }
 

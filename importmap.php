@@ -76,4 +76,7 @@ return [
         'version' => '2.4.3',
         'type' => 'css',
     ],
+    '@symfony/ux-autocomplete' => [
+        'version' => '2.30.0',
+    ],
 ];

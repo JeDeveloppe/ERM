@@ -87,7 +87,7 @@ class MapsController extends AbstractController
                 ],
                 [
                     'isGranted' => 'ROLE_MCF',
-                    'url' => $this->generateUrl('app_search_distance_for_road_assistance'),
+                    'url' => $this->generateUrl('app_search_distance_for_telematic_assistance'),
                     'name' => 'Calculer une distance pour une intervention',
                     'icon' => 'game-icons:path-distance'
                 ],

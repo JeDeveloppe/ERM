@@ -40,7 +40,7 @@
         "symfony/string": "7.2.*",
         "symfony/translation": "7.2.*",
         "symfony/twig-bundle": "7.2.*",
-        "symfony/ux-autocomplete": "^2.22",
+        "symfony/ux-autocomplete": "^2.30",
         "symfony/ux-google-map": "^2.22",
         "symfony/ux-icons": "^2.22",
         "symfony/ux-leaflet-map": "^2.25",

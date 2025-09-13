@@ -4,11 +4,11 @@
 
 {% block body %}
 
-<div class="container my-5">
+<div class="container-fluid my-5">
     
-    <div class="row justify-content-center mb-4">
-        <div class="col-12 col-md-8 col-lg-6">
-            <div class="card shadow-lg border-0">
+    <div class="row justify-content-center">
+        <div class="col-12 {% if isSearchDone %}col-xl-5{% else %}col-lg-6{% endif %}">
+            <div class="card shadow-lg border-0 mb-4">
                 <div class="card-header text-center bg-primary text-white py-3">
                     <h5 class="my-1">
                         <i class="fas fa-search-location me-2"></i> Rechercher les télématiciens à proximité
@@ -63,13 +63,8 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
-
-    {% if isSearchDone %}
-        {% if datas | length > 0 %}
-            <div class="row justify-content-center">
-                <div class="col-12 col-xl-10">
+            {% if isSearchDone %}
+                {% if datas | length > 0 %}
                     <div class="card shadow-lg mb-4">
                         <div class="card-header bg-success text-white py-3">
                             <h5 class="my-1"><i class="fas fa-list-ul me-2"></i> Résultats de la recherche ({{ datas | length }} centre(s) trouvé(s))</h5>
@@ -110,40 +105,33 @@
                             </table>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <div class="row justify-content-center">
-                <div class="col-12 col-xl-10">
-                    <div class="card shadow-lg mb-5">
-                        <div class="card-header bg-info text-white py-3">
-                            <h5 class="my-1"><i class="fas fa-map me-2"></i> Carte des résultats</h5>
-                        </div>
-                        <div class="card-body p-0">
-                            {{ ux_map(map, {'data-controller': 'mymap', 'controller_id': false, style: 'height: 650px; border-radius: 0 0 8px 8px;'}) }}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        {% else %}
-            <div class="row justify-content-center">
-                <div class="col-12 col-md-8 col-lg-6">
+                {% else %}
                     <div class="alert alert-info text-center shadow-lg" role="alert">
                         <i class="fas fa-info-circle me-2"></i> Aucun résultat trouvé pour votre recherche.
                     </div>
-                </div>
-            </div>
-        {% endif %}
-    {% else %}
-        <div class="row justify-content-center">
-            <div class="col-12 col-md-8 col-lg-6">
+                {% endif %}
+            {% else %}
                 <div class="alert alert-info text-center shadow-lg" role="alert">
                     <i class="fas fa-info-circle me-2"></i> Veuillez choisir une ville et une formation pour lancer la recherche.
                 </div>
-            </div>
+            {% endif %}
         </div>
-    {% endif %}
 
+        {% if isSearchDone %}
+        <div class="col-12 col-xl-7">
+            {% if datas | length > 0 %}
+            <div class="card shadow-lg mb-5">
+                <div class="card-header bg-info text-white py-3">
+                    <h5 class="my-1"><i class="fas fa-map me-2"></i> Carte des résultats</h5>
+                </div>
+                <div class="card-body p-0">
+                    {{ ux_map(map, {'data-controller': 'mymap', 'controller_id': false, style: 'height: 650px; border-radius: 0 0 8px 8px;'}) }}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
 </div>
 
 {% endblock %}
@@ -154,6 +142,8 @@
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.querySelector('form');
             const submitButton = document.getElementById('submit-button');
+            const buttonTextSpan = submitButton.querySelector('.button-text');
+            const spinnerSpan = submitButton.querySelector('.spinner-border');
             const collapseElement = document.getElementById('searchFormCollapse');
             const collapsedText = document.querySelector('.collapsed-text');
             const expandedText = document.querySelector('.expanded-text');
@@ -162,9 +152,19 @@
             if (form && submitButton) {
                 // Handle the button state on form submit
                 form.addEventListener('submit', function(event) {
-                    submitButton.querySelector('.spinner-border').classList.remove('d-none');
-                    submitButton.querySelector('.button-text').classList.add('d-none');
+                    // Étape 1 : Met à jour le bouton pour afficher le spinner et le texte de chargement.
+                    spinnerSpan.classList.remove('d-none');
+                    buttonTextSpan.innerHTML = 'Recherche en cours...';
                     submitButton.disabled = true;
+
+                    // Étape 2 : Permet au navigateur de faire la mise à jour visuelle avant de continuer.
+                    // On utilise une petite temporisation pour garantir le rendu visuel.
+                    setTimeout(() => {
+                        // Pas besoin de prévenir le rechargement de la page ici,
+                        // car le comportement par défaut est de soumettre le formulaire
+                        // après cette courte pause.
+                        // Rien à faire de plus, le formulaire va se soumettre naturellement.
+                    }, 50); // Un délai de 50ms est suffisant pour le rendu
                 });
             }
 

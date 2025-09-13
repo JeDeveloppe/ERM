@@ -217,24 +217,6 @@ class GeocodingService
                 'duration' => null,
                 'error'    => 'OSRM API request failed: ' . $e->getMessage()
             ];
-        } finally {
-
-            $user = $this->security->getUser();
-
-            $endTime = microtime(true);
-            $durationInSeconds = $endTime - $startTime;
-
-            $log = new ApiLog();
-            $log
-                ->setService('OSRM')
-                ->setEndPoint($endpoint)
-                ->setStatus($requestStatus)
-                ->setErrorMessage($errorMessage)
-                ->setUser($user)
-                ->setLoggedAt(new \DateTimeImmutable('now', new \DateTimeZone('Europe/Paris')))
-                ->setDuration($durationInSeconds);
-            $this->em->persist($log);
-            $this->em->flush();
         }
     }
 

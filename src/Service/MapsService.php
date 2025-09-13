@@ -4,19 +4,20 @@ namespace App\Service;
 
 use App\Entity\Cgo;
 use App\Entity\City;
+use Twig\Environment;
 use App\Entity\Manager;
 use Symfony\UX\Map\Map;
 use App\Entity\ShopClass;
 use Symfony\UX\Map\Point;
 use Symfony\UX\Map\Marker;
 use Symfony\UX\Map\Polygon;
+use App\Custom\CustomUxIcon;
 use Symfony\UX\Map\Icon\Icon;
 use Symfony\UX\Map\InfoWindow;
 use App\Repository\CgoRepository;
 use App\Repository\ShopRepository;
 use App\Repository\ZoneErmRepository;
 use App\Repository\RegionErmRepository;
-use Symfony\UX\Map\MapOptionsInterface;
 use App\Repository\DepartmentRepository;
 use App\Repository\TechnicianRepository;
 use App\Repository\TelematicAreaRepository;
@@ -24,9 +25,7 @@ use App\Repository\TechnicalAdvisorRepository;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\UX\Map\Bridge\Leaflet\LeafletOptions;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\Serializer\Encoder\JsonDecode;
 use Symfony\UX\Map\Bridge\Leaflet\Option\TileLayer;
-use Twig\Environment;
 
 class MapsService
 {
