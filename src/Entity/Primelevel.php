@@ -24,6 +24,9 @@ class Primelevel
     #[ORM\Column]
     private ?float $percentage = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $version = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -61,6 +64,18 @@ class Primelevel
     public function setPercentage(float $percentage): static
     {
         $this->percentage = $percentage;
+
+        return $this;
+    }
+
+    public function getVersion(): ?string
+    {
+        return $this->version;
+    }
+
+    public function setVersion(?string $version): static
+    {
+        $this->version = $version;
 
         return $this;
     }

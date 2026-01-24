@@ -4,9 +4,10 @@ namespace App\Controller\Admin;
 
 use App\Entity\Primelevel;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
-use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 
 class PrimelevelCrudController extends AbstractCrudController
 {
@@ -22,6 +23,7 @@ class PrimelevelCrudController extends AbstractCrudController
             IntegerField::new('start', 'De'),
             IntegerField::new('end', 'A'),
             NumberField::new('percentage', 'Pourcentage'),
+            TextField::new('version', 'Version')->setRequired(true),
         ];
     }
 

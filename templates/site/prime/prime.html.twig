@@ -8,39 +8,99 @@
     <h1 class="text-center mb-4">{{ title }}</h1>
 
     <div class="row justify-content-center">
-        {% if primeByPerson is not null %}
+        {# --- ZONE DE RÉSULTAT (S'affiche après calcul) --- #}
+        {% if primeByPersonNew is not null %}
             <div class="col-12 col-md-10 col-lg-8">
-                <div class="card shadow-sm mb-4">
-                    <div class="card-header bg-success text-white text-center">
-                        <h5 class="my-1">Résultat du calcul</h5>
+                <div class="card shadow-sm mb-4 border-primary">
+                    <div class="card-header bg-primary text-white text-center">
+                        <h5 class="my-1">Résultat du calcul (Comparatif)</h5>
                     </div>
                     <div class="card-body p-4 text-center">
-                        <h4 class="text-warning">
-                            Prime par personne : {{ primeByPerson|number_format(2, '.', ',') }} €
-                            <span class="small fst-italic fw-light d-block mt-1">(pour 100% de présence)</span>
-                        </h4>
+                        <div class="row">
+                            <div class="col-6 border-end">
+                                <h6 class="text-muted">Ancien Barème ({{ form.versionOld.vars.data }})</h6>
+                                <h4 class="text-secondary">{{ primeByPersonOld|number_format(2, '.', ',') }} €</h4>
+                            </div>
+                            <div class="col-6">
+                                <h6 class="text-primary fw-bold">Nouveau Barème ({{ form.versionNew.vars.data }})</h6>
+                                <h4 class="text-success">{{ primeByPersonNew|number_format(2, '.', ',') }} €</h4>
+                            </div>
+                        </div>
                         
+                        <div class="mt-4 p-4 bg-light border rounded shadow-sm">
+                            <h5 class="text-center mb-3">Analyse de la Transition {{ form.versionOld.vars.data }} → {{ form.versionNew.vars.data }}</h5>
+                            
+                            {# Récupération dynamique du bonus depuis le formulaire #}
+                            {% set bonus = form.compensationBonus.vars.data|default(0) %}
+                            {% set totalNewWithBonus = primeByPersonNew + bonus %}
+                            {% set deltaReel = totalNewWithBonus - primeByPersonOld %}
+
+                            <div class="row text-center align-items-center">
+                                {# Colonne Ancien Système #}
+                                <div class="col-md-4">
+                                    <span class="text-muted small d-block">Base {{ form.versionOld.vars.data }}</span>
+                                    <span class="h4">{{ primeByPersonOld|number_format(2, ',', ' ') }} €</span>
+                                </div>
+
+                                {# Colonne Flèche / Comparateur #}
+                                <div class="col-md-4">
+                                    <div class="d-flex flex-column align-items-center">
+                                        <span class="badge bg-info mb-2">+ {{ bonus }} € (Compensation)</span>
+                                        <i class="fas fa-arrow-right fa-lg text-primary"></i>
+                                    </div>
+                                </div>
+
+                                {# Colonne Nouveau Système avec Bonus #}
+                                <div class="col-md-4">
+                                    <span class="text-muted small d-block">Total {{ form.versionNew.vars.data }} (Barème + Bonus)</span>
+                                    <span class="h4 text-primary">{{ totalNewWithBonus|number_format(2, ',', ' ') }} €</span>
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            <div class="text-center">
+                                <p class="mb-2">Impact net :</p>
+                                <div class="d-inline-flex align-items-center gap-3">
+                                    {# Le badge de gain ou perte RÉEL #}
+                                    <span class="badge {{ deltaReel >= 0 ? 'bg-success' : 'bg-danger' }} fs-5 p-2">
+                                        {{ deltaReel >= 0 ? 'Gain réel : +' : 'Perte réelle : ' }}{{ deltaReel|number_format(2, ',', ' ') }} €
+                                    </span>
+
+                                    {# Badge Bonus dynamique #}
+                                    <span class="badge bg-dark fs-5 p-2" title="Bonus de rattrapage inclus">
+                                        + {{ bonus }} €
+                                    </span>
+                                </div>
+                                
+                                {% if deltaReel < 0 %}
+                                    <div class="alert alert-warning mt-3 mb-0 py-2 small">
+                                        <i class="fas fa-exclamation-triangle me-2"></i>
+                                        Malgré le bonus de {{ bonus }} €, le nouveau barème reste moins avantageux de {{ deltaReel|abs|number_format(2) }} € sur ce palier.
+                                    </div>
+                                {% else %}
+                                    <div class="alert alert-success mt-3 mb-0 py-2 small">
+                                        <i class="fas fa-check-circle me-2"></i>
+                                        Le nouveau barème combiné au bonus est avantageux (+ {{ deltaReel|number_format(2) }} €).
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
                         <hr class="my-4">
                         
                         <div class="row justify-content-center">
                             <div class="col-12 col-md-8">
-                                <h6 class="text-muted mb-3">Informations pour le prochain palier</h6>
+                                <h6 class="text-muted mb-3">Objectif Prochain Palier (Nouveau Barème)</h6>
                                 <table class="table table-sm table-striped mb-0">
                                     <tbody>
                                         <tr>
                                             <td class="text-start"><strong>PS Totale :</strong></td>
-                                            <td class="text-end">{{ infosForNextLevel.nextPsForNextLevel }}</td>
+                                            <td class="text-end text-primary fw-bold">{{ infosForNextLevel.nextPsForNextLevel }}</td>
                                         </tr>
                                         <tr>
                                             <td class="text-start"><strong>Reste à faire :</strong></td>
-                                            <td class="text-end">{{ infosForNextLevel.psDifference }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-start"><strong>Prime par personne :</strong></td>
-                                            <td class="text-end">
-                                                Mini: {{ infosForNextLevel.startPrime|number_format(2, '.', ',') }} € - 
-                                                Max: {{ infosForNextLevel.endPrime|number_format(2, '.', ',') }} €
-                                            </td>
+                                            <td class="text-end text-danger">{{ infosForNextLevel.psDifference }}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -52,72 +112,107 @@
                     </div>
                 </div>
             </div>
+
+        {# --- ZONE FORMULAIRE (S'affiche par défaut) --- #}
         {% else %}
-            <div class="col-12 col-md-8 col-lg-6">
+            <div class="col-12 col-md-10 col-lg-8">
                 <div class="card shadow-sm mb-4">
                     <div class="card-header bg-info text-white text-center">
-                        <h5 class="my-1">Estimation de la prime par personne</h5>
+                        <h5 class="my-1">Estimation et Comparaison de Prime</h5>
                     </div>
                     <div class="card-body">
-                        {{ form_start(form, {'attr': {'class': 'd-flex flex-column align-items-center'}}) }}
-                            <div class="w-100 mb-3">
-                                {{ form_label(form.fullPs, null, {'label_attr': {'class': 'form-label'}}) }}
-                                {{ form_widget(form.fullPs, {'attr': {'class': 'form-control'}}) }}
-                                {{ form_errors(form.fullPs) }}
+                        {{ form_start(form) }}
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    {{ form_label(form.fullPs) }}
+                                    {{ form_widget(form.fullPs) }}
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    {{ form_label(form.divider) }}
+                                    {{ form_widget(form.divider) }}
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    {{ form_label(form.compensationBonus) }}
+                                    {{ form_widget(form.compensationBonus) }}
+                                </div>
                             </div>
-                            <div class="w-100 mb-4">
-                                {{ form_label(form.divider, null, {'label_attr': {'class': 'form-label'}}) }}
-                                {{ form_widget(form.divider, {'attr': {'class': 'form-control'}}) }}
-                                {{ form_errors(form.divider) }}
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    {{ form_label(form.versionOld) }}
+                                    {{ form_widget(form.versionOld) }}
+                                </div>
+                                <div class="col-md-6 mb-4">
+                                    {{ form_label(form.versionNew) }}
+                                    {{ form_widget(form.versionNew) }}
+                                </div>
                             </div>
-                            <button type="submit" class="btn btn-primary btn-lg">Calculer</button>
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary btn-lg px-5">Calculer et Comparer</button>
+                            </div>
                         {{ form_end(form) }}
                     </div>
                 </div>
             </div>
         {% endif %}
 
-        <div class="col-12 col-md-10 col-lg-8">
-            <div class="card shadow-sm mb-5">
-                <div class="card-header bg-dark text-white text-center">
-                    <h5 class="my-1">Tableau des paliers de prime</h5>
+        {# --- ZONE DES TABLEAUX (Toujours visible) --- #}
+        <div class="col-12 mt-2">
+            <div class="row">
+                {# Tableau ANCIEN #}
+                <div class="col-12 col-xl-6">
+                    <div class="card shadow-sm mb-5">
+                        <div class="card-header bg-secondary text-white text-center">
+                            <h6 class="my-1">Paliers : {{ form.versionOld.vars.data|default('Ancien') }}</h6>
+                        </div>
+                        {{ _self.render_prime_table(primeLevelsOld, primeLevelOld, divider) }}
+                    </div>
                 </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-striped table-hover mb-0">
-                            <thead>
-                                <tr class="bg-light">
-                                    <th scope="col" class="text-center">PS de départ</th>
-                                    <th scope="col" class="text-center">PS de fin</th>
-                                    <th scope="col" class="text-center">Pourcentage</th>
-                                    <th scope="col" class="text-center">PS à faire</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for primeLevel in primeLevels %}
-                                    {% set highlightClass = '' %}
-                                    {% if primeLevelFromCalc is not null and primeLevelFromCalc.start == primeLevel.start %}
-                                        {% set highlightClass = 'table-secondary' %}
-                                    {% endif %}
-                                    <tr class="{{ highlightClass }}">
-                                        <td class="text-center">{{ primeLevel.start }}</td>
-                                        <td class="text-center">{{ primeLevel.end }}</td>
-                                        <td class="text-center">{{ primeLevel.percentage / 100 }}</td>
-                                        <td class="text-center">
-                                            {% if primeLevel.start > 0 %}
-                                                {{ primeLevel.start * divider|default(0) | number_format(0, '', ' ') }}
-                                            {% else %}
-                                                Calcul en attente...
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+
+                {# Tableau NOUVEAU #}
+                <div class="col-12 col-xl-6">
+                    <div class="card shadow-sm mb-5">
+                        <div class="card-header bg-dark text-white text-center">
+                            <h6 class="my-1">Paliers : {{ form.versionNew.vars.data|default('Nouveau') }}</h6>
+                        </div>
+                        {{ _self.render_prime_table(primeLevelsNew, primeLevelNew, divider) }}
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+{# --- MACRO POUR LE TABLEAU --- #}
+{% macro render_prime_table(levels, currentLevel, divider) %}
+    <div class="table-responsive">
+        <table class="table table-striped table-hover mb-0">
+            <thead>
+                <tr class="bg-light">
+                    <th class="text-center small">Départ</th>
+                    <th class="text-center small">Fin</th>
+                    <th class="text-center small">%</th>
+                    <th class="text-center small">Seuil (PS)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for level in levels %}
+                    {% set highlight = (currentLevel is not null and currentLevel.start == level.start) ? 'table-warning fw-bold' : '' %}
+                    <tr class="{{ highlight }}">
+                        <td class="text-center">{{ level.start }}</td>
+                        <td class="text-center">{{ level.end }}</td>
+                        <td class="text-center">{{ level.percentage }}%</td>
+                        <td class="text-center">
+                            {% if divider > 0 and level.start > 0 %}
+                                {{ (level.start * divider)|number_format(0, '', ' ') }}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endmacro %}
+
 {% endblock %}

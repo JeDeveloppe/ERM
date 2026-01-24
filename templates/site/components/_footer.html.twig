@@ -3,7 +3,7 @@
     {% set startedAt = 2025 %}
     {% set now = 'now'|date('Y') %}
     {% if startedAt != now %}
-		{{ start }} - {{ now }}
+		{{ startedAt }} - {{ now }}
     {% else %}
         {{ now }}
     {% endif %}
