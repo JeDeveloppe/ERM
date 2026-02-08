@@ -11,8 +11,9 @@ use App\Entity\ShopClass;
 use Symfony\UX\Map\Point;
 use Symfony\UX\Map\Marker;
 use Symfony\UX\Map\Polygon;
-use App\Custom\CustomUxIcon;
-use Symfony\UX\Map\Icon\Icon;
+// use Symfony\UX\Map\Icon\Icon;
+use App\Core\UxMap\CustomIcon as Icon;
+
 use Symfony\UX\Map\InfoWindow;
 use App\Repository\CgoRepository;
 use App\Repository\ShopRepository;
