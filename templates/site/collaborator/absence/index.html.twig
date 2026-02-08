@@ -1,0 +1,290 @@
+{% extends "site/components/_base.html.twig" %}
+
+{% block title %}Historique des Absences
+{% endblock %}
+
+{% block body %}
+	<div
+		class="container py-5">
+		{# --- HEADER (Harmonisé avec la page 1) --- #}
+		<div class="d-flex justify-content-between align-items-center mb-4">
+			<div>
+				<h1 class="fw-900 text-primary mb-0">PILOTAGE RH</h1>
+				<p class="text-muted fw-bold small text-uppercase mb-0">Historique des absences et décomptes</p>
+			</div>
+
+			{# --- BOUTON HEADER (Conditionnel) --- #}
+			{% if collaborators is not empty %}
+				<button type="button" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#addAbsenceModal">
+					<i class="bi bi-plus-lg me-2"></i>Nouvelle Absence
+				</button>
+			{% else %}
+				<button type="button" class="btn btn-secondary rounded-pill px-4 fw-bold shadow-sm opacity-50" disabled data-bs-toggle="tooltip" title="Créez d'abord un collaborateur">
+					<i class="bi bi-plus-lg me-2"></i>Nouvelle Absence
+				</button>
+			{% endif %}
+		</div>
+
+		{# --- NAVIGATION (Identique) --- #}
+		{% include "site/collaborator/_nav.html.twig" %}
+
+		{# --- CAS 1 : LA LISTE DES COLLABORATEURS EST TOTALEMENT VIDE --- #}
+		{% if collaborators is empty %}
+			<div class="card border-0 shadow-sm rounded-4 py-5 mt-4">
+				<div class="card-body text-center py-5">
+					<h2 class="fw-900 text-dark mb-2">Aucun collaborateur trouvé</h2>
+					<p class="text-muted mx-auto mb-4" style="max-width: 450px;">
+						Vous devez d'abord enregistrer des collaborateurs dans votre base RH avant de pouvoir gérer leurs absences ou voir leur historique.
+					</p>
+
+					<a href="{{ path('app_collaborator_index') }}" class="btn btn-primary rounded-pill px-5 fw-bold shadow-sm">
+						<i class="bi bi-person-plus-fill me-2"></i>Créer mon premier collaborateur
+					</a>
+				</div>
+			</div>
+
+			{# --- CAS 2 : DES COLLABORATEURS EXISTENT MAIS AUCUNE ABSENCE (finalData vide) --- #}
+		{% elseif finalData is empty %}
+			<div class="card border-0 shadow-sm rounded-4 py-5 mt-4">
+				<div class="card-body text-center py-5">
+					<h2 class="fw-900 text-dark mb-2">Historique vide</h2>
+					<p class="text-muted mx-auto mb-4" style="max-width: 450px;">
+						Vos collaborateurs sont prêts ! Vous pouvez maintenant commencer à saisir leurs CP, RTT ou JTT.
+					</p>
+
+					<button type="button" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#addAbsenceModal">
+						<i class="bi bi-calendar-plus me-2"></i>Saisir une absence
+					</button>
+				</div>
+			</div>
+
+			{# --- CAS 3 : TOUT EST OK, ON AFFICHE L'HISTORIQUE --- #}
+		{% else %}
+
+			{# --- BOUCLE COLLABORATEURS --- #}
+			{% for collabName, data in finalData %}
+				<div
+					class="card border-0 shadow-sm rounded-4 mb-5 overflow-hidden">
+					{# --- STATS HEADER (Style harmonisé) --- #}
+					<div class="card-header bg-white border-0 p-4 border-bottom">
+						<div class="row align-items-center">
+							<div class="col-md-4">
+								<div class="d-flex align-items-center">
+									<div class="avatar-circle-lg bg-primary text-white me-3 shadow-sm">
+										{{ collabName|first|upper }}
+									</div>
+									<div>
+										<h4 class="fw-bold mb-0 text-dark">{{ collabName|upper }}</h4>
+										<span class="text-muted x-small fw-bold text-uppercase">Collaborateur</span>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-5 border-start border-end px-4">
+								<div class="d-flex justify-content-between mb-1">
+									<span class="x-small fw-bold text-muted text-uppercase">Quota Samedis (CP)</span>
+									<span class="x-small fw-bold {{ data.saturdays >= 5 ? 'text-danger' : 'text-primary' }}">
+										{{ data.saturdays }}
+										/ 5
+									</span>
+								</div>
+								<div class="progress rounded-pill" style="height: 8px; background-color: #f1f5f9;">
+									<div class="progress-bar {{ data.saturdays >= 5 ? 'bg-danger' : 'bg-primary' }}" style="width: {{ (data.saturdays / 5 * 100) }}%"></div>
+								</div>
+							</div>
+							<div class="col-md-3 text-end">
+								<div class="x-small fw-bold text-muted text-uppercase mb-1">Total Décompté</div>
+								<div class="h3 fw-900 text-primary mb-0">{{ data.total }}
+									<span class="fs-6 text-muted">jours</span>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					{# --- TABLEAU --- #}
+					<div class="table-responsive">
+						<table class="table align-middle mb-0 table-hover">
+							<thead class="bg-light">
+								<tr class="x-small text-muted text-uppercase">
+									<th class="ps-4 py-3">Période</th>
+									<th class="text-center">Nature</th>
+									<th class="text-center">Décompte Réel</th>
+									<th class="text-end pe-4">Actions</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for entry in data.entries|reverse %}
+									{% set a = entry.absence %}
+									<tr>
+										<td class="ps-4">
+											<div class="fw-bold text-dark lh-1">Du
+												{{ a.startDate|date('d/m/Y') }}</div>
+											<span class="text-muted x-small">Au
+												{{ a.endDate|date('d/m/Y') }}</span>
+										</td>
+										<td class="text-center">
+											<span class="custom-badge badge-{{ a.type|lower }}">{{ a.type }}</span>
+										</td>
+										<td class="text-center">
+											<div class="lh-1">
+												<span class="fs-5 fw-900 text-dark">{{ entry.duration }}</span>
+												<span class="text-muted x-small fw-bold text-uppercase">jours</span>
+											</div>
+											{% if a.type == 'CP' %}
+												<span class="text-muted" style="font-size: 0.6rem;">
+													<i class="bi bi-info-circle"></i>
+													Règle Samedi
+												</span>
+											{% endif %}
+										</td>
+										<td class="text-end pe-4">
+											<div class="d-flex justify-content-end gap-2">
+												<a href="{{ path('app_collaborator_absence_edit', {'id': a.id}) }}" class="btn-action btn-edit" title="Modifier">
+													<i class="bi bi-pencil-square"></i>
+												</a>
+												<form method="post" action="{{ path('app_collaborator_absence_delete', {'id': a.id}) }}" onsubmit="return confirm('Supprimer ?');" class="d-inline">
+													<input type="hidden" name="_token" value="{{ csrf_token('delete' ~ a.id) }}">
+													<button class="btn-action btn-delete" title="Supprimer">
+														<i class="bi bi-trash3"></i>
+													</button>
+												</form>
+											</div>
+										</td>
+									</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+				</div>
+			{% endfor %}
+		{% endif %}
+	</div>
+
+	<style>
+		/* VARIABLES ET TYPO */
+		body {
+			background-color: #f8fafc;
+			font-family: 'Plus Jakarta Sans', sans-serif;
+		}
+		.fw-900 {
+			font-weight: 900;
+		}
+		.x-small {
+			font-size: 0.7rem;
+		}
+
+		/* AVATARS HARMONISÉS */
+		.avatar-circle-lg {
+			width: 48px;
+			height: 48px;
+			border-radius: 12px; /* Style "Squircle" comme ton avatar CP */
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-weight: 800;
+			font-size: 1rem;
+		}
+
+		/* BADGES NATURE ABSENCE */
+		.custom-badge {
+			padding: 5px 12px;
+			border-radius: 8px;
+			font-size: 0.65rem;
+			font-weight: 800;
+			text-transform: uppercase;
+		}
+		.badge-cp {
+			background: #dcfce7;
+			color: #166534;
+		}
+		.badge-rtt {
+			background: #fef9c3;
+			color: #854d0e;
+		}
+		.badge-jtt {
+			background: #e0f2fe;
+			color: #0369a1;
+		}
+
+		/* BOUTONS ACTIONS HARMONISÉS */
+		.btn-action {
+			width: 34px;
+			height: 34px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			border-radius: 50%;
+			border: 1px solid #e2e8f0;
+			transition: all 0.2s;
+			background: white;
+		}
+		.btn-edit {
+			color: #003399;
+		}
+		.btn-edit:hover {
+			background-color: #003399;
+			color: #fff;
+			transform: translateY(-2px);
+		}
+		.btn-delete {
+			color: #dc3545;
+		}
+		.btn-delete:hover {
+			background-color: #dc3545;
+			color: #fff;
+			transform: translateY(-2px);
+		}
+
+		/* TABLEAU */
+		.table tbody tr {
+			transition: all 0.2s;
+		}
+		.table tbody tr:hover {
+			background-color: #fbfcfe !important;
+		}
+	</style>
+	{# --- MODALE NOUVELLE ABSENCE --- #}
+	<div class="modal fade" id="addAbsenceModal" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content border-0 shadow-lg rounded-4">
+				<div class="modal-header border-0 pb-0">
+					<h5 class="modal-title fw-900 text-primary pt-3 ps-2">
+						<i class="bi bi-calendar-plus me-2"></i>DÉCLARER UNE ABSENCE
+					</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div
+					class="modal-body p-4">
+					{# Assure-toi que ton contrôleur passe bien une variable 'form' à la vue #}
+					{{ form_start(absenceForm) }}
+					<div class="mb-3">
+						<label class="form-label fw-bold small text-uppercase opacity-75">Collaborateur</label>
+						{{ form_widget(absenceForm.collaborator, {'attr': {'class': 'form-select rounded-3'}}) }}
+					</div>
+
+					<div class="row g-3 mb-3">
+						<div class="col-6">
+							<label class="form-label fw-bold small text-uppercase opacity-75">Date de début</label>
+							{{ form_widget(absenceForm.startDate, {'attr': {'class': 'form-control rounded-3'}}) }}
+						</div>
+						<div class="col-6">
+							<label class="form-label fw-bold small text-uppercase opacity-75">Date de fin</label>
+							{{ form_widget(absenceForm.endDate, {'attr': {'class': 'form-control rounded-3'}}) }}
+						</div>
+					</div>
+
+					<div class="mb-4">
+						<label class="form-label fw-bold small text-uppercase opacity-75">Type d'absence</label>
+						{{ form_widget(absenceForm.type, {'attr': {'class': 'form-select rounded-3'}}) }}
+					</div>
+
+					<div class="mt-4">
+						<button type="submit" class="btn btn-primary w-100 fw-bold py-2 shadow-sm rounded-pill">
+							<i class="bi bi-check-lg me-2"></i>Enregistrer l'absence
+						</button>
+					</div>
+					{{ form_end(absenceForm) }}
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}

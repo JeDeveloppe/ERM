@@ -1,0 +1,183 @@
+{% extends "site/components/_base.html.twig" %}
+
+{% block title %}Gestion des Collaborateurs{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    {# --- HEADER --- #}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="fw-900 text-primary mb-0">PILOTAGE RH</h1>
+            <p class="text-muted fw-bold small text-uppercase mb-0">Gestion globale des effectifs</p>
+        </div>
+        
+        {# BOUTON POUR OUVRIR LA MODALE #}
+        <button type="button" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm" data-bs-toggle="modal" data-bs-target="#addCollaboratorModal">
+            <i class="bi bi-plus-lg me-2"></i>Nouveau Collaborateur
+        </button>
+    </div>
+
+    {# --- NAVIGATION --- #}
+    {% include "site/collaborator/_nav.html.twig" %}
+
+    {# --- LISTE PLEINE LARGEUR --- #}
+    <div class="card border-0 shadow-sm overflow-hidden">
+        <div class="table-responsive">
+            <table class="table align-middle mb-0 table-hover">
+                <thead class="bg-light">
+                    <tr class="x-small text-muted text-uppercase">
+                        <th class="ps-4 py-3">Collaborateur</th>
+                        <th class="text-center">CP initial Total</th>
+                        <th class="text-center">RTT initial</th>
+                        <th class="text-center">JTT initial</th>
+                        <th class="text-center">Actions</th>
+                        <th class="text-end pe-4">Dernière maj</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for c in collaborators %}
+                    <tr>
+                        <td class="ps-4">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-circle bg-primary text-white me-3 shadow-sm">
+                                    {{ c.firstName|first|upper }}{{ c.lastName|first|upper }}
+                                </div>
+                                <div>
+                                    <span class="fw-bold d-block text-dark lh-1">{{ c.firstName }} {{ c.lastName|upper }}</span>
+                                    <span class="text-muted x-small">Inscrit le {{ c.updatedAt|date('d/m/Y') }}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge bg-soft-success text-success px-3 py-2 rounded-pill fw-bold">
+                                {{ c.vacationInitial + c.seniorityLeaveInitial }} j
+                            </span>
+                        </td>
+                        <td class="text-center fw-bold text-dark">{{ c.rttInitial }}</td>
+                        <td class="text-center fw-bold text-dark">{{ c.recoveryBalanceInitial }}</td>
+                        <td class="text-center">
+                            <div class="d-flex justify-content-center gap-2">
+                                <a href="{{ path('app_collaborator_edit', {'id': c.id}) }}" class="btn-action btn-edit" title="Modifier">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+                                <a href="{{ path('app_collaborator_absence_index') }}" class="btn-action btn-view" title="Absences">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                            </div>
+                        </td>
+                        <td class="text-end pe-4">
+                            <div class="lh-1">
+                                <small class="text-dark fw-bold d-block small">{{ c.updatedAt|date('d/m/Y') }}</small>
+                                <small class="text-muted x-small opacity-75">{{ c.updatedAt|date('H:i') }}</small>
+                            </div>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5 text-muted">
+                            <i class="bi bi-people fs-1 opacity-25 d-block mb-3"></i>
+                            <p class="fw-bold mb-0">Aucun collaborateur enregistré.</p>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{# --- MODALE D'AJOUT --- #}
+<div class="modal fade" id="addCollaboratorModal" tabindex="-1" aria-labelledby="addCollaboratorModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-900 text-primary pt-3 ps-2" id="addCollaboratorModalLabel">
+                    <i class="bi bi-person-plus-fill me-2"></i>NOUVEAU PROFIL
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4">
+                {{ form_start(form) }}
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small text-uppercase opacity-75">Identité</label>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                {{ form_widget(form.lastName, {'attr': {'placeholder': 'NOM', 'class': 'form-control text-uppercase'}}) }}
+                            </div>
+                            <div class="col-6">
+                                {{ form_widget(form.firstName, {'attr': {'placeholder': 'Prénom', 'class': 'form-control'}}) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="text-muted opacity-25 mb-4">
+
+                    <label class="form-label fw-bold small text-uppercase opacity-75 mb-3">Compteurs Initiaux (Jours)</label>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <label class="x-small fw-bold mb-1">CP initial</label>
+                            {{ form_widget(form.vacationInitial) }}
+                        </div>
+                        <div class="col-6">
+                            <label class="x-small fw-bold mb-1">RTT initial</label>
+                            {{ form_widget(form.rttInitial) }}
+                        </div>
+                        <div class="col-6">
+                            <label class="x-small fw-bold mb-1">Ancienneté initial</label>
+                            {{ form_widget(form.seniorityLeaveInitial) }}
+                        </div>
+                        <div class="col-6">
+                            <label class="x-small fw-bold mb-1">JTT initial</label>
+                            {{ form_widget(form.recoveryBalanceInitial) }}
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-2">
+                        <button type="submit" class="btn btn-primary w-100 fw-bold py-2 shadow-sm rounded-pill">
+                            <i class="bi bi-check-lg me-2"></i>Enregistrer le profil
+                        </button>
+                    </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .fw-900 { font-weight: 900; }
+    .x-small { font-size: 0.7rem; }
+    .bg-soft-success { background-color: rgba(46, 184, 92, 0.12); }
+    
+    .avatar-circle {
+        width: 38px; height: 38px;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 800; font-size: 0.75rem;
+    }
+
+    .table tbody tr { transition: all 0.2s; }
+    .table tbody tr:hover { background-color: #f8fafc !important; }
+
+    .form-control {
+        border-radius: 10px; border: 1px solid #e2e8f0; padding: 0.6rem 0.8rem;
+    }
+    .form-control:focus {
+        border-color: #003399; box-shadow: 0 0 0 3px rgba(0, 51, 153, 0.1);
+    }
+
+    .btn-action {
+        width: 34px; height: 34px;
+        display: flex; align-items: center; justify-content: center;
+        border-radius: 50%; border: 1px solid #eee;
+        transition: all 0.2s ease;
+    }
+    .btn-edit { background-color: #f0f7ff; color: #003399; }
+    .btn-edit:hover { background-color: #003399; color: #fff; transform: translateY(-2px); }
+    .btn-view { background-color: #f8f9fa; color: #333; }
+    .btn-view:hover { background-color: #333; color: #fff; transform: translateY(-2px); }
+
+    /* Modale Design */
+    .modal-content { border: none; }
+    .modal-backdrop.show { opacity: 0.4; }
+</style>
+{% endblock %}

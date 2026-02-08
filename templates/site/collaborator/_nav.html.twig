@@ -1,0 +1,79 @@
+{# Sous-menu de navigation UX #}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="nav-container-rh">
+            {# BOUTON COLLABORATEURS #}
+            <a href="{{ path('app_collaborator_index') }}" 
+                class="nav-item-rh {% if app.request.attributes.get('_route') == 'app_collaborator_index' %}active{% endif %}">
+                <i class="bi bi-people-fill"></i>
+                <span>Collaborateurs</span>
+            </a>
+            
+            {# BOUTON SAISIE ABSENCES #}
+            <a href="{{ path('app_collaborator_absence_index') }}" 
+                class="nav-item-rh {% if 'app_collaborator_absence' in app.request.attributes.get('_route') %}active{% endif %}">
+                <i class="bi bi-calendar-check-fill"></i>
+                <span>Absences</span>
+            </a>
+            
+            {# BOUTON CALENDRIER #}
+            <a href="{{ path('app_collaborator_calendar_index') }}" 
+                class="nav-item-rh {% if 'app_collaborator_calendar' in app.request.attributes.get('_route') %}active{% endif %}">
+                <i class="bi bi-calendar3"></i>
+                <span>Calendrier</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Conteneur de la navigation (Pill invisible) */
+    .nav-container-rh {
+        display: inline-flex;
+        gap: 8px;
+        padding: 6px;
+        background-color: #f1f4f9; /* Gris bleuté très léger */
+        border-radius: 50px;
+        border: 1px solid rgba(0,0,0,0.05);
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.03);
+    }
+
+    /* Style de chaque item */
+    .nav-item-rh {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 24px;
+        border-radius: 40px;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 0.85rem;
+        color: #6c757d;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Survol (Hover) */
+    .nav-item-rh:hover {
+        color: #003399;
+        background-color: rgba(255, 255, 255, 0.6);
+    }
+
+    /* État Actif */
+    .nav-item-rh.active {
+        color: #003399;
+        background-color: #ffffff;
+        box-shadow: 0 4px 12px rgba(0, 51, 153, 0.12);
+        transform: scale(1.02);
+    }
+
+    /* Animation de l'icône active */
+    .nav-item-rh.active i {
+        color: #003399;
+        filter: drop-shadow(0 0 2px rgba(0, 51, 153, 0.2));
+    }
+
+    .nav-item-rh i {
+        font-size: 1.1rem;
+        line-height: 0;
+    }
+</style>

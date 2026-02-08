@@ -14,6 +14,7 @@
                                 <a class="dropdown-item" href="{{ path('app_map_all_shops') }}"><i class="fas fa-store"></i> Tous les centres</a>
                                 <a class="dropdown-item" href="{{ path('app_map_all_shops_under_cgo', {'classeName': 'mv'}) }}"><i class="fas fa-truck-moving"></i> Centres sous CGO MV</a>
                                 <a class="dropdown-item" href="{{ path('app_map_all_shops_under_cgo', {'classeName': 'vl'}) }}"><i class="fas fa-car-side"></i> Centres sous CGO VL</a>
+                                <a class="dropdown-item" href="{{ path('app_map_all_cts') }}"><i class="fas fa-map-marker-alt"></i> Carte des CT</a>
                             </div>
                         </li>
                         <li class="nav-item dropdown">
@@ -24,15 +25,21 @@
                                 <a class="dropdown-item" href="{{ path('app_map_all_zones', {'classeName': 'vl'}) }}"><i class="fas fa-car-side"></i> Toutes les zones VL</a>
                             </div>
                         </li>
+                        {# --- NOUVEAU MENU DÉROULANT PILOTAGE RH --- #}
                         <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"><i class="fas fa-car-crash"></i> CT</a>
+                            <a class="nav-link dropdown-toggle fw-bold" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                                <i class="bi bi-people-fill me-1"></i> PILOTAGE RH
+                            </a>
                             <div class="dropdown-menu">
-                                <a class="dropdown-item" href="{{ path('app_map_all_cts') }}"><i class="fas fa-map-marker-alt"></i> Carte des CT</a>
+                                <a class="dropdown-item" href="{{ path('app_collaborator_index') }}">
+                                    <i class="bi bi-person-lines-fill me-2"></i> Gestion Collaborateurs
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="{{ path('app_prime') }}">
+                                    <i class="bi bi-currency-euro me-2"></i> Calcul prime mensuelle
+                                </a>
                             </div>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ path('app_prime') }}"><i class="fas fa-euro-sign"></i> Calcul prime mensuelle</a>
-                        </li>
+                        </li>                    
                     {% endif %}
                     {% if is_granted('ROLE_MCF') %}
                         <li class="nav-item dropdown">

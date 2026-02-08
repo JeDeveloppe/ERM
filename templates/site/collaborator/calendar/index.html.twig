@@ -1,0 +1,174 @@
+{% extends "site/components/_base.html.twig" %}
+
+{% block title %}Calendrier Planning RH{% endblock %}
+
+{% block body %}
+{# --- TRADUCTION MANUELLE --- #}
+{% set moisFr = ['', 'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'] %}
+{% set joursFr = {'Mon': 'Lun', 'Tue': 'Mar', 'Wed': 'Mer', 'Thu': 'Jeu', 'Fri': 'Ven', 'Sat': 'Sam', 'Sun': 'Dim'} %}
+
+<div class="container-fluid py-5 px-4">
+    {# --- EN-TÊTE --- #}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="fw-900 text-primary mb-0">PILOTAGE RH</h1>
+            <p class="text-muted fw-bold small text-uppercase mb-0">
+                Calendrier des absences — {{ moisFr[currentMonth|date('n')] }} {{ currentMonth|date('Y') }}
+            </p>
+        </div>
+        
+        <div class="d-flex align-items-center gap-3">
+            <div class="d-inline-flex gap-2 align-items-center bg-white p-1 rounded-pill shadow-sm border">
+                <a href="{{ path('app_collaborator_calendar_index', {month: prevMonth|date('m'), year: prevMonth|date('Y')}) }}" class="btn btn-light btn-sm rounded-circle"><i class="bi bi-chevron-left"></i></a>
+                <span class="px-2 fw-bold text-uppercase x-small" style="min-width: 120px; text-align: center;">
+                    {{ moisFr[currentMonth|date('n')] }} {{ currentMonth|date('Y') }}
+                </span>
+                <a href="{{ path('app_collaborator_calendar_index', {month: nextMonth|date('m'), year: nextMonth|date('Y')}) }}" class="btn btn-light btn-sm rounded-circle"><i class="bi bi-chevron-right"></i></a>
+            </div>
+        </div>
+    </div>
+
+    {% include "site/collaborator/_nav.html.twig" %}
+
+    {% if collaborators is empty %}
+        {# --- ÉTAT VIDE : AUCUN COLLABORATEUR --- #}
+        <div class="card border-0 shadow-sm rounded-4 py-5 mt-4">
+            <div class="card-body text-center py-5">
+                <div class="empty-state-container mb-4 mx-auto">
+                    <div class="main-icon-circle shadow-sm bg-soft-warning">
+                        <i class="bi bi-people text-warning"></i>
+                    </div>
+                    <div class="secondary-icon-circle bg-warning shadow-sm border-white">
+                        <i class="bi bi-exclamation-triangle-fill text-white" style="font-size: 0.8rem;"></i>
+                    </div>
+                </div>
+                
+                <h2 class="fw-900 text-dark mb-2">Le calendrier est vide</h2>
+                <p class="text-muted mx-auto mb-4" style="max-width: 450px;">
+                    Aucun collaborateur n'a été trouvé. Vous devez d'abord ajouter des membres à votre équipe pour gérer le planning des absences.
+                </p>
+                
+                <a href="{{ path('app_collaborator_index') }}" class="btn btn-primary rounded-pill px-5 fw-bold shadow-sm">
+                    <i class="bi bi-person-plus-fill me-2"></i>Ajouter des collaborateurs
+                </a>
+            </div>
+        </div>
+    {% else %}
+        {# --- GRILLE CALENDRIER (SI COLLABS EXISTENT) --- #}
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4 mt-4">
+            <div class="table-responsive calendar-container">
+                <table class="table table-bordered mb-0">
+                    <thead>
+                        <tr class="bg-light align-middle text-center">
+                            <th class="sticky-col name-col border-bottom-0">Collaborateur</th>
+                            <th class="quota-col border-bottom-0">Quota S.</th>
+                            {% for day in daysInMonth %}
+                                {% set isWeekend = day|date('N') >= 6 %}
+                                {% set dayName = day|date('D') %}
+                                <th class="day-cell {{ isWeekend ? 'bg-weekend-header' : '' }} border-bottom-0">
+                                    <span class="x-small text-muted text-uppercase d-block lh-1 mb-1">{{ joursFr[dayName] }}</span>
+                                    <span class="fs-6 fw-bold {{ isWeekend ? 'text-primary' : 'text-dark' }}">{{ day|date('d') }}</span>
+                                </th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for collab in collaborators %}
+                            <tr>
+                                <td class="sticky-col name-col fw-bold bg-white border-end">
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-sm-sq me-2 bg-primary-gradient text-white">{{ collab.firstName|first|upper }}</div>
+                                        <span class="text-truncate small">{{ collab.firstName }} {{ collab.lastName|upper }}</span>
+                                    </div>
+                                </td>
+                                <td class="text-center bg-white border-end">
+                                    <span class="badge {{ collab.saturdaysTaken >= 5 ? 'bg-danger' : 'bg-soft-indigo text-indigo' }} rounded-pill x-small">
+                                        {{ collab.saturdaysTaken }}/5
+                                    </span>
+                                </td>
+                                
+                                {% for day in daysInMonth %}
+                                    {% set currentDayStr = day|date('Y-m-d') %}
+                                    {% set dayAbsence = null %}
+                                    
+                                    {% for abs in absences %}
+                                        {% if abs.collaborator.id == collab.id and currentDayStr >= abs.startDate|date('Y-m-d') and currentDayStr <= abs.endDate|date('Y-m-d') %}
+                                            {% set dayAbsence = abs %}
+                                        {% endif %}
+                                    {% endfor %}
+
+                                    <td class="p-0 day-cell {{ day|date('N') == 7 ? 'bg-sunday' : (day|date('N') == 6 ? 'bg-saturday' : '') }}">
+                                        {% if dayAbsence %}
+                                            <div class="absence-segment absence-{{ dayAbsence.type|lower }}" 
+                                                 data-bs-toggle="tooltip" 
+                                                 title="{{ dayAbsence.type }} : {{ dayAbsence.startDate|date('d/m') }} au {{ dayAbsence.endDate|date('d/m') }}">
+                                            </div>
+                                        {% endif %}
+                                    </td>
+                                {% endfor %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        {# --- LÉGENDE --- #}
+        <div class="d-flex gap-4 justify-content-center bg-white py-3 rounded-pill shadow-sm border mx-auto" style="max-width: 750px;">
+            <div class="d-flex align-items-center"><span class="legend-dot bg-cp"></span> <small class="fw-bold ms-2 text-muted x-small text-uppercase">Congés Payés</small></div>
+            <div class="d-flex align-items-center"><span class="legend-dot bg-rtt"></span> <small class="fw-bold ms-2 text-muted x-small text-uppercase">RTT</small></div>
+            <div class="d-flex align-items-center"><span class="legend-dot bg-jtt"></span> <small class="fw-bold ms-2 text-muted x-small text-uppercase">JTT / Récup'</small></div>
+            <div class="d-flex align-items-center border-start ps-4"><span class="legend-dot bg-weekend-header border"></span> <small class="fw-bold ms-2 text-muted x-small text-uppercase">Week-end</small></div>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+    body { background-color: #f4f7fe; font-family: 'Plus Jakarta Sans', sans-serif; }
+    .fw-900 { font-weight: 900; }
+    .x-small { font-size: 0.7rem; }
+    
+    .sticky-col { position: sticky; left: 0; z-index: 5; background: white; min-width: 190px; box-shadow: 4px 0 10px rgba(0,0,0,0.02); }
+    .day-cell { min-width: 44px; height: 52px; vertical-align: middle; border-color: #e2e8f0 !important; }
+    
+    /* Styles Empty State */
+    .empty-state-container { position: relative; width: 120px; height: 120px; }
+    .main-icon-circle { width: 100px; height: 100px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3rem; }
+    .bg-soft-warning { background-color: #fff9db; }
+    .secondary-icon-circle { position: absolute; bottom: 5px; right: 5px; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 4px solid #fff; }
+
+    /* Couleurs de fond Week-end */
+    .bg-weekend-header { background-color: #edf2ff !important; }
+    .bg-saturday { background-color: #f8faff !important; }
+    .bg-sunday { background-color: #f1f4ff !important; }
+
+    /* Avatar Squircle */
+    .avatar-sm-sq { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 800; }
+    .bg-primary-gradient { background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); }
+
+    /* Couleurs Absences SaaS Cool */
+    .absence-segment { height: 36px; width: 100%; transition: transform 0.1s; cursor: pointer; }
+    .absence-segment:hover { transform: scaleY(1.1); z-index: 2; position: relative; }
+    
+    .absence-cp, .bg-cp { background-color: #4ade80 !important; }
+    .absence-rtt, .bg-rtt { background-color: #38bdf8 !important; }
+    .absence-jtt, .bg-jtt { background-color: #fb7185 !important; }
+
+    .bg-soft-indigo { background-color: #e0e7ff; }
+    .text-indigo { color: #4338ca; }
+    .legend-dot { width: 12px; height: 12px; border-radius: 4px; }
+    
+    .calendar-container::-webkit-scrollbar { height: 8px; }
+    .calendar-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+    })
+</script>
+
+{% endblock %}

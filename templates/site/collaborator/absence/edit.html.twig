@@ -1,0 +1,137 @@
+{% extends "site/components/_base.html.twig" %}
+
+{% block title %}Modifier l'absence{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+{# --- BOUTON RETOUR --- #}
+            <div class="mb-4">
+                <a href="{{ path('app_collaborator_absence_index') }}" class="btn btn-light rounded-pill px-4 fw-bold text-muted border shadow-sm btn-sm">
+                    <i class="bi bi-arrow-left me-2"></i>Retour à la liste
+                </a>
+            </div>
+
+    <div class="row justify-content-center">
+        <div class="col-xl-5 col-lg-7">
+            
+            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                {# HEADER #}
+                <div class="card-header bg-primary py-4 border-0 text-center">
+                    <div class="avatar-edit shadow-sm mb-3">
+                        <i class="bi bi-pencil-fill text-primary fs-4"></i>
+                    </div>
+                    <h4 class="mb-0 fw-900 text-white text-uppercase">Mise à jour</h4>
+                </div>
+
+                <div class="card-body p-4 p-md-5">
+                    {{ form_start(form) }}
+                        
+                        {# SECTION COLLABORATEUR : STATIQUE ET VISUELLE #}
+                        <div class="mb-4">
+                            <label class="form-label-custom">Collaborateur (non modifiable)</label>
+                            <div class="d-flex align-items-center p-3 rounded-4 bg-light border border-dashed">
+                                <div class="avatar-circle bg-primary text-white me-3 shadow-sm" style="width: 48px; height: 48px; flex-shrink: 0; font-size: 1rem;">
+                                    {{ absence.collaborator.firstName|first|upper }}{{ absence.collaborator.lastName|first|upper }}
+                                </div>
+                                <div class="overflow-hidden">
+                                    <h6 class="mb-0 fw-bold text-dark text-truncate">
+                                        {{ absence.collaborator.firstName }} {{ absence.collaborator.lastName|upper }}
+                                    </h6>
+                                    <span class="x-small text-muted fw-bold text-uppercase opacity-75">Saisie rattachée</span>
+                                </div>
+                            </div>
+                            {# Le widget est présent mais caché pour Symfony #}
+                            <div class="d-none">
+                                {{ form_widget(form.collaborator) }}
+                            </div>
+                        </div>
+
+                        {# SECTION TYPE #}
+                        <div class="form-group-custom mb-4">
+                            <label class="form-label-custom">Type de repos</label>
+                            {{ form_widget(form.type, {'attr': {'class': 'form-select fw-bold'}}) }}
+                        </div>
+
+                        <hr class="my-4 opacity-25">
+
+                        {# SECTION DATES #}
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <label class="form-label-custom text-center d-block">Date de début</label>
+                                {{ form_widget(form.startDate, {'attr': {'class': 'form-control text-center py-2 fw-bold'}}) }}
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label-custom text-center d-block">Date de fin</label>
+                                {{ form_widget(form.endDate, {'attr': {'class': 'form-control text-center py-2 fw-bold'}}) }}
+                            </div>
+                        </div>
+
+                        {# ACTIONS #}
+                        <div class="mt-5 d-flex flex-column gap-3">
+                            <button type="submit" class="btn btn-primary btn-lg rounded-pill fw-bold shadow-sm py-3">
+                                <i class="bi bi-cloud-arrow-up-fill me-2"></i>Enregistrer les changements
+                            </button>
+                            <a href="{{ path('app_collaborator_absence_index') }}" class="btn btn-link text-muted text-decoration-none fw-bold small text-center">
+                                <i class="bi bi-x-lg me-1"></i> Annuler
+                            </a>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+
+            <p class="text-center text-muted mt-4 x-small fw-bold text-uppercase opacity-50">
+                Saisie #{{ absence.id }} • Créée le {{ absence.createdAt|date('d/m/Y') }}
+            </p>
+        </div>
+    </div>
+</div>
+
+<style>
+    .fw-900 { font-weight: 900; }
+    .x-small { font-size: 0.7rem; }
+    
+    .avatar-edit {
+        width: 64px; height: 64px;
+        background: white;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        margin: 0 auto;
+    }
+
+    .form-label-custom {
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        color: #6c757d;
+        margin-bottom: 10px;
+        letter-spacing: 0.5px;
+    }
+
+    .form-control, .form-select {
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        transition: all 0.2s ease;
+        padding: 0.75rem;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #003399;
+        box-shadow: 0 0 0 4px rgba(0, 51, 153, 0.1);
+    }
+
+    /* Style pour le bloc collaborateur statique */
+    .border-dashed {
+        border-style: dashed !important;
+        border-width: 2px !important;
+        background-color: #f8fafc !important;
+    }
+
+    .avatar-circle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        font-weight: 800;
+    }
+</style>
+{% endblock %}

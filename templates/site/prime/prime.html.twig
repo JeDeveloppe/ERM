@@ -123,14 +123,16 @@
                     <div class="card-body">
                         {{ form_start(form) }}
                             <div class="row">
-                                <div class="col-md-4 mb-3">
+                                <div class="col-md-6 mb-3">
                                     {{ form_label(form.fullPs) }}
                                     {{ form_widget(form.fullPs) }}
                                 </div>
-                                <div class="col-md-4 mb-3">
+                                <div class="col-md-6 mb-3">
                                     {{ form_label(form.divider) }}
                                     {{ form_widget(form.divider) }}
                                 </div>
+                            </div>
+                            <div class="row">
                                 <div class="col-md-4 mb-3">
                                     {{ form_label(form.compensationBonus) }}
                                     {{ form_widget(form.compensationBonus) }}
@@ -147,7 +149,7 @@
                                 </div>
                             </div>
                             <div class="text-center">
-                                <button type="submit" class="btn btn-primary btn-lg px-5">Calculer et Comparer</button>
+                                <button type="submit" class="btn btn-primary btn-lg px-5">Calculer et comparer</button>
                             </div>
                         {{ form_end(form) }}
                     </div>

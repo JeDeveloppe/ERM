@@ -41,6 +41,7 @@ security:
         - { path: ^/prime, roles: ROLE_ERM }
         - { path: ^/distance, roles: ROLE_ERM }
         - { path: ^/telematique, roles: ROLE_MCF }
+        - { path: ^/collaborateurs, roles: ROLE_ERM }
     role_hierarchy:
         ROLE_SUPER_ADMIN: ROLE_ADMIN,ROLE_MCF_ADMIN,ROLE_ERM_ADMIN
         ROLE_MCF_ADMIN: ROLE_ADMIN,ROLE_MCF

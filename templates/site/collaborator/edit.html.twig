@@ -1,0 +1,127 @@
+{% extends "site/components/_base.html.twig" %}
+
+{% block title %}Modifier {{ collaborator.firstName }}{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-xl-7 col-lg-9">
+            
+            {# Fil d'ariane / Retour #}
+            <nav aria-label="breadcrumb" class="mb-4">
+                <a href="{{ path('app_collaborator_index') }}" class="text-decoration-none text-muted fw-bold">
+                    <i class="bi bi-arrow-left me-1"></i> Retour à la liste
+                </a>
+            </nav>
+
+            <div class="card border-0 shadow-lg overflow-hidden">
+                <div class="row g-0">
+                    {# Panneau Latéral Gauche (Infos rapides) #}
+                    <div class="col-md-4 bg-primary text-white d-flex flex-column align-items-center justify-content-center p-4 text-center">
+                        <div class="avatar-circle bg-white text-primary mx-auto mb-3 shadow-sm" style="width: 80px; height: 80px; font-size: 1.8rem;">
+                            {{ collaborator.firstName|first }}{{ collaborator.lastName|first }}
+                        </div>
+                        <h3 class="fw-900 mb-1">{{ collaborator.firstName }}</h3>
+                        <p class="text-uppercase small fw-bold opacity-75">{{ collaborator.lastName }}</p>
+                        
+                        <div class="mt-4 pt-4 border-top border-white border-opacity-25 w-100 text-start">
+                            <label class="x-small text-uppercase opacity-75 fw-bold d-block mb-1">Dernière modification</label>
+                            <p class="small mb-0"><i class="bi bi-calendar3 me-2"></i>{{ collaborator.updatedAt|date('d/m/Y') }}</p>
+                        </div>
+                    </div>
+
+                    {# Formulaire à Droite #}
+                    <div class="col-md-8 bg-white p-4 p-lg-5">
+                        <div class="d-flex justify-content-between align-items-start mb-4">
+                            <h2 class="fw-900 text-dark mb-0">ÉDITION DES COMPTEURS</h2>
+                        </div>
+
+                        {{ form_start(form) }}
+                            <div class="row g-3">
+                                <div class="col-6">
+                                    <label class="form-label fw-bold small">Nom</label>
+                                    {{ form_widget(form.lastName) }}
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label fw-bold small">Prénom</label>
+                                    {{ form_widget(form.firstName) }}
+                                </div>
+                                
+                                <div class="col-12 my-3"><hr class="opacity-10"></div>
+
+                                <div class="col-6">
+                                    <label class="form-label fw-bold small">CP Initial</label>
+                                    {{ form_widget(form.vacationInitial) }}
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label fw-bold small">RTT</label>
+                                    {{ form_widget(form.rttInitial) }}
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label fw-bold small">Ancienneté</label>
+                                    {{ form_widget(form.seniorityLeaveInitial) }}
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label fw-bold small">Récup. (JTT)</label>
+                                    {{ form_widget(form.recoveryBalanceInitial) }}
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex flex-column gap-3 mt-5">
+                                <button type="submit" class="btn btn-primary fw-bold py-3 shadow-sm">
+                                    <i class="bi bi-cloud-check me-2"></i>Enregistrer les modifications
+                                </button>
+                                
+                                <div class="d-flex justify-content-between align-items-center mt-2">
+                                    <a href="{{ path('app_collaborator_index') }}" class="text-muted small fw-bold text-decoration-none">Annuler</a>
+                                    
+                                    {# Bouton de suppression #}
+                                    <button type="button" class="btn btn-link text-danger p-0 small fw-bold text-decoration-none" 
+                                            data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                        <i class="bi bi-trash3 me-1"></i>Supprimer le collaborateur
+                                    </button>
+                                </div>
+                            </div>
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# MODAL DE CONFIRMATION DE SUPPRESSION #}
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-body p-4 text-center">
+                <i class="bi bi-exclamation-triangle text-danger fs-1"></i>
+                <h4 class="fw-900 mt-3">CONFIRMER LA SUPPRESSION ?</h4>
+                <p class="text-muted">Vous allez supprimer définitivement <strong>{{ collaborator.firstName }} {{ collaborator.lastName }}</strong> et tous ses compteurs associés.</p>
+                
+                <div class="d-flex gap-2 justify-content-center mt-4">
+                    <button type="button" class="btn btn-light px-4 fw-bold" data-bs-box="dismiss" data-bs-dismiss="modal">Annuler</button>
+                    <form method="post" action="{{ path('app_collaborator_delete', {'id': collaborator.id}) }}">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ collaborator.id) }}">
+                        <button class="btn btn-danger px-4 fw-bold">Oui, supprimer</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .fw-900 { font-weight: 900; }
+    .x-small { font-size: 0.7rem; }
+    .avatar-circle {
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+    }
+    .form-control { border-color: #eee; padding: 0.75rem; }
+    .form-control:focus { border-color: var(--bs-primary); box-shadow: none; }
+</style>
+{% endblock %}

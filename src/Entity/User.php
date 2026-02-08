@@ -75,6 +75,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: ApiLog::class, mappedBy: 'user')]
     private Collection $apiLogs;
 
+    /**
+     * @var Collection<int, Collaborator>
+     */
+    #[ORM\OneToMany(targetEntity: Collaborator::class, mappedBy: 'owner')]
+    private Collection $collaborators;
+
     public function __construct()
     {
         $this->techniciansUpdated = new ArrayCollection();
@@ -83,6 +89,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->telematicAreaUpdated = new ArrayCollection();
         $this->technicianVehiclesUpdated = new ArrayCollection();
         $this->apiLogs = new ArrayCollection();
+        $this->collaborators = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -363,6 +370,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($apiLog->getUser() === $this) {
                 $apiLog->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Collaborator>
+     */
+    public function getCollaborators(): Collection
+    {
+        return $this->collaborators;
+    }
+
+    public function addCollaborator(Collaborator $collaborator): static
+    {
+        if (!$this->collaborators->contains($collaborator)) {
+            $this->collaborators->add($collaborator);
+            $collaborator->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCollaborator(Collaborator $collaborator): static
+    {
+        if ($this->collaborators->removeElement($collaborator)) {
+            // set the owning side to null (unless already changed)
+            if ($collaborator->getOwner() === $this) {
+                $collaborator->setOwner(null);
             }
         }
 
