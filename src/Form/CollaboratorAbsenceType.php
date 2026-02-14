@@ -4,22 +4,30 @@ namespace App\Form;
 
 use App\Entity\Collaborator;
 use App\Entity\CollaboratorAbsence;
-use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
+use App\Repository\CollaboratorRepository;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class CollaboratorAbsenceType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $user = $options['user'];
         $builder
             ->add('collaborator', EntityType::class, [
                 'class' => Collaborator::class,
                 'choice_label' => function(Collaborator $c) {
                     return $c->getFirstName() . ' ' . strtoupper($c->getLastName());
+                },
+                'query_builder' => function (CollaboratorRepository $er) use ($user) {
+                    return $er->createQueryBuilder('c')
+                        ->where('c.owner = :user')
+                        ->setParameter('user', $user)
+                        ->orderBy('c.lastName', 'ASC');
                 },
                 'label' => 'Collaborateur',
                 'placeholder' => 'Sélectionnez un collaborateur', // Affiche une ligne vide au début
@@ -53,6 +61,7 @@ class CollaboratorAbsenceType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => CollaboratorAbsence::class,
+            'user' => null
         ]);
     }
 }

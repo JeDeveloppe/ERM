@@ -12,7 +12,7 @@ class CustomIcon extends UxIcon
      * On surcharge la méthode statique pour retourner notre CustomIcon 
      * au lieu de l'UxIcon standard
      */
-    public static function ux(string $name): self
+    public static function ux(string $name): static
     {
         // On récupère les propriétés par défaut (24x24)
         return new self($name);
@@ -22,7 +22,7 @@ class CustomIcon extends UxIcon
      * VOICI LA MÉTHODE QUE TU VOULAIS :
      * Elle permet de chaîner ->color() comme tu le fais déjà
      */
-    public function color(string $color): self
+    public function color(string $color): static
     {
         $this->color = $color;
         return $this;

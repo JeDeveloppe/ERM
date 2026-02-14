@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-use App\Entity\CollaboratorAbsence;
+use App\Entity\Collaborator;
 use App\Repository\CollaboratorAbsenceRepository;
 
 class CollaboratorService
@@ -12,53 +12,41 @@ class CollaboratorService
     ) {}
 
     /**
-     * Utilisé pour le Calendrier : Calcule les samedis déjà consommés AVANT le mois affiché.
+     * Retourne la liste des jours fériés pour une année donnée.
      */
-    public function getSaturdaysQuotaForCollaborators(array $collaborators, int $year, \DateTimeInterface $startDate): array
+    public function getHolidays(int $year): array
     {
-        $quotas = [];
-        $startOfYear = new \DateTime("$year-01-01");
+        $holidays = [
+            "$year-01-01",
+            "$year-05-01",
+            "$year-05-08",
+            "$year-07-14",
+            "$year-08-15",
+            "$year-11-01",
+            "$year-11-11",
+            "$year-12-25",
+        ];
 
-        foreach ($collaborators as $collab) {
-            // Récupère les CP entre le 1er janvier et le début du mois sélectionné
-            $absencesPrecedentes = $this->absenceRepository->createQueryBuilder('a')
-                ->where('a.collaborator = :collab')
-                ->andWhere('a.type = :type')
-                ->andWhere('a.startDate >= :startOfYear')
-                ->andWhere('a.startDate < :startOfMonth')
-                ->setParameter('collab', $collab)
-                ->setParameter('type', 'CP')
-                ->setParameter('startOfYear', $startOfYear)
-                ->setParameter('startOfMonth', $startDate)
-                ->orderBy('a.startDate', 'ASC')
-                ->getQuery()
-                ->getResult();
+        $easterTimestamp = easter_date($year);
+        $holidays[] = date('Y-m-d', strtotime('+1 day', $easterTimestamp));  // Lundi de Pâques
+        $holidays[] = date('Y-m-d', strtotime('+39 days', $easterTimestamp)); // Ascension
+        $holidays[] = date('Y-m-d', strtotime('+50 days', $easterTimestamp)); // Lundi de Pentecôte
 
-            $count = 0;
-            foreach ($absencesPrecedentes as $absence) {
-                if ($count >= 5) break; // Optimisation : on s'arrête si le quota est plein
-
-                $period = new \DatePeriod(
-                    $absence->getStartDate(),
-                    new \DateInterval('P1D'),
-                    (clone $absence->getEndDate())->modify('+1 day')
-                );
-
-                foreach ($period as $date) {
-                    if ($date->format('N') == 6) { // Samedi
-                        $count++;
-                    }
-                }
-            }
-            $quotas[$collab->getId()] = min($count, 5);
-        }
-
-        return $quotas;
+        return $holidays;
     }
 
     /**
-     * Utilisé pour l'historique/liste : Calcule les durées réelles pour un groupe d'absences
-     * en respectant la chronologie du quota de 5 samedis.
+     * Vérifie si une date précise est un jour férié.
+     */
+    private function isHoliday(\DateTimeInterface $date): bool
+    {
+        $yearHolidays = $this->getHolidays((int)$date->format('Y'));
+        return in_array($date->format('Y-m-d'), $yearHolidays);
+    }
+
+    /**
+     * Calcule les durées réelles en excluant Dimanches ET Jours Fériés.
+     * Pour les CP, on n'inclut le samedi que s'il n'est pas férié et dans le quota de 5.
      */
     public function calculateGroupDurations(array $absences): array
     {
@@ -78,14 +66,19 @@ class CollaboratorService
             foreach ($period as $date) {
                 $dayOfWeek = (int)$date->format('N');
 
-                if ($dayOfWeek === 7) continue; // On ignore le dimanche
+                // 1. Si c'est un dimanche ou un jour férié, on ne décompte JAMAIS
+                if ($dayOfWeek === 7 || $this->isHoliday($date)) {
+                    continue;
+                }
 
-                if ($dayOfWeek === 6) { // Samedi
+                // 2. Gestion spécifique du Samedi (Jour 6)
+                if ($dayOfWeek === 6) {
                     if ($absence->getType() === 'CP' && $saturdayQuota < 5) {
                         $daysToDeduct++;
                         $saturdayQuota++;
                     }
                 } else {
+                    // 3. Jour de semaine classique (Lun-Ven) non férié
                     $daysToDeduct++;
                 }
             }
@@ -96,69 +89,95 @@ class CollaboratorService
     }
 
     /**
-     * Calcule la déduction exacte d'une absence unique (si besoin hors groupe).
+     * Calcule le quota de samedis pour le calendrier, en ignorant les samedis fériés.
      */
-    public function calculateDeduction(CollaboratorAbsence $absence, int $alreadyCountedSaturdays = 0): array
+    public function getSaturdaysQuotaForCollaborators(array $collaborators, int $year, \DateTimeInterface $startDate): array
     {
-        $daysToDeduct = 0;
-        $saturdaysAddedToQuota = 0;
+        $quotas = [];
+        $startOfYear = new \DateTime("$year-01-01");
 
-        $period = new \DatePeriod(
-            $absence->getStartDate(),
-            new \DateInterval('P1D'),
-            (clone $absence->getEndDate())->modify('+1 day')
-        );
+        foreach ($collaborators as $collab) {
+            $absencesPrecedentes = $this->absenceRepository->createQueryBuilder('a')
+                ->where('a.collaborator = :collab')
+                ->andWhere('a.type = :type')
+                ->andWhere('a.startDate >= :startOfYear')
+                ->andWhere('a.startDate < :startOfMonth')
+                ->setParameter('collab', $collab)
+                ->setParameter('type', 'CP')
+                ->setParameter('startOfYear', $startOfYear)
+                ->setParameter('startOfMonth', $startDate)
+                ->orderBy('a.startDate', 'ASC')
+                ->getQuery()
+                ->getResult();
 
-        foreach ($period as $date) {
-            $dayOfWeek = (int)$date->format('N');
+            $count = 0;
+            foreach ($absencesPrecedentes as $absence) {
+                if ($count >= 5) break;
 
-            if ($dayOfWeek !== 7) { 
-                if ($dayOfWeek === 6) { 
-                    if ($absence->getType() === 'CP' && ($alreadyCountedSaturdays + $saturdaysAddedToQuota < 5)) {
-                        $daysToDeduct++;
-                        $saturdaysAddedToQuota++;
+                $period = new \DatePeriod(
+                    $absence->getStartDate(),
+                    new \DateInterval('P1D'),
+                    (clone $absence->getEndDate())->modify('+1 day')
+                );
+
+                foreach ($period as $date) {
+                    // On ne compte le samedi que s'il n'est pas férié
+                    if ($date->format('N') == 6 && !$this->isHoliday($date)) {
+                        $count++;
                     }
-                } else {
-                    $daysToDeduct++;
                 }
             }
+            $quotas[$collab->getId()] = min($count, 5);
         }
 
-        return [
-            'daysToDeduct' => $daysToDeduct,
-            'saturdaysAddedToQuota' => $saturdaysAddedToQuota
-        ];
+        return $quotas;
     }
 
-    /**
-     * Calcule le nombre de samedis impactés pour l'affichage de la jauge UX
-     * (Basé sur le calendrier réel des absences fournies)
-     */
     public function calculateSaturdaysForProgress(array $absences): int
     {
         $saturdaysImpacted = 0;
 
         foreach ($absences as $a) {
-            // Seuls les Congés Payés (CP) comptent pour cette règle
-            if ($a->getType() !== 'CP' || !$a->getStartDate() || !$a->getEndDate()) {
-                continue;
-            }
+            if ($a->getType() !== 'CP' || !$a->getStartDate() || !$a->getEndDate()) continue;
 
-            $start = $a->getStartDate();
-            $end = (clone $a->getEndDate())->modify('+1 day');
-
-            if ($end > $start) {
-                $period = new \DatePeriod($start, new \DateInterval('P1D'), $end);
-                foreach ($period as $date) {
-                    // On compte chaque samedi (Jour 6 de la semaine)
-                    if ($date->format('N') == 6) {
-                        $saturdaysImpacted++;
-                    }
+            $period = new \DatePeriod($a->getStartDate(), new \DateInterval('P1D'), (clone $a->getEndDate())->modify('+1 day'));
+            foreach ($period as $date) {
+                // Un samedi férié ne doit pas impacter la jauge des 5 samedis décomptés
+                if ($date->format('N') == 6 && !$this->isHoliday($date)) {
+                    $saturdaysImpacted++;
                 }
             }
         }
-
-        // On plafonne à 5 pour la jauge, car au-delà, ils ne sont plus décomptés
         return min($saturdaysImpacted, 5);
+    }
+
+    public function getFullDecompte(Collaborator $collaborator, array $absences): array
+    {
+        $durations = $this->calculateGroupDurations($absences);
+        $totalCpInitial = $collaborator->getVacationInitial() + $collaborator->getSeniorityLeaveInitial();
+
+        $stats = [
+            'CONGÉS PAYÉS' => ['total' => $totalCpInitial, 'pris' => 0, 'color' => 'primary'],
+            'RTT' => ['total' => $collaborator->getRttInitial(), 'pris' => 0, 'color' => 'warning'],
+            'JTT' => ['total' => $collaborator->getRecoveryBalanceInitial(), 'pris' => 0, 'color' => 'info'],
+        ];
+
+        foreach ($absences as $absence) {
+            $type = strtoupper($absence->getType());
+            $duration = $durations[$absence->getId()] ?? 0;
+
+            if ($type === 'CP' || $type === 'SENIORITY') {
+                $stats['CONGÉS PAYÉS']['pris'] += $duration;
+            } elseif (isset($stats[$type])) {
+                $stats[$type]['pris'] += $duration;
+            }
+        }
+
+        foreach ($stats as $type => $data) {
+            $stats[$type]['restant'] = $data['total'] - $data['pris'];
+            $stats[$type]['percent'] = $data['total'] > 0 ? ($data['pris'] / $data['total'] * 100) : 0;
+        }
+
+        return $stats;
     }
 }

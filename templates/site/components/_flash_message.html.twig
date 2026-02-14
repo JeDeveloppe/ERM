@@ -1,0 +1,13 @@
+{# --- SECTION MESSAGES FLASH --- #}
+{% for label, messages in app.flashes %}
+	{% for message in messages %}
+		<div class="alert alert-{{ label == 'danger' ? 'danger' : (label == 'success' ? 'success' : 'info') }} alert-dismissible fade show shadow-sm border-0 rounded-4" role="alert">
+			<div class="d-flex align-items-center">
+				<i class="bi {{ label == 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill' }} me-2"></i>
+				<div>{{ message }}</div>
+			</div>
+			<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+		</div>
+	{% endfor %}
+{% endfor %}
+{# --- FIN MESSAGES FLASH --- #}

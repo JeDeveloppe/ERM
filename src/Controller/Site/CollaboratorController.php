@@ -20,7 +20,11 @@ class CollaboratorController extends AbstractController
         EntityManagerInterface $entityManager,
         CollaboratorRepository $collaboratorRepository
     ): Response {
-        // 1. Gestion de la création d'un nouveau collaborateur
+
+        // 1. Récupération de la liste (uniquement ceux de l'utilisateur connecté)
+        $collaborators = $collaboratorRepository->findBy(['owner' => $this->getUser()]);
+
+        // 2. Gestion de la création d'un nouveau collaborateur
         $collaborator = new Collaborator();
         $form = $this->createForm(CollaboratorType::class, $collaborator);
         $form->handleRequest($request);
@@ -37,8 +41,7 @@ class CollaboratorController extends AbstractController
             return $this->redirectToRoute('app_collaborator_index');
         }
 
-        // 2. Récupération de la liste (uniquement ceux de l'utilisateur connecté)
-        $collaborators = $collaboratorRepository->findBy(['owner' => $this->getUser()]);
+ 
 
         return $this->render('site/collaborator/index.html.twig', [
             'collaborators' => $collaborators,

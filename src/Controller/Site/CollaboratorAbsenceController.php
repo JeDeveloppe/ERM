@@ -24,9 +24,14 @@ class CollaboratorAbsenceController extends AbstractController
         CollaboratorRepository $collaboratorRepository,
         CollaboratorService $rhService
     ): Response {
+
+        $user = $this->getUser();
+
         // --- GESTION DU FORMULAIRE D'AJOUT ---
         $absence = new CollaboratorAbsence();
-        $form = $this->createForm(CollaboratorAbsenceType::class, $absence);
+        $form = $this->createForm(CollaboratorAbsenceType::class, $absence, [
+            'user' => $user
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -38,8 +43,12 @@ class CollaboratorAbsenceController extends AbstractController
             return $this->redirectToRoute('app_collaborator_absence_index');
         }
 
+        if ($form->isSubmitted() && !$form->isValid()) {
+            $this->addFlash('danger', 'Une erreur est survenue lors de l\'enregistrement de l\'absence.');
+        }
+
         // --- LOGIQUE DE CALCUL ET GROUPAGE ---
-        
+
         // 1. Récupération des absences (le Repository doit trier par date début ASC)
         $absencesRaw = $absenceRepository->findAbsencesForCurrentYear($this->getUser());
 
@@ -53,32 +62,36 @@ class CollaboratorAbsenceController extends AbstractController
         // 3. Transformation des données pour l'UX
         $finalData = [];
         foreach ($groupedAbsences as $collabName => $absences) {
-            // APPEL AU SERVICE : Calcule les durées réelles (Règle des 5 samedis incluse)
+            // On récupère l'entité Collaborator (via la première absence du groupe)
+            $collaborator = $absences[0]->getCollaborator();
+
+            // 1. APPEL AU SERVICE : On récupère le tableau global des compteurs (CP, RTT, etc.)
+            $stats = $rhService->getFullDecompte($collaborator, $absences);
+
+            // 2. On récupère les durées individuelles pour l'affichage de la liste
             $durations = $rhService->calculateGroupDurations($absences);
-            
-            $totalYearDecompte = 0;
+
             $items = [];
-
             foreach ($absences as $a) {
-                $duration = $durations[$a->getId()] ?? 0;
-                $totalYearDecompte += $duration;
-
                 $items[] = [
                     'absence'  => $a,
-                    'duration' => $duration
+                    'duration' => $durations[$a->getId()] ?? 0
                 ];
             }
 
+            // 3. On assemble tout dans finalData
             $finalData[$collabName] = [
                 'entries'   => $items,
-                'total'     => $totalYearDecompte,
-                'saturdays' => $rhService->calculateSaturdaysForProgress($absences, $durations)
+                'stats'     => $stats, // Contient CP, RTT, RECOVERY, SENIORITY (initial, consommé, restant)
+                'saturdays' => $rhService->calculateSaturdaysForProgress($absences)
             ];
         }
 
+        ksort($finalData);
+        
         return $this->render('site/collaborator/absence/index.html.twig', [
             'finalData' => $finalData,
-            'collaborators' => $collaboratorRepository->findAll(),
+            'collaborators' => $collaboratorRepository->findBy(['owner' => $user]),
             'absenceForm'        => $form->createView(),
         ]);
     }
@@ -90,7 +103,9 @@ class CollaboratorAbsenceController extends AbstractController
             throw $this->createAccessDeniedException();
         }
 
-        $form = $this->createForm(CollaboratorAbsenceType::class, $absence);
+        $form = $this->createForm(CollaboratorAbsenceType::class, $absence, [
+            'user' => $this->getUser()
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

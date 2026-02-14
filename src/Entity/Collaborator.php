@@ -55,6 +55,8 @@ class Collaborator
     #[ORM\OneToMany(mappedBy: 'collaborator', targetEntity: CollaboratorAbsence::class, cascade: ['remove'], orphanRemoval: true)]
     private Collection $absences;
 
+    public int $saturdaysTaken = 0;
+    
     public function __construct()
     {
         // Initialisation par défaut pour éviter les erreurs de calcul

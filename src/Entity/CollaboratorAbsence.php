@@ -29,7 +29,6 @@ class CollaboratorAbsence
     private ?string $type = null; // CP, RTT, ou JTT
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
-    #[Assert\GreaterThanOrEqual('today')]
     private ?\DateTimeImmutable $startDate = null;
 
     #[ORM\Column(type: Types::DATE_IMMUTABLE)]
