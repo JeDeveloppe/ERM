@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\Site;
+namespace App\Controller\Site\Rh;
 
 use App\Entity\Collaborator;
 use App\Form\CollaboratorType;

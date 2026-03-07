@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\Site;
+namespace App\Controller\Site\Prime;
 
 use App\Form\PrimeForTechniciansType;
 use App\Repository\PrimelevelRepository;

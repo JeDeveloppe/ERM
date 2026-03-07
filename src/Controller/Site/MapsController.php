@@ -2,7 +2,6 @@
 
 namespace App\Controller\Site;
 
-use App\Form\SearchTechnicianByDetailsTypeForm;
 use App\Form\TechnicianAdvisorMapOptionsTypeForm;
 use App\Service\MapsService;
 use App\Repository\ShopClassRepository;
