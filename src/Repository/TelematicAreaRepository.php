@@ -18,6 +18,26 @@ class TelematicAreaRepository extends ServiceEntityRepository
 
     
     /**
+     * Précharge departments/cgos/cgo.city/cgo.manager/cgo.manager.roles en 1
+     * requête pour éviter le N+1 lors de l'affichage de la carte des zones
+     * télématiques.
+     *
+     * @return TelematicArea[]
+     */
+    public function findAllWithRelations(): array
+    {
+        return $this->createQueryBuilder('t')
+            ->leftJoin('t.departments', 'departments')->addSelect('departments')
+            ->leftJoin('t.cgos', 'cgos')->addSelect('cgos')
+            ->leftJoin('cgos.city', 'cgoCity')->addSelect('cgoCity')
+            ->leftJoin('cgos.manager', 'manager')->addSelect('manager')
+            ->leftJoin('manager.roles', 'managerRoles')->addSelect('managerRoles')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    /**
     * @return TelematicArea[] Returns an array of TelematicArea objects
     */
     public function findTerritoryFromCgo($cgo): ?TelematicArea

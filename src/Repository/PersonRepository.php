@@ -22,8 +22,16 @@ class PersonRepository extends ServiceEntityRepository
      */
     public function findByRole(string $roleName): array
     {
+        // Précharge shop/workForShops (+ leur ville/personnes/rôles) en 1 requête
+        // pour éviter le N+1 lors de l'affichage de la carte des CT.
         return $this->createQueryBuilder('p')
             ->join('p.roles', 'r')
+            ->leftJoin('p.shop', 'shop')->addSelect('shop')
+            ->leftJoin('shop.city', 'shopCity')->addSelect('shopCity')
+            ->leftJoin('p.workForShops', 'workForShops')->addSelect('workForShops')
+            ->leftJoin('workForShops.city', 'workForShopsCity')->addSelect('workForShopsCity')
+            ->leftJoin('workForShops.people', 'workForShopsPeople')->addSelect('workForShopsPeople')
+            ->leftJoin('workForShopsPeople.roles', 'workForShopsPeopleRoles')->addSelect('workForShopsPeopleRoles')
             ->where('r.name = :roleName')
             ->setParameter('roleName', $roleName)
             ->getQuery()

@@ -16,6 +16,28 @@ class CgoRepository extends ServiceEntityRepository
         parent::__construct($registry, Cgo::class);
     }
 
+    /**
+     * Précharge city/shopsUnderControls/leur ville/leurs personnes/rôles en 1
+     * requête pour éviter le N+1 lors de l'affichage de la carte "centres sous CGO".
+     *
+     * @param mixed $classErm
+     * @return Cgo[]
+     */
+    public function findByClassErmWithRelations($classErm): array
+    {
+        return $this->createQueryBuilder('c')
+            ->leftJoin('c.city', 'city')->addSelect('city')
+            ->leftJoin('c.shopsUnderControls', 'shops')->addSelect('shops')
+            ->leftJoin('shops.city', 'shopCity')->addSelect('shopCity')
+            ->leftJoin('shops.people', 'people')->addSelect('people')
+            ->leftJoin('people.roles', 'peopleRoles')->addSelect('peopleRoles')
+            ->where('c.classErm = :classErm')
+            ->setParameter('classErm', $classErm)
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
     public function findOneCgoByZoneNameAndClasse(string $zoneName, string $classe)
     {
         $query = $this->createQueryBuilder('c')

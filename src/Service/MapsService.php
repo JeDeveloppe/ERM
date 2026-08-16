@@ -56,7 +56,7 @@ class MapsService
     public function constructionMapOfZonesTelematique(): Map
     {
         $map = $this->generationUxMapWithBaseOptions();
-        $areas = $this->telematicAreaRepository->findAll();
+        $areas = $this->telematicAreaRepository->findAllWithRelations();
 
         foreach($areas as $area)
         {
@@ -593,7 +593,7 @@ class MapsService
             : $classErm;
 
         //?on recupere tous les cgos
-        $cgos = $this->cgoRepository->findBy(['classErm' => $cgoClassErm]);
+        $cgos = $this->cgoRepository->findByClassErmWithRelations($cgoClassErm);
 
         $map = $this->generationUxMapWithBaseOptions();
 
