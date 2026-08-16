@@ -209,7 +209,7 @@ class MapsService
 
     public function constructionMapOfRegions(): Map
     {
-        $map = $this->generationUxMapWithBaseOptions();
+        $map = $this->generationUxMapWithBaseOptions(hasMarkersToFit: false);
         $regionErms = $this->regionErmRepository->findAll();
 
         foreach($regionErms as $regionErm)
@@ -228,7 +228,7 @@ class MapsService
 
     public function constructionMapOfZonesByClasseWithUx(string $classeName): Map
     {
-        $map = $this->generationUxMapWithBaseOptions();
+        $map = $this->generationUxMapWithBaseOptions(hasMarkersToFit: false);
 
         // Les zones en base gardent encore l'ancien nom "MV" (jamais renommées en
         // "MX" lors du découpage VL/VI/MX des centres).
@@ -777,13 +777,23 @@ class MapsService
         return $map;
     }
 
-    public function generationUxMapWithBaseOptions()
+    /**
+     * @param bool $hasMarkersToFit false pour les cartes sans marqueur (régions/zones
+     *  en polygones) : on fixe alors un centre/zoom valides sur la France nous-mêmes,
+     *  sinon la carte resterait au zoom(4) par défaut (sous le minZoom(6) du fond de
+     *  carte) et aucune tuile ne s'afficherait. Pour les cartes AVEC marqueurs, on ne
+     *  fixe rien ici : fitBoundsToMarkers() recalculera la bonne position une fois les
+     *  marqueurs ajoutés — fixer un centre/zoom ici en plus ferait charger les tuiles
+     *  OSM deux fois (une fois pour cette position initiale, une fois pour la position
+     *  finale), ce qui multiplie inutilement les requêtes.
+     */
+    public function generationUxMapWithBaseOptions(bool $hasMarkersToFit = true)
     {
-        // Centre/zoom par défaut sur la France : nécessaire pour les cartes sans
-        // marqueur (régions/zones en polygones), où fitBoundsToMarkers ne peut rien
-        // corriger (le zoom(4) précédent était sous le minZoom(6) du fond de carte,
-        // donc aucune tuile ne s'affichait).
-        $map = (new Map())->center(new Point(46.6, 2.2))->zoom(6)->fitBoundsToMarkers(true);
+        $map = (new Map())->fitBoundsToMarkers($hasMarkersToFit);
+
+        if(!$hasMarkersToFit){
+            $map->center(new Point(46.6, 2.2))->zoom(6);
+        }
 
         $leafletOptions = (new LeafletOptions())
             ->tileLayer(new TileLayer(
