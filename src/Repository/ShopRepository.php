@@ -19,6 +19,24 @@ class ShopRepository extends ServiceEntityRepository
     }
 
     /**
+     * Charge tous les centres avec leur ville et les personnes rattachées (+ leurs
+     * rôles) en une seule requête, pour éviter le N+1 (getCity()/getRcsPerson()
+     * déclenchant sinon une requête par centre lors de l'affichage des cartes).
+     *
+     * @return Shop[]
+     */
+    public function findAllWithCityAndPeopleRoles(): array
+    {
+        return $this->createQueryBuilder('s')
+            ->leftJoin('s.city', 'city')->addSelect('city')
+            ->leftJoin('s.people', 'people')->addSelect('people')
+            ->leftJoin('people.roles', 'roles')->addSelect('roles')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
+
+    /**
     * @return Shop[] Returns an array of Shop objects
     */
     public function findAllShopsFromDepartment(Department $department): array

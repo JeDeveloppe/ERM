@@ -178,8 +178,8 @@ class MapsService
 
         //? on recupere l'url de base
         $baseUrl = $this->requestStack->getCurrentRequest()->getScheme() . '://' . $this->requestStack->getCurrentRequest()->getHttpHost() . $this->requestStack->getCurrentRequest()->getBasePath();
-        //?on recupere tous les centres
-        $shops = $this->shopRepository->findAll();
+        //?on recupere tous les centres (ville + personnes/rôles préchargés en 1 requête)
+        $shops = $this->shopRepository->findAllWithCityAndPeopleRoles();
 
         $map = $this->generationUxMapWithBaseOptions();
 
