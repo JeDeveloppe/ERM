@@ -37,7 +37,7 @@ class DistanceController extends AbstractController
                 $isSearchDone = true;
                 $cityOfIntervention = $form->get('city')->getData();
                 $option = $form->get('options')->getData();
-                $classErm = ['MX','MV']; //?on cherche un dépannage par default
+                $classErm = ['MX','MV','VI']; //?on cherche un dépannage par default
 
                 $datas = $this->cgoService->getShopsByClassErmAndOptionArroundCityOfIntervention($cityOfIntervention, $classErm, $option);
                 $map = $this->mapsService->getMapWithInterventionPointAndAllShopsArround($cityOfIntervention, $datas, $option);
