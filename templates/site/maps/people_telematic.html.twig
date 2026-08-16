@@ -8,11 +8,11 @@
     <h1 class="text-center mb-4"><i class="fas fa-map-marked-alt me-2 text-primary"></i>{{ title }}</h1>
 
     <div class="row justify-content-center">
-        <div class="col-12 col-xl-10">
+        <div class="col-12 col-xl-11">
             <div class="card shadow-lg mb-4 border-0">
                 <div class="card-body p-0">
                     {% if mapDonnees is not empty %}
-                        {{ ux_map(mapDonnees, { 'data-controller': 'mymap', 'controller_id': false, style: 'height: 600px; border-radius: 8px;' }) }}
+                        {{ ux_map(mapDonnees, { 'data-controller': 'mymap', 'controller_id': false, style: 'height: 80vh; min-height: 500px; border-radius: 8px;' }) }}
                     {% else %}
                         <div class="alert alert-warning text-center rounded-0 rounded-top" role="alert">
                             <i class="fas fa-exclamation-triangle me-2"></i><strong>Aucun technicien trouvé.</strong> Veuillez ajuster vos critères de recherche.
@@ -22,7 +22,7 @@
             </div>
         </div>
 
-        <div class="col-12 col-xl-10">
+        <div class="col-12 col-xl-11">
             <div class="card shadow-lg border-0">
                 <div class="card-body p-4">
                     <h3 class="card-title text-center mb-4"><i class="fas fa-filter me-2"></i>Filtrer les techniciens télématiques</h3>
