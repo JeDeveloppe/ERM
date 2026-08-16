@@ -25,3 +25,13 @@
 /public/assets/
 /assets/vendor/
 ###< symfony/asset-mapper ###
+
+###> local data (PII, not to be published) ###
+/import/annuaire.csv
+/import/cgoUpdated.csv
+/import/cgos.csv
+/import/ct.csv
+/import/shops.csv
+/import/technicians.csv
+/import/technicians.old.csv
+###< local data (PII, not to be published) ###
