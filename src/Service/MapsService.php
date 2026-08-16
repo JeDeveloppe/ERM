@@ -4,8 +4,9 @@ namespace App\Service;
 
 use App\Entity\Cgo;
 use App\Entity\City;
+use App\Entity\Person;
+use App\Entity\Department;
 use Twig\Environment;
-use App\Entity\Manager;
 use Symfony\UX\Map\Map;
 use App\Entity\ShopClass;
 use Symfony\UX\Map\Point;
@@ -17,12 +18,12 @@ use App\Core\UxMap\CustomIcon as Icon;
 use Symfony\UX\Map\InfoWindow;
 use App\Repository\CgoRepository;
 use App\Repository\ShopRepository;
+use App\Repository\ShopClassRepository;
 use App\Repository\ZoneErmRepository;
 use App\Repository\RegionErmRepository;
 use App\Repository\DepartmentRepository;
-use App\Repository\TechnicianRepository;
+use App\Repository\PersonRepository;
 use App\Repository\TelematicAreaRepository;
-use App\Repository\TechnicalAdvisorRepository;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\UX\Map\Bridge\Leaflet\LeafletOptions;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -37,86 +38,73 @@ class MapsService
             private ZoneErmRepository $zoneErmRepository,
             private RegionErmRepository $regionErmRepository,
             private TelematicAreaRepository $telematicAreaRepository,
-            private TechnicianRepository $technicianRepository,
+            private PersonRepository $personRepository,
             private CgoRepository $cgoRepository,
             private KernelInterface $kernel,
             private DepartmentRepository $departmentRepository,
-            private TechnicalAdvisorRepository $technicalAdvisorRepository,
+            private ShopClassRepository $shopClassRepository,
             private Environment $twig
         ){}
 
     private $COLORS_OF_MARKERS = "#0029D2";
 
-    public function constructionMapOfZonesTelematique()
+    // Tolérance (en degrés) de la simplification Douglas-Peucker appliquée aux
+    // polygones de département : ~0.01° ≈ 1km, largement suffisant pour une carte
+    // de la France entière tout en gardant des formes reconnaissables.
+    private const POLYGON_SIMPLIFICATION_TOLERANCE = 0.01;
+
+    public function constructionMapOfZonesTelematique(): Map
     {
-
-        //? on recupere l'url de base
-        $baseUrl = $this->requestStack->getCurrentRequest()->getScheme() . '://' . $this->requestStack->getCurrentRequest()->getHttpHost() . $this->requestStack->getCurrentRequest()->getBasePath();
-        //?on recupere les shops concernés
+        $map = $this->generationUxMapWithBaseOptions();
         $areas = $this->telematicAreaRepository->findAll();
-
-        $locations = []; //? toutes les réponses seront dans ce tableau final
-        $states = []; //? toutes les réponses seront dans ce tableau final
 
         foreach($areas as $area)
         {
             //?si la zone contient au moins 1 département
-            if($area->getDepartments()->count() > 0){
+            if($area->getDepartments()->count() === 0){
+                continue;
+            }
 
-                $contactCgo = "";
-                foreach($area->getCgos() as $cgo){
-                    //?comment contacter le cgo
-                    if($cgo->getManager() !== null){
+            $color = $area->getTerritoryColor() ?? $this->randomHexadecimalColor();
 
-                        $contactCgo .= '<p><b>' . $cgo->getName() . '</b><br/> ' . $cgo->getManager()->getFirstName() . ' ' . $cgo->getManager()->getLastName() . ' <br/> ' . $cgo->getManager()->getPhone() . '<br/>' . $cgo->getManager()->getEmail().'</p>';
+            $contactCgo = "";
+            foreach($area->getCgos() as $cgo){
+                //?comment contacter le cgo
+                if($cgo->getManager() !== null){
 
-                    }else{
+                    $contactCgo .= '<p><b>' . $cgo->getName() . '</b><br/> ' . $cgo->getManager()->getFirstName() . ' ' . $cgo->getManager()->getName() . ' <br/> ' . $cgo->getManager()->getPhone() . '<br/>' . $cgo->getManager()->getEmail().'</p>';
 
-                        $contactCgo = "MANAGER DE CGO NON RENSEIGNÉ !";
-                    }
+                }else{
+
+                    $contactCgo = "MANAGER DE CGO NON RENSEIGNÉ !";
+                }
+            }
+
+            $this->addDepartmentPolygonsToMap($map, $area->getDepartments(), fn(Department $department) => [
+                'label' => $department->getName().' ('.$department->getCode().')',
+                'color' => $color,
+                'content' => $contactCgo,
+            ]);
+
+            //?on boucle sur les plusieurs cgo possible de la zone
+            foreach($area->getCgos() as $cgo){
+                if (!$cgo->getCity()) {
+                    continue;
                 }
 
-                //?on boucle sur les plusieurs cgo possible de la zone
-                foreach($area->getCgos() as $cgo){
-
-                    $locations[] = 
-                    [
-                        "lat" => $cgo->getCity()->getLatitude() ? $cgo->getCity()->getLatitude() : $cgo->getCity()->getLatitude(),
-                        "lng" => $cgo->getCity()->getLongitude() ? $cgo->getCity()->getLongitude() : $cgo->getCity()->getLongitude(),
-                        "color" => "#000000",
-                        "name" => $cgo->getName(),
-                        "description" => $contactCgo,
-                        "url" => $baseUrl,
-                        "size" => 30,
-                        "type" => "image",
-                        "image_url" => "https://erm.je-developpe.fr/map/images/logoCgo.png"
-                    ];
-
-
-                    //?on traite les departements ratachées au shop
-                    $departments = $area->getDepartments();
-                    foreach($departments as $department){
-
-                        $states[$department->getSimplemapCode()] =
-                        [
-                            "name" => $department->getName().' ('.$department->getCode().')',
-                            "description" => $contactCgo,
-                            "color" => $area->getTerritoryColor(),
-                        ];
-                        
-                    }
-                }
+                $map->addMarker(new Marker(
+                    position: new Point($cgo->getCity()->getLatitude(), $cgo->getCity()->getLongitude()),
+                    icon: Icon::url('../../map/images/logoCgo.png')->width(32)->height(32),
+                    title: $cgo->getName(),
+                    infoWindow: new InfoWindow(
+                        headerContent: $cgo->getName(),
+                        content: $contactCgo,
+                    ),
+                ));
             }
         }
 
-        //?on encode en json
-        $jsonLocations = json_encode($locations, JSON_FORCE_OBJECT); 
-        $jsonStates = json_encode($states, JSON_FORCE_OBJECT); 
-
-        $donnees['locations'] = $jsonLocations;
-        $donnees['states'] = $jsonStates;
-
-        return $donnees;
+        return $map;
     }
 
     public function constructionMapOfAllShops()
@@ -132,13 +120,16 @@ class MapsService
 
         //?on boucle sur les cgos
         foreach($cgos as $cgo){
-            $locations[] = 
+            if (!$cgo->getCity()) {
+                continue;
+            }
+            $locations[] =
             [
                 "lat" => $cgo->getCity()->getLatitude(),
                 "lng" => $cgo->getCity()->getLongitude(),
                 "color" => $cgo->getTerritoryColor() ?? $this->randomHexadecimalColor(),
                 "name" => $cgo->getName().' ('.$cgo->getCm().')',
-                "description" => $cgo->getManager()->getFirstName().' '.$cgo->getManager()->getLastName(),
+                "description" => $cgo->getManager() ? $cgo->getManager()->getFirstName().' '.$cgo->getManager()->getName() : 'MANAGER DE CGO NON RENSEIGNÉ !',
                 "size" => 30,
                 "type" => "image",
                 "image_url" => "https://erm.je-developpe.fr/map/images/logoCgo.png"
@@ -152,10 +143,10 @@ class MapsService
             if(!is_null($shop->getCity()))
             {
 
-                if($shop->getManager() !== null){
+                if($shop->getRcsPerson() !== null){
 
-                    $manager = $shop->getManager();
-                    $contactShop = $manager->getFirstName() . ' ' . $manager->getLastName() . ' <br/> ' . $shop->getManager()->getPhone() . '<br/>' . $manager->getEmail();
+                    $manager = $shop->getRcsPerson();
+                    $contactShop = $manager->getFirstName() . ' ' . $manager->getName() . ' <br/> ' . $shop->getRcsPerson()->getPhone() . '<br/>' . $manager->getEmail();
                 
                 }else{
 
@@ -194,6 +185,9 @@ class MapsService
 
         foreach($shops as $shop)
         {
+            if (!$shop->getCity()) {
+                continue;
+            }
 
             $iconOfShopUnderCgo = Icon::ux('solar:garage-bold')->width(12)->height(12)->color($this->COLORS_OF_MARKERS);
 
@@ -202,7 +196,7 @@ class MapsService
                 icon: $iconOfShopUnderCgo,
                 title: $shop->getName(),
                 infoWindow: new InfoWindow(
-                    content: $shop->getName().'('.$shop->getCm().')<p>'.$shop->getManager()->getFirstNameAndNameOnly().'<br/>'.$shop->getPhone().'</p>',
+                    content: $shop->getName().'('.$shop->getCm().')<p>'.$shop->getRcsPerson()?->getNameAndFirstName().'<br/>'.$shop->getPhone().'</p>',
                 ),
                 extra: [
                     'markerColor' => $this->COLORS_OF_MARKERS
@@ -213,138 +207,75 @@ class MapsService
         return $map;
     }
 
-    public function constructionMapOfRegions()
+    public function constructionMapOfRegions(): Map
     {
-
-        //?on recupere tous les centres
+        $map = $this->generationUxMapWithBaseOptions();
         $regionErms = $this->regionErmRepository->findAll();
-        //?on fait un tableau des couleurs des régions
-        $regionColors = [];
-
-
-        $states = []; //? toutes les réponses seront dans ce tableau final
 
         foreach($regionErms as $regionErm)
         {
+            $color = $regionErm->getTerritoryColor() ?? $this->randomHexadecimalColor();
 
-            $regionColors[$regionErm->getName()] = $this->randomHexadecimalColor();
-
-            //pour chaque zone ou récupère les centres
-            foreach($regionErm->getZoneErms() as $zone){
-
-                $shops = $zone->getShops();
-                //pour chaque shop on recupere le département
-                foreach($shops as $shop){
-                    if($shop->getCity()){
-
-                        $department = $shop->getCity()->getDepartment();
-                        $states[$department->getSimplemapCode()] =
-                            [
-                                "name" => $regionErm->getName(),
-                                "description" => $department->getName().' ('.$department->getCode().')',
-                                "color" => $regionErm->getTerritoryColor() ?? $regionColors[$regionErm->getName()],
-                            ];
-
-                    }else{
-
-                        $noCities[] = $shop->getName();
-                    }
-                }
-            }
+            //?les départements rattachés directement à la région
+            $this->addDepartmentPolygonsToMap($map, $regionErm->getDepartments(), fn(Department $department) => [
+                'label' => $regionErm->getName(),
+                'color' => $color,
+            ]);
         }
-        // $jsonLocations = json_encode($locations, JSON_FORCE_OBJECT); 
-        $jsonStates = json_encode($states, JSON_FORCE_OBJECT); 
 
-        // $donnees['locations'] = $jsonLocations;
-        $donnees['states'] = $jsonStates;
-
-        return $donnees;
+        return $map;
     }
 
-    public function constructionMapOfZonesByClasse(string $classeName)
+    public function constructionMapOfZonesByClasseWithUx(string $classeName): Map
     {
+        $map = $this->generationUxMapWithBaseOptions();
 
-        $states = []; //? toutes les réponses seront dans ce tableau final
+        // Les zones en base gardent encore l'ancien nom "MV" (jamais renommées en
+        // "MX" lors du découpage VL/VI/MX des centres).
+        $zoneClasseName = $classeName === 'MX' ? 'MV' : $classeName;
 
         //on recupere toutes les zones
-        $zones = $this->zoneErmRepository->findByClasse($classeName);
+        $zones = $this->zoneErmRepository->findByClasse($zoneClasseName);
 
-        //pour chaque zone ou récupère les centres
+        // Les zones sont des territoires à l'échelle de la ville : un même département
+        // peut contenir des centres rattachés à plusieurs zones différentes. On ne
+        // garde qu'une seule zone par département (la première trouvée, comme pour les
+        // régions) pour éviter de redessiner le même polygone plusieurs fois.
+        $departments = [];
+        $stylesByDepartment = [];
+
         foreach($zones as $zone){
 
-            $zoneName = $zone->getName();
-            $zoneColors[$zoneName] = $this->randomHexadecimalColor();
-            
-            $shops = $zone->getShops();
+            $color = $zone->getTerritoryColor() ?? $this->randomHexadecimalColor();
 
             $managerOfZone = $zone->getManager();
             if($managerOfZone !== null){
-                $zoneContact = $managerOfZone->getFirstName() . ' ' . $managerOfZone->getLastName() . ' ('.$managerOfZone->getManagerClass()->getName().') <br/> ' . $managerOfZone->getPhone() . '<br/>' . $managerOfZone->getEmail();
+                $roleNames = implode(', ', array_map(fn($role) => $role->getName(), $managerOfZone->getRoles()->toArray()));
+                $zoneContact = $managerOfZone->getFirstName() . ' ' . $managerOfZone->getName() . ' ('.$roleNames.') <br/> ' . $managerOfZone->getPhone() . '<br/>' . $managerOfZone->getEmail();
             }else{
                 $zoneContact = "MANAGER NON RENSEIGNÉ";
             }
 
-            //pour chaque shop on recupere le département
-            foreach($shops as $shop){
-                
-                if($shop->getCity() !== null){
-
-                    $department = $shop->getCity()->getDepartment();
-                    
-                    $states[$department->getSimplemapCode()] =
-                        [
-                            "name" => $department->getName().' ('.$department->getCode().')',
-                            "description" => $zoneName.' <br/>'.$zoneContact,
-                            "color" => $zone->getTerritoryColor() ?? $zoneColors[$zoneName],
-                        ];
+            foreach($zone->getShops() as $shop){
+                if($shop->getCity() === null || $shop->getCity()->getDepartment() === null){
+                    continue;
                 }
+
+                $department = $shop->getCity()->getDepartment();
+                if(isset($stylesByDepartment[$department->getId()])){
+                    continue;
+                }
+
+                $departments[$department->getId()] = $department;
+                $stylesByDepartment[$department->getId()] = [
+                    'label' => $zone->getName(),
+                    'color' => $color,
+                    'content' => $zoneContact,
+                ];
             }
         }
 
-        // $jsonLocations = json_encode($locations, JSON_FORCE_OBJECT); 
-        $jsonStates = json_encode($states, JSON_FORCE_OBJECT); 
-
-        // $donnees['locations'] = $jsonLocations;
-        $donnees['states'] = $jsonStates;
-
-        return $donnees;
-    }
-
-    public function constructionMapOfZonesByClasseWithUx(string $classeName)
-    {
-
-        $map = $this->generationUxMapWithBaseOptions();
-        $gpsPoints = $this->departmentRepository->findAllGpsPoints();
-        $points = [];
-
-        foreach($gpsPoints as $gpsPoint){
-            $data = json_decode($gpsPoint, true);
-            if($data['type'] === 'Polygon'){
-                $coordinates = $data['coordinates'];
-                foreach($coordinates as $coordinate){
-                    foreach($coordinate as $coord){
-                        $points[] = new Point($coord[1], $coord[0]);
-                    }
-                }
-
-            }else{
-                $coordinates = $data['coordinates'];
-                foreach($coordinates as $coordinate){
-                    foreach($coordinate as $coord){
-                        if(is_float($coord[0]) && is_float($coord[1])){
-                            $points[] = new Point($coord[1], $coord[0]);
-                        }else{
-                            foreach($coord as $coord2){
-                                $points[] = new Point($coord2[1], $coord2[0]);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        $map->addPolygon(new Polygon(
-            points: $points
-            ));
+        $this->addDepartmentPolygonsToMap($map, $departments, fn(Department $department) => $stylesByDepartment[$department->getId()]);
 
         return $map;
     }
@@ -357,32 +288,199 @@ class MapsService
         return $color;
     }
 
+    /**
+     * Ajoute un polygone coloré par département sur la carte.
+     *
+     * @param iterable<Department> $departments
+     * @param callable(Department): (array{label: string, color: string, content?: string}|null) $styleResolver
+     */
+    private function addDepartmentPolygonsToMap(Map $map, iterable $departments, callable $styleResolver): void
+    {
+        foreach($departments as $department){
+
+            $gpsPoints = $department->getGpsPoints();
+            if(!$gpsPoints){
+                continue;
+            }
+
+            $style = $styleResolver($department);
+            if(!$style){
+                continue;
+            }
+
+            foreach($this->geoJsonToPolygonPathGroups($gpsPoints) as $paths){
+                if(!$paths){
+                    continue;
+                }
+
+                $map->addPolygon(new Polygon(
+                    points: $paths,
+                    infoWindow: new InfoWindow(
+                        headerContent: $style['label'],
+                        content: $style['content'] ?? ($department->getName().' ('.$department->getCode().')'),
+                    ),
+                    extra: [
+                        'fillColor' => $style['color'],
+                        'color' => '#333333',
+                        'fillOpacity' => 0.45,
+                        'weight' => 1,
+                    ],
+                ));
+            }
+        }
+    }
+
+    /**
+     * Convertit une géométrie GeoJSON (Polygon ou MultiPolygon) en un tableau de
+     * "paths" (chaque path = anneau extérieur + éventuels trous), un groupe par
+     * polygone disjoint (utile pour les MultiPolygon).
+     *
+     * @return array<int, array<int, array<int, Point>>>
+     */
+    private function geoJsonToPolygonPathGroups(array $gpsPoints): array
+    {
+        $type = $gpsPoints['type'] ?? null;
+        $coordinates = $gpsPoints['coordinates'] ?? [];
+
+        if($type === 'MultiPolygon'){
+            $groups = [];
+            foreach($coordinates as $polygonRings){
+                $groups[] = $this->ringsToPointPaths($polygonRings);
+            }
+
+            return $groups;
+        }
+
+        //?'Polygon' (ou format inconnu, traité comme un seul polygone)
+        return [$this->ringsToPointPaths($coordinates)];
+    }
+
+    /**
+     * @return array<int, array<int, Point>>
+     */
+    private function ringsToPointPaths(array $rings): array
+    {
+        $paths = [];
+        foreach($rings as $ring){
+            $coords = [];
+            foreach($ring as $coord){
+                if(isset($coord[0], $coord[1]) && is_numeric($coord[0]) && is_numeric($coord[1])){
+                    $coords[] = [(float) $coord[0], (float) $coord[1]];
+                }
+            }
+
+            // Les frontières GeoJSON stockées sont en résolution complète (jusqu'à
+            // 35 000 points pour un seul département côtier) : bien trop détaillé pour
+            // une carte de la France entière, ça sature la mémoire PHP. On simplifie.
+            $coords = $this->simplifyRing($coords, self::POLYGON_SIMPLIFICATION_TOLERANCE);
+
+            $path = array_map(fn(array $coord) => new Point($coord[1], $coord[0]), $coords);
+            if($path){
+                $paths[] = $path;
+            }
+        }
+
+        return $paths;
+    }
+
+    /**
+     * Simplification de Douglas-Peucker : réduit le nombre de points d'un anneau
+     * tout en conservant sa forme générale (les points les plus "structurants" sont gardés).
+     *
+     * @param array<int, array{0: float, 1: float}> $points
+     * @return array<int, array{0: float, 1: float}>
+     */
+    private function simplifyRing(array $points, float $tolerance): array
+    {
+        $count = count($points);
+        if($count < 3){
+            return $points;
+        }
+
+        $dMax = 0.0;
+        $index = 0;
+        $start = $points[0];
+        $end = $points[$count - 1];
+
+        for($i = 1; $i < $count - 1; $i++){
+            $distance = $this->perpendicularDistance($points[$i], $start, $end);
+            if($distance > $dMax){
+                $index = $i;
+                $dMax = $distance;
+            }
+        }
+
+        if($dMax > $tolerance){
+            $left = $this->simplifyRing(array_slice($points, 0, $index + 1), $tolerance);
+            $right = $this->simplifyRing(array_slice($points, $index), $tolerance);
+
+            return array_merge(array_slice($left, 0, -1), $right);
+        }
+
+        return [$start, $end];
+    }
+
+    /**
+     * @param array{0: float, 1: float} $point
+     * @param array{0: float, 1: float} $lineStart
+     * @param array{0: float, 1: float} $lineEnd
+     */
+    private function perpendicularDistance(array $point, array $lineStart, array $lineEnd): float
+    {
+        [$x, $y] = $point;
+        [$x1, $y1] = $lineStart;
+        [$x2, $y2] = $lineEnd;
+
+        $dx = $x2 - $x1;
+        $dy = $y2 - $y1;
+
+        if($dx === 0.0 && $dy === 0.0){
+            return sqrt(($x - $x1) ** 2 + ($y - $y1) ** 2);
+        }
+
+        $t = (($x - $x1) * $dx + ($y - $y1) * $dy) / ($dx * $dx + $dy * $dy);
+        $t = max(0.0, min(1.0, $t));
+
+        $closestX = $x1 + $t * $dx;
+        $closestY = $y1 + $t * $dy;
+
+        return sqrt(($x - $closestX) ** 2 + ($y - $closestY) ** 2);
+    }
+
     public function constructionMapOfAllShopsUnderCgo(ShopClass $classErm)
     {
 
         //? on recupere l'url de base
         $baseUrl = $this->requestStack->getCurrentRequest()->getScheme() . '://' . $this->requestStack->getCurrentRequest()->getHttpHost() . $this->requestStack->getCurrentRequest()->getBasePath();
-        
+
+        // Un CGO n'a lui-même jamais la classe MV/MX : c'est le CGO VI qui pilote
+        // aussi les centres MV/MX (comme pour les zones télématiques).
+        $cgoClassErm = in_array($classErm->getName(), ['MX', 'MV'], true)
+            ? $this->shopClassRepository->findOneBy(['name' => 'VI'])
+            : $classErm;
+
         //?on recupere tous les cgos
-        $cgos = $this->cgoRepository->findBy(['classErm' => $classErm]);
+        $cgos = $this->cgoRepository->findBy(['classErm' => $cgoClassErm]);
 
         $locations = []; //? toutes les réponses seront dans ce tableau final
 
         foreach($cgos as $cgo)
         {
             //?le cgo
-            $locations[] = 
-            [
-                "lat" => $cgo->getCity()->getLatitude(),
-                "lng" => $cgo->getCity()->getLongitude(),
-                "color" => $cgo->getTerritoryColor() ?? $this->randomHexadecimalColor(),
-                "name" => $cgo->getName().' ('.$cgo->getCm().')',
-                "description" => $cgo->getManager()->getFirstName().' '.$cgo->getManager()->getLastName(),
-                "size" => 30,
-                "type" => "image",
-                "image_url" => "https://erm.je-developpe.fr/map/images/logoCgo.png"
-            ];
-            
+            if ($cgo->getCity()) {
+                $locations[] =
+                [
+                    "lat" => $cgo->getCity()->getLatitude(),
+                    "lng" => $cgo->getCity()->getLongitude(),
+                    "color" => $cgo->getTerritoryColor() ?? $this->randomHexadecimalColor(),
+                    "name" => $cgo->getName().' ('.$cgo->getCm().')',
+                    "description" => $cgo->getManager() ? $cgo->getManager()->getFirstName().' '.$cgo->getManager()->getName() : 'MANAGER DE CGO NON RENSEIGNÉ !',
+                    "size" => 30,
+                    "type" => "image",
+                    "image_url" => "https://erm.je-developpe.fr/map/images/logoCgo.png"
+                ];
+            }
+
             $shops = $cgo->getShopsUnderControls();
 
             foreach($shops as $shop)
@@ -391,10 +489,10 @@ class MapsService
                 if(!is_null($shop->getCity()))
                 {
     
-                    if($shop->getManager() !== null){
+                    if($shop->getRcsPerson() !== null){
     
-                        $manager = $shop->getManager();
-                        $contactShop = $manager->getFirstName() . ' ' . $manager->getLastName() . ' <br/> ' . $shop->getManager()->getPhone() . '<br/>' . $manager->getEmail();
+                        $manager = $shop->getRcsPerson();
+                        $contactShop = $manager->getFirstName() . ' ' . $manager->getName() . ' <br/> ' . $shop->getRcsPerson()->getPhone() . '<br/>' . $manager->getEmail();
                     
                     }else{
     
@@ -458,7 +556,7 @@ class MapsService
 
             // Render the Twig template and pass the necessary data
             $infoWindowContent = $this->twig->render(
-                'site/maps/popups/technicians_infowindow.html.twig',
+                'site/maps/popups/people_infowindow.html.twig',
                 [
                     'shop' => $shop,
                     'data' => $data,
@@ -488,8 +586,14 @@ class MapsService
     public function constructionMapOfAllShopsUnderCgoWithUxMap(ShopClass $classErm)
     {
 
+        // Un CGO n'a lui-même jamais la classe MV/MX : c'est le CGO VI qui pilote
+        // aussi les centres MV/MX (comme pour les zones télématiques).
+        $cgoClassErm = in_array($classErm->getName(), ['MX', 'MV'], true)
+            ? $this->shopClassRepository->findOneBy(['name' => 'VI'])
+            : $classErm;
+
         //?on recupere tous les cgos
-        $cgos = $this->cgoRepository->findBy(['classErm' => $classErm]);
+        $cgos = $this->cgoRepository->findBy(['classErm' => $cgoClassErm]);
 
         $map = $this->generationUxMapWithBaseOptions();
 
@@ -498,6 +602,10 @@ class MapsService
 
         foreach($cgos as $cgo)
         {
+            if (!$cgo->getCity()) {
+                continue;
+            }
+
             $map->addMarker(new Marker(
                 position: new Point($cgo->getCity()->getLatitude(), $cgo->getCity()->getLongitude()),
                 icon: $iconOfCgo,
@@ -512,6 +620,10 @@ class MapsService
 
             foreach($shops as $shop)
             {
+                if (!$shop->getCity()) {
+                    continue;
+                }
+
                 $color = $cgo->getTerritoryColor();
                 if (!is_string($color) || empty($color)) {
                     $color = '#000000'; // Default to black if color is missing/invalid
@@ -525,7 +637,7 @@ class MapsService
                     icon: $iconOfShopUnderCgo,
                     title: $shop->getName(),
                     infoWindow: new InfoWindow(
-                        content: $shop->getName().'('.$shop->getCm().')<p>'.$shop->getManager()->getFirstNameAndNameOnly().'<br/>'.$shop->getPhone().'</p>',
+                        content: $shop->getName().'('.$shop->getCm().')<p>'.$shop->getRcsPerson()?->getNameAndFirstName().'<br/>'.$shop->getPhone().'</p>',
                     ),
                     // Ajoutez la couleur dans le tableau 'extra'
                     extra: [
@@ -539,14 +651,14 @@ class MapsService
         return $map;
     }
 
-    public function constructionMapOfTechniciansTelematique(array $formationNames, array $functionNames, array $vehicleNames)
+    public function constructionMapOfPeopleTelematique(array $formationNames, array $functionNames, array $vehicleNames)
     {
 
         //?on recupere tous les techniciens
-        $technicians = $this->technicianRepository->findAllTelematicTechnicians($formationNames, $functionNames, $vehicleNames);
+        $people = $this->personRepository->findAllTelematicPeople($formationNames, $functionNames, $vehicleNames);
 
         //?on cré un manager et un Cgo fakes
-        $fakeManager = new Manager();
+        $fakeManager = new Person();
         $fakeManager->setFirstName('MANAGER NON RENSEIGNÉ')->setPhone("TÉLÉPHONE NON RENSEIGNÉ")->setEmail("EMAIL NON RENSEIGNÉ");
         $fakeCgo = new Cgo();
         $fakeCgo->setTerritoryColor('#000000')->setName("PAS DE CGO RENSEIGNÉ")->setManager($fakeManager);
@@ -554,22 +666,26 @@ class MapsService
         //?on construit la map
         $map = $this->generationUxMapWithBaseOptions();
 
-        foreach($technicians as $technician)
+        foreach($people as $person)
         {
-            $cgo = $technician->getControledByCgo();
+            if (!$person->getShop() || !$person->getShop()->getCity()) {
+                continue;
+            }
+
+            $cgo = $person->getControledByCgo();
             if(!$cgo){
                 $cgo = $fakeCgo;
             }
 
             $color = $cgo->getTerritoryColor();
 
-            $iconOfTechnician = Icon::ux('ri:taxi-wifi-fill')->width(24)->height(24)->color($color);
-            $infoWindowContent = $this->getInfoWindowContentForTechnicianTelematic($technician, $cgo);
+            $iconOfPerson = Icon::ux('ri:taxi-wifi-fill')->width(24)->height(24)->color($color);
+            $infoWindowContent = $this->getInfoWindowContentForPersonTelematic($person, $cgo);
 
              $map->addMarker(new Marker(
-                    position: new Point($technician->getShop()->getCity()->getLatitude(), $technician->getShop()->getCity()->getLongitude()),
-                    icon: $iconOfTechnician,
-                    title: $technician->getName(),
+                    position: new Point($person->getShop()->getCity()->getLatitude(), $person->getShop()->getCity()->getLongitude()),
+                    icon: $iconOfPerson,
+                    title: $person->getName(),
                     infoWindow: new InfoWindow(content: $infoWindowContent),
                     // Ajoutez la couleur dans le tableau 'extra'
                     extra: [
@@ -587,11 +703,14 @@ class MapsService
         $mapOnlyWithCts = $this->generationUxMapWithBaseOptions();
         
         //?on recupere tous les ct
-        $cts = $this->technicalAdvisorRepository->findAll();
+        $cts = $this->personRepository->findByRole(\App\Entity\RoleErm::CT);
 
         //?on construit la map
         foreach($cts as $ct)
         {
+            if (!$ct->getShop() || !$ct->getShop()->getCity()) {
+                continue;
+            }
 
             $color = $ct->getZoneColor();
             $iconOfTechnicalAdvisor = Icon::ux('fa6-solid:magnifying-glass-dollar')->width(24)->height(24)->color($color);
@@ -606,11 +725,11 @@ class MapsService
             $workForShops .= '</p>';
 
             $mapOnlyWithCts->addMarker(new Marker(
-                position: new Point($ct->getAttachmentCenter()->getCity()->getLatitude(), $ct->getAttachmentCenter()->getCity()->getLongitude()),
+                position: new Point($ct->getShop()->getCity()->getLatitude(), $ct->getShop()->getCity()->getLongitude()),
                 icon: $iconOfTechnicalAdvisor,
-                title: $ct->getAttachmentCenter()->getName(),
+                title: $ct->getShop()->getName(),
                 infoWindow: new InfoWindow(
-                    headerContent: $ct->getFirstName().' '.$ct->getLastName(),
+                    headerContent: $ct->getFirstName().' '.$ct->getName(),
                     content: '<p>Tél: '.$ct->getPhone().'<br/>Email: '.$ct->getEmail().'</p>'.$workForShops,
                 ),
                 extra: [
@@ -623,6 +742,9 @@ class MapsService
 
             foreach($shops as $shop)
             {
+                if (!$shop->getCity()) {
+                    continue;
+                }
 
                 $iconOfShopUnderCt = Icon::ux('gravity-ui:target')->width(34)->height(34)->color($color);
 
@@ -631,7 +753,7 @@ class MapsService
                     icon: $iconOfShopUnderCt,
                     title: $shop->getName(),
                     infoWindow: new InfoWindow(
-                        content: $shop->getName().'('.$shop->getCm().')<p>'.$shop->getManager()->getFirstNameAndNameOnly().'<br/>'.$shop->getPhone().'</p>',
+                        content: $shop->getName().'('.$shop->getCm().')<p>'.$shop->getRcsPerson()?->getNameAndFirstName().'<br/>'.$shop->getPhone().'</p>',
                     ),
                     // Ajoutez la couleur dans le tableau 'extra'
                     extra: [
@@ -657,7 +779,11 @@ class MapsService
 
     public function generationUxMapWithBaseOptions()
     {
-        $map = (new Map())->zoom(4)->fitBoundsToMarkers(true);
+        // Centre/zoom par défaut sur la France : nécessaire pour les cartes sans
+        // marqueur (régions/zones en polygones), où fitBoundsToMarkers ne peut rien
+        // corriger (le zoom(4) précédent était sous le minZoom(6) du fond de carte,
+        // donc aucune tuile ne s'affichait).
+        $map = (new Map())->center(new Point(46.6, 2.2))->zoom(6)->fitBoundsToMarkers(true);
 
         $leafletOptions = (new LeafletOptions())
             ->tileLayer(new TileLayer(
@@ -674,10 +800,10 @@ class MapsService
         return $map;
     }
 
-    public function getInfoWindowContentForTechnicianTelematic($technician): string
+    public function getInfoWindowContentForPersonTelematic($person): string
     {
-        return $this->twig->render('site/maps/popups/technician_telematic_infowindow.html.twig', [
-            'technician' => $technician
+        return $this->twig->render('site/maps/popups/person_telematic_infowindow.html.twig', [
+            'person' => $person
         ]);
     }
 

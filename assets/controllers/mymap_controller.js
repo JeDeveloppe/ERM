@@ -83,7 +83,24 @@ export default class extends Controller {
 
     _onInfoWindowBeforeCreate(event) { }
     _onInfoWindowAfterCreate(event) { }
-    _onPolygonBeforeCreate(event) { }
+
+    _onPolygonBeforeCreate(event) {
+        const definition = event.detail.definition;
+        const extra = definition && definition.extra;
+
+        if (!extra) {
+            return;
+        }
+
+        definition.rawOptions = {
+            ...(definition.rawOptions || {}),
+            ...(extra.fillColor !== undefined ? { fillColor: extra.fillColor, fill: true } : {}),
+            ...(extra.fillOpacity !== undefined ? { fillOpacity: extra.fillOpacity } : {}),
+            ...(extra.color !== undefined ? { color: extra.color } : {}),
+            ...(extra.weight !== undefined ? { weight: extra.weight } : {}),
+        };
+    }
+
     _onPolygonAfterCreate(event) { }
     _onPolylineBeforeCreate(event) { }
     _onPolylineAfterCreate(event) { }

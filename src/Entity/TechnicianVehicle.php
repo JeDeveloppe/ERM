@@ -19,10 +19,10 @@ class TechnicianVehicle
     private ?string $name = null;
 
     /**
-     * @var Collection<int, Technician>
+     * @var Collection<int, Person>
      */
-    #[ORM\OneToMany(targetEntity: Technician::class, mappedBy: 'vehicle')]
-    private Collection $technicians;
+    #[ORM\OneToMany(targetEntity: Person::class, mappedBy: 'vehicle')]
+    private Collection $people;
 
     #[ORM\ManyToOne(inversedBy: 'technicianVehiclesUpdated')]
     private ?User $updatedBy = null;
@@ -32,7 +32,7 @@ class TechnicianVehicle
 
     public function __construct()
     {
-        $this->technicians = new ArrayCollection();
+        $this->people = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -53,29 +53,29 @@ class TechnicianVehicle
     }
 
     /**
-     * @return Collection<int, Technician>
+     * @return Collection<int, Person>
      */
-    public function getTechnicians(): Collection
+    public function getPeople(): Collection
     {
-        return $this->technicians;
+        return $this->people;
     }
 
-    public function addTechnician(Technician $technician): static
+    public function addPerson(Person $person): static
     {
-        if (!$this->technicians->contains($technician)) {
-            $this->technicians->add($technician);
-            $technician->setVehicle($this);
+        if (!$this->people->contains($person)) {
+            $this->people->add($person);
+            $person->setVehicle($this);
         }
 
         return $this;
     }
 
-    public function removeTechnician(Technician $technician): static
+    public function removePerson(Person $person): static
     {
-        if ($this->technicians->removeElement($technician)) {
+        if ($this->people->removeElement($person)) {
             // set the owning side to null (unless already changed)
-            if ($technician->getVehicle() === $this) {
-                $technician->setVehicle(null);
+            if ($person->getVehicle() === $this) {
+                $person->setVehicle(null);
             }
         }
 

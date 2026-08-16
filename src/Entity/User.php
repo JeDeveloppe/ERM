@@ -40,10 +40,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?\DateTimeImmutable $lastVisitAt = null;
 
     /**
-     * @var Collection<int, Technician>
+     * @var Collection<int, Person>
      */
-    #[ORM\OneToMany(targetEntity: Technician::class, mappedBy: 'updatedBy')]
-    private Collection $techniciansUpdated;
+    #[ORM\OneToMany(targetEntity: Person::class, mappedBy: 'updatedBy')]
+    private Collection $peopleUpdated;
 
     /**
      * @var Collection<int, TechnicianFormations>
@@ -83,7 +83,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function __construct()
     {
-        $this->techniciansUpdated = new ArrayCollection();
+        $this->peopleUpdated = new ArrayCollection();
         $this->technicianFormationsUpdated = new ArrayCollection();
         $this->technicianFonctionsUpdated = new ArrayCollection();
         $this->telematicAreaUpdated = new ArrayCollection();
@@ -192,29 +192,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @return Collection<int, Technician>
+     * @return Collection<int, Person>
      */
-    public function getTechniciansUpdated(): Collection
+    public function getPeopleUpdated(): Collection
     {
-        return $this->techniciansUpdated;
+        return $this->peopleUpdated;
     }
 
-    public function addTechniciansUpdated(Technician $techniciansUpdated): static
+    public function addPeopleUpdated(Person $peopleUpdated): static
     {
-        if (!$this->techniciansUpdated->contains($techniciansUpdated)) {
-            $this->techniciansUpdated->add($techniciansUpdated);
-            $techniciansUpdated->setUpdatedBy($this);
+        if (!$this->peopleUpdated->contains($peopleUpdated)) {
+            $this->peopleUpdated->add($peopleUpdated);
+            $peopleUpdated->setUpdatedBy($this);
         }
 
         return $this;
     }
 
-    public function removeTechniciansUpdated(Technician $techniciansUpdated): static
+    public function removePeopleUpdated(Person $peopleUpdated): static
     {
-        if ($this->techniciansUpdated->removeElement($techniciansUpdated)) {
+        if ($this->peopleUpdated->removeElement($peopleUpdated)) {
             // set the owning side to null (unless already changed)
-            if ($techniciansUpdated->getUpdatedBy() === $this) {
-                $techniciansUpdated->setUpdatedBy(null);
+            if ($peopleUpdated->getUpdatedBy() === $this) {
+                $peopleUpdated->setUpdatedBy(null);
             }
         }
 

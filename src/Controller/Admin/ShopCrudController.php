@@ -32,7 +32,6 @@ class ShopCrudController extends AbstractCrudController
             AssociationField::new('city', 'Ville:')->autocomplete()->setColumns(6),
             TextField::new('phone', 'Téléphone:')->setColumns(6),
             CollectionField::new('cgos', 'CGO(s):')->onlyOnIndex(),
-            AssociationField::new('manager', 'Manager:')->autocomplete()->setColumns(6)->onlyOnForms(),
             AssociationField::new('cgos', 'CGO(s):')
                 ->setQueryBuilder(fn(QueryBuilder $queryBuilder) => 
                         $queryBuilder

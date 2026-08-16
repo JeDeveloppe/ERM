@@ -2,34 +2,31 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\ManagerClass;
+use App\Entity\RoleErm;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
-use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 
-class ManagerClassCrudController extends AbstractCrudController
+class RoleErmCrudController extends AbstractCrudController
 {
     public static function getEntityFqcn(): string
     {
-        return ManagerClass::class;
+        return RoleErm::class;
     }
 
     public function configureFields(string $pageName): iterable
     {
         return [
-            TextField::new('name', 'Nom du statut:'),
+            TextField::new('name', 'Nom du rôle:'),
         ];
     }
-
 
     public function configureCrud(Crud $crud): Crud
     {
         return $crud
-            ->setPageTitle('index', 'Liste des status des managers')
-            ->setPageTitle('new', 'Nouveau status des managers')
-            ->setPageTitle('edit', 'Modifier status des managers')
+            ->setPageTitle('index', 'Liste des rôles ERM')
+            ->setPageTitle('new', 'Nouveau rôle ERM')
+            ->setPageTitle('edit', 'Modifier le rôle ERM')
             ->showEntityActionsInlined();
     }
 }

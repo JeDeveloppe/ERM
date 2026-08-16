@@ -2,7 +2,7 @@
 
 namespace App\Controller\Site\Prime;
 
-use App\Form\PrimeForTechniciansType;
+use App\Form\PrimeForPeopleType;
 use App\Repository\PrimelevelRepository;
 use App\Service\PrimeLevelService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -40,7 +40,7 @@ public function prime(Request $request): Response
     $primeLevelsNew = $this->primelevelRepository->findBy(['version' => $defaultNew], ['start' => 'ASC']);
 
     // 3. On pré-remplit le formulaire avec ces versions
-    $form = $this->createForm(PrimeForTechniciansType::class, [
+    $form = $this->createForm(PrimeForPeopleType::class, [
         'versionOld' => $defaultOld,
         'versionNew' => $defaultNew,
     ], ['versions' => $versionsAvailable]);

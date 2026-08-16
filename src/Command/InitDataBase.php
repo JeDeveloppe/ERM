@@ -7,8 +7,8 @@ use App\Service\CgoService;
 use App\Service\CityService;
 use App\Service\DepartmentService;
 use App\Service\LargeRegionService;
-use App\Service\ManagerClassService;
-use App\Service\ManagerService;
+use App\Service\RoleErmService;
+use App\Service\PersonService;
 use App\Service\RegionErmService;
 use App\Service\RegionErmServiceService;
 use App\Service\ShopClassService;
@@ -33,9 +33,9 @@ class InitDataBase extends Command
         private RegionErmService $regionErmService,
         private ZoneErmService $zoneErmService,
         private ShopClassService $shopClassService,
-        private ManagerService $managerService,
+        private PersonService $personService,
         private ShopService $shopService,
-        private ManagerClassService $managerClassService,
+        private RoleErmService $roleErmService,
         private CgoService $cgoService,
         private TelematicAreasService $telematicAreasService,
         private UserService $userService
@@ -56,21 +56,18 @@ class InitDataBase extends Command
         $this->largeregionService->importLargesregions($io);
         $this->departmentService->importDepartementsFrancais($io);
         $this->cityService->importCitiesOfFrance($io);
-        $this->managerClassService->importManagerClass($io);
+        $this->roleErmService->seedRoles($io);
         $this->regionErmService->importRegionserm($io);
         $this->zoneErmService->importZoneserm($io);
         $this->shopClassService->importShopClasses($io);
-        $this->managerService->importRcsManagers($io);
-        $this->managerService->importDrManagers($io);
-        $this->managerService->importRAVL_RZManagers($io);
-        $this->managerService->importAOManagers($io);
+        $this->personService->importDR($io);
+        $this->personService->importRAVL_RZ($io);
+        $this->personService->importAO($io);
         $this->shopService->importShops($io);
         $this->cgoService->importCgos($io);
         $this->cgoService->importShopsUnderControls($io);
-        $this->shopService->updateShops($io);
         $this->telematicAreasService->importCgoTelematicAreas($io);
         $this->telematicAreasService->importDepartmentsInTelematicsAreas($io);
-        $this->cgoService->updateCgos($io);
 
         return Command::SUCCESS;
     }

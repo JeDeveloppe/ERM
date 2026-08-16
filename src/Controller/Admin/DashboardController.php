@@ -7,17 +7,15 @@ use App\Entity\Cgo;
 use App\Entity\City;
 use App\Entity\Shop;
 use App\Entity\User;
-use App\Entity\Manager;
 use App\Entity\ZoneErm;
 use App\Entity\RegionErm;
 use App\Entity\ShopClass;
 use App\Entity\Department;
 use App\Entity\Primelevel;
-use App\Entity\Technician;
+use App\Entity\Person;
+use App\Entity\RoleErm;
 use App\Entity\LargeRegion;
-use App\Entity\ManagerClass;
 use App\Entity\TelematicArea;
-use App\Entity\TechnicalAdvisor;
 use App\Entity\TechnicianVehicle;
 use App\Entity\TechnicianFonction;
 use App\Entity\TechnicianFormations;
@@ -53,13 +51,15 @@ class DashboardController extends AbstractDashboardController
             // MenuItem::linkToCrud('Zones opérationnelles (par centres)', 'fas fa-list', CgoOperationalAreaByShops::class),
             // MenuItem::linkToCrud('Zones télématiques', 'fas fa-list', CgoTelematicArea::class),
             MenuItem::section('Télématique:')->setPermission('ROLE_MCF_ADMIN'),
-            MenuItem::linkToCrud('Liste des techniciens', 'fas fa-list', Technician::class)->setPermission('ROLE_MCF_ADMIN'),
+            MenuItem::linkToCrud('Liste des personnes', 'fas fa-list', Person::class)->setPermission('ROLE_MCF_ADMIN'),
             MenuItem::linkToCrud('Liste des formations', 'fas fa-list', TechnicianFormations::class)->setPermission('ROLE_MCF_ADMIN'),
             MenuItem::linkToCrud('Liste des fonctions', 'fas fa-list', TechnicianFonction::class)->setPermission('ROLE_MCF_ADMIN'),
             MenuItem::linkToCrud('Liste des véhicules', 'fas fa-list', TechnicianVehicle::class)->setPermission('ROLE_MCF_ADMIN'),
 
             MenuItem::section('CT:')->setPermission('ROLE_ERM_ADMIN'),
-            MenuItem::linkToCrud('Liste des CT', 'fas fa-list', TechnicalAdvisor::class)->setPermission('ROLE_ERM_ADMIN'),
+            MenuItem::linkToCrud('Liste des CT', 'fas fa-list', Person::class)
+                ->setController(PersonCtCrudController::class)
+                ->setPermission('ROLE_ERM_ADMIN'),
 
             MenuItem::section('Les zones / régions ERM:')->setPermission('ROLE_MCF_ADMIN'),
             MenuItem::linkToCrud('Zones télématiques', 'fas fa-list', TelematicArea::class)->setPermission('ROLE_MCF_ADMIN'),
@@ -69,10 +69,12 @@ class DashboardController extends AbstractDashboardController
             MenuItem::section('Les entités ERM:')->setPermission('ROLE_ERM_ADMIN'),
             MenuItem::linkToCrud('Les cgos', 'fas fa-list', Cgo::class)->setPermission('ROLE_ERM_ADMIN'),
             MenuItem::linkToCrud('Les centres', 'fas fa-list', Shop::class)->setPermission('ROLE_ERM_ADMIN'),
-            MenuItem::linkToCrud('Les managers', 'fas fa-list', Manager::class)->setPermission('ROLE_SUPER_ADMIN'),
+            MenuItem::linkToCrud('Les managers', 'fas fa-list', Person::class)
+                ->setController(PersonManagerCrudController::class)
+                ->setPermission('ROLE_SUPER_ADMIN'),
 
             MenuItem::section('Configurations ERM:')->setPermission('ROLE_SUPER_ADMIN'),
-            MenuItem::linkToCrud('Les status des managers', 'fas fa-gear', ManagerClass::class)->setPermission('ROLE_SUPER_ADMIN'),
+            MenuItem::linkToCrud('Les rôles ERM', 'fas fa-gear', RoleErm::class)->setPermission('ROLE_SUPER_ADMIN'),
             MenuItem::linkToCrud('Les classes des centres', 'fas fa-gear', ShopClass::class)->setPermission('ROLE_SUPER_ADMIN'),
 
             MenuItem::section('Configurations Bdd FRANCE:')->setPermission('ROLE_SUPER_ADMIN'),

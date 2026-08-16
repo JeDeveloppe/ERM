@@ -27,11 +27,11 @@
 ###< symfony/asset-mapper ###
 
 ###> local data (PII, not to be published) ###
-/import/annuaire.csv
-/import/cgoUpdated.csv
-/import/cgos.csv
+/import/centres.csv
+/import/cgo.csv
 /import/ct.csv
-/import/shops.csv
-/import/technicians.csv
-/import/technicians.old.csv
+/import/rattachements_ct_cds.csv
+/import/experts_telematique.csv
+/import/competences_telematique.csv
+/import/csv/
 ###< local data (PII, not to be published) ###

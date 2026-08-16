@@ -28,14 +28,11 @@ class ZoneErm
     #[ORM\OneToMany(targetEntity: Shop::class, mappedBy: 'zoneErm')]
     private Collection $shops;
 
-    #[ORM\OneToOne(mappedBy: 'zoneErm', cascade: ['persist', 'remove'])]
-    private ?Manager $zoneManagers = null;
-
     #[ORM\Column(length: 10, nullable: true)]
     private ?string $territoryColor = null;
 
     #[ORM\ManyToOne(inversedBy: 'zoneErms')]
-    private ?Manager $manager = null;
+    private ?Person $manager = null;
 
     public function __construct()
     {
@@ -101,28 +98,6 @@ class ZoneErm
         return $this;
     }
 
-    public function getZoneManagers(): ?Manager
-    {
-        return $this->zoneManagers;
-    }
-
-    public function setZoneManagers(?Manager $zoneManagers): static
-    {
-        // unset the owning side of the relation if necessary
-        if ($zoneManagers === null && $this->zoneManagers !== null) {
-            $this->zoneManagers->setZoneErm(null);
-        }
-
-        // set the owning side of the relation if necessary
-        if ($zoneManagers !== null && $zoneManagers->getZoneErm() !== $this) {
-            $zoneManagers->setZoneErm($this);
-        }
-
-        $this->zoneManagers = $zoneManagers;
-
-        return $this;
-    }
-
     public function __toString()
     {
         return $this->name;
@@ -140,12 +115,12 @@ class ZoneErm
         return $this;
     }
 
-    public function getManager(): ?Manager
+    public function getManager(): ?Person
     {
         return $this->manager;
     }
 
-    public function setManager(?Manager $manager): static
+    public function setManager(?Person $manager): static
     {
         $this->manager = $manager;
 

@@ -4,7 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Shop;
 use App\Entity\Department;
-use App\Entity\Technician;
+use App\Entity\Person;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
@@ -32,21 +32,21 @@ class ShopRepository extends ServiceEntityRepository
         ;
     }
 
-    public function findShopsByTechnicians(array $technicians): array
+    public function findShopsByPeople(array $people): array
     {
         // Si la liste de techniciens est vide, on retourne un tableau vide pour éviter une erreur
-        if (empty($technicians)) {
+        if (empty($people)) {
             return [];
         }
 
         $qb = $this->createQueryBuilder('s');
         
         // On fait un innerJoin sur les techniciens de la boutique
-        $qb->innerJoin('s.technicians', 't');
+        $qb->innerJoin('s.people', 't');
 
         // On filtre sur les techniciens qui sont dans la liste fournie
-        $qb->where('t.id IN (:technicianIds)')
-           ->setParameter('technicianIds', array_map(fn(Technician $tech) => $tech->getId(), $technicians));
+        $qb->where('t.id IN (:personIds)')
+           ->setParameter('personIds', array_map(fn(Person $tech) => $tech->getId(), $people));
 
         // On regroupe par boutique pour avoir un résultat unique
         $qb->groupBy('s.id');

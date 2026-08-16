@@ -10,10 +10,12 @@ use App\Repository\ZoneErmRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 class ZoneErmService
 {
     public function __construct(
+        #[Autowire('%kernel.project_dir%')] private string $projectDir,
         private EntityManagerInterface $em,
         private ZoneErmRepository $zoneErmRepository,
         private RegionErmRepository $regionErmRepository,
@@ -46,7 +48,7 @@ class ZoneErmService
 
     private function readCsvFile(): Reader
     {
-        $csv = Reader::createFromPath('%kernel.root.dir%/../import/annuaire.csv','r');
+        $csv = Reader::createFromPath($this->projectDir . '/import/centres.csv', 'r');
         $csv->setHeaderOffset(0);
 
         return $csv;
@@ -54,15 +56,25 @@ class ZoneErmService
 
     private function createOrUpdate(array $arrayEntity): ZoneErm
     {
-        $regionErm = $this->regionErmRepository->findOneByName($arrayEntity['Région']);
+        $regionName = trim($arrayEntity['Région']);
 
-        $zoneErm = $this->zoneErmRepository->findOneByName($arrayEntity['Secteur RA VL ou Zone MV']);
+        $regionErm = $this->regionErmRepository->findOneByName($regionName);
+        if (!$regionErm) {
+            // Sécurité : normalement déjà créée par RegionErmService qui tourne avant dans le
+            // pipeline, mais on ne veut pas planter/laisser une zone sans région si l'ordre change.
+            $regionErm = new RegionErm();
+            $regionErm->setName($regionName)->setTerritoryColor($this->mapsService->randomHexadecimalColor());
+            $this->em->persist($regionErm);
+            $this->em->flush($regionErm);
+        }
+
+        $zoneErm = $this->zoneErmRepository->findOneByName($arrayEntity['Zone']);
 
         if(!$zoneErm){
             $zoneErm = new ZoneErm();
         }
 
-        $zoneErm->setName($arrayEntity['Secteur RA VL ou Zone MV'])->setRegionErm($regionErm)->setTerritoryColor($this->mapsService->randomHexadecimalColor());
+        $zoneErm->setName($arrayEntity['Zone'])->setRegionErm($regionErm)->setTerritoryColor($this->mapsService->randomHexadecimalColor());
 
         return $zoneErm;
     }

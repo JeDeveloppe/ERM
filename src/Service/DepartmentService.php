@@ -65,7 +65,6 @@ class DepartmentService
             ->setName($arrayDepartement['name'])
             ->setCode(strval($arrayDepartement['code']))
             ->setSlug($this->sluggerInterface->slug($arrayDepartement['slug']))
-            ->setSimplemapCode($arrayDepartement['simplemap_code'])
             ->setLargeregion($this->largeregionRepository->findOneBy(['id' => $arrayDepartement['large_region_id'] ]));
 
         return $departement;

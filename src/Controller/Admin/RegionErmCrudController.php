@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\RegionErm;
+use App\Entity\RoleErm;
 use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
@@ -22,17 +23,22 @@ class RegionErmCrudController extends AbstractCrudController
         return [
             TextField::new('name', 'Nom de la région ERM:'),
             ColorField::new('territoryColor', 'Couleur de la région:'),
-            AssociationField::new('regionManagers', 'Manager de la zone:')
-                ->setQueryBuilder(fn(QueryBuilder $queryBuilder) => 
+            AssociationField::new('regionManagers', 'Manager de la région (DR):')
+                ->setQueryBuilder(fn(QueryBuilder $queryBuilder) =>
                         $queryBuilder
-                            ->join('entity.managerClass', 'm')
-                            ->where('m.name = :className')
-                            ->setParameter('className', 'RCGO')
-                            ->orderBy('entity.managerClass', 'ASC')
+                            ->join('entity.roles', 'r')
+                            ->where('r.name = :roleName')
+                            ->setParameter('roleName', RoleErm::DR)
                     )
                 ->setFormTypeOptions(['placeholder' => 'Séléctionner un manager', 'by_reference' => false]),
             AssociationField::new('zoneErms', 'Nombre de zone(s):')->onlyOnIndex(),
-            AssociationField::new('zoneErms', 'Zones de la région:')->onlyOnForms()
+            AssociationField::new('zoneErms', 'Zones de la région:')
+                ->onlyOnForms()
+                ->setFormTypeOptions(['by_reference' => false]),
+            AssociationField::new('departments', 'Nombre de département(s):')->onlyOnIndex(),
+            AssociationField::new('departments', 'Départements de la région:')
+                ->onlyOnForms()
+                ->setFormTypeOptions(['by_reference' => false])
         ];
     }
     

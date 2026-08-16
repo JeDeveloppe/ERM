@@ -8,10 +8,12 @@ use App\Repository\RegionErmRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 class RegionErmService
 {
     public function __construct(
+        #[Autowire('%kernel.project_dir%')] private string $projectDir,
         private EntityManagerInterface $em,
         private RegionErmRepository $regionErmRepository,
         private MapsService $mapsService
@@ -43,7 +45,7 @@ class RegionErmService
 
     private function readCsvFile(): Reader
     {
-        $csv = Reader::createFromPath('%kernel.root.dir%/../import/annuaire.csv','r');
+        $csv = Reader::createFromPath($this->projectDir . '/import/centres.csv', 'r');
         $csv->setHeaderOffset(0);
 
         return $csv;
@@ -51,13 +53,15 @@ class RegionErmService
 
     private function createOrUpdate(array $arrayEntity): RegionErm
     {
-        $regionErm = $this->regionErmRepository->findOneByName($arrayEntity['Région']);
+        $name = trim($arrayEntity['Région']);
+
+        $regionErm = $this->regionErmRepository->findOneByName($name);
 
         if(!$regionErm){
             $regionErm = new RegionErm();
         }
 
-        $regionErm->setName($arrayEntity['Région'])->setTerritoryColor($this->mapsService->randomHexadecimalColor());
+        $regionErm->setName($name)->setTerritoryColor($this->mapsService->randomHexadecimalColor());
 
         return $regionErm;
     }

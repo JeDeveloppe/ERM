@@ -30,7 +30,9 @@ class TelematicAreasService
     {
         $io->title('Importation des zones télématic');
 
-            $cgos = $this->cgoRepository->findBy(['classErm' => $this->shopClassRepository->findOneBy(['name' => 'MV'])]);
+            // Le télématique est piloté par les CGO VI (qui couvrent aussi le VI/MV/MX
+            // des centres) - un CGO n'a lui-même jamais la classe MV/MX, uniquement VI ou VL.
+            $cgos = $this->cgoRepository->findBy(['classErm' => $this->shopClassRepository->findOneBy(['name' => 'VI'])]);
         
             $io->progressStart(count($cgos));
 

@@ -28,9 +28,6 @@ class Department
     #[ORM\Column(length: 10)]
     private ?string $code = null;
 
-    #[ORM\Column(length: 20)]
-    private ?string $simplemapCode = null;
-
     /**
      * @var Collection<int, City>
      */
@@ -39,6 +36,9 @@ class Department
 
     #[ORM\ManyToOne(inversedBy: 'departments')]
     private ?TelematicArea $telematicArea = null;
+
+    #[ORM\ManyToOne(inversedBy: 'departments')]
+    private ?RegionErm $regionErm = null;
 
     #[ORM\Column(nullable: true)]
     private ?array $gpsPoints = null;
@@ -101,18 +101,6 @@ class Department
         return $this;
     }
 
-    public function getSimplemapCode(): ?string
-    {
-        return $this->simplemapCode;
-    }
-
-    public function setSimplemapCode(string $simplemapCode): static
-    {
-        $this->simplemapCode = $simplemapCode;
-
-        return $this;
-    }
-
     /**
      * @return Collection<int, City>
      */
@@ -156,6 +144,18 @@ class Department
     public function setTelematicArea(?TelematicArea $telematicArea): static
     {
         $this->telematicArea = $telematicArea;
+
+        return $this;
+    }
+
+    public function getRegionErm(): ?RegionErm
+    {
+        return $this->regionErm;
+    }
+
+    public function setRegionErm(?RegionErm $regionErm): static
+    {
+        $this->regionErm = $regionErm;
 
         return $this;
     }

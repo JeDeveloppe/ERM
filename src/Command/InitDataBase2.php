@@ -2,13 +2,11 @@
 
 namespace App\Command;
 
-use App\Entity\TechnicalAdvisor;
 use App\Repository\DepartmentRepository;
 use App\Service\DepartmentService;
-use App\Service\TechnicalAdvisorService;
 use App\Service\TechnicianFonctionService;
 use App\Service\TechnicianFormationsService;
-use App\Service\TechnicianService;
+use App\Service\PersonService;
 use App\Service\TechnicianVehicleService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Style\SymfonyStyle;
@@ -21,10 +19,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 class InitDataBase2 extends Command
 {
     public function __construct(
-        private TechnicianService $technicianService,
+        private PersonService $personService,
         private TechnicianFormationsService $technicianFormationsService,
         private TechnicianVehicleService $technicianVehicleService,
-        private TechnicalAdvisorService $technicalAdvisorService,
         private DepartmentService $departmentService,
         private TechnicianFonctionService $technicianFonctionService
         )
@@ -43,8 +40,11 @@ class InitDataBase2 extends Command
         $this->technicianFonctionService->initDatabase($io);
         $this->technicianVehicleService->initDatabase($io);
         $this->technicianFormationsService->initDatabase($io);
-        $this->technicianService->importTechnicians($io);
-        $this->technicalAdvisorService->importCTs($io);
+        $this->personService->importCTs($io);
+        $this->personService->importWorkForShops($io);
+        $this->personService->importRCS($io);
+        $this->personService->importTelematicExperts($io);
+        $this->personService->importTelematicCompetences($io);
         $this->departmentService->importDepartmentsWithGpsPoints($io);
 
 

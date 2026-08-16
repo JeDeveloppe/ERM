@@ -11,7 +11,7 @@ use App\Repository\TelematicAreaRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use App\Form\SearchTechnicianByDetailsTypeForm;
+use App\Form\SearchPersonByDetailsTypeForm;
 use App\Service\ApiLogService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
@@ -41,12 +41,12 @@ class TelematicController extends AbstractController
         ]);
     }
 
-    #[Route('/telematique/maps/techniciens/{formationName?}', name: 'app_map_technicians_telematique', methods: ['GET', 'POST'])]
-    public function mapTechniciansTelematiqueArea(?array $formationNames, Request $request): Response
+    #[Route('/telematique/maps/techniciens/{formationName?}', name: 'app_map_people_telematique', methods: ['GET', 'POST'])]
+    public function mapPeopleTelematiqueArea(?array $formationNames, Request $request): Response
     {
 
         // Create the form, associating it with the $film object
-        $form = $this->createForm(SearchTechnicianByDetailsTypeForm::class);
+        $form = $this->createForm(SearchPersonByDetailsTypeForm::class);
 
         // Handle the form submission
         $form->handleRequest($request);
@@ -78,7 +78,7 @@ class TelematicController extends AbstractController
                 $vehicleNames[] = $vehicleName->getName();
             }
 
-            $mapDonnees = $this->mapsService->constructionMapOfTechniciansTelematique($formationNames, $functionNames, $vehicleNames);
+            $mapDonnees = $this->mapsService->constructionMapOfPeopleTelematique($formationNames, $functionNames, $vehicleNames);
 
         }else{
             
@@ -86,10 +86,10 @@ class TelematicController extends AbstractController
             $functionNames = [];
             $vehicleNames = [];
             //?on recupere les donnees dans le service
-            $mapDonnees = $this->mapsService->constructionMapOfTechniciansTelematique($formationNames, $functionNames, $vehicleNames);
+            $mapDonnees = $this->mapsService->constructionMapOfPeopleTelematique($formationNames, $functionNames, $vehicleNames);
         }
 
-        return $this->render('site/maps/technicians_telematic.html.twig', [
+        return $this->render('site/maps/people_telematic.html.twig', [
             'mapDonnees' => $mapDonnees,
             'title' => 'Les techniciens télématiques',
             'form' => $form->createView()

@@ -9,10 +9,12 @@ use App\Repository\DepartmentRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 class CityService
 {
     public function __construct(
+        #[Autowire('%kernel.project_dir%')] private string $projectDir,
         private EntityManagerInterface $em,
         private CityRepository $cityRepository,
         private DepartmentRepository $departmentRepository,
@@ -24,8 +26,13 @@ class CityService
     {
         $io->title('Importation des villes Françaises');
 
-            $cities = $this->readCsvFileFrance();
-            
+            $cities = iterator_to_array($this->readCsvFileFrance()->getRecords());
+
+            if ($this->isAlreadyImported($cities)) {
+                $io->success('Villes déjà importées (première et dernière ligne du CSV trouvées en base) - import ignoré');
+                return;
+            }
+
             $io->progressStart(count($cities));
 
             foreach($cities as $arrayVille){
@@ -34,19 +41,46 @@ class CityService
                 $ville = $this->createOrUpdateCityFrance($arrayVille);
                 $this->em->persist($ville);
             }
-            
+
             $this->em->flush();
 
             unset($cities);
             $io->progressFinish();
-        
+
 
         $io->success('Importation terminée');
     }
 
+    /**
+     * cities.csv contient ~36 000 lignes de données géographiques françaises qui ne
+     * changent quasiment jamais. Plutôt que de refaire 36 000 lectures/écritures à
+     * chaque `app:initdatabase`, on vérifie juste que la première et la dernière
+     * ligne du CSV existent déjà en base : si oui, on considère l'import à jour.
+     */
+    private function isAlreadyImported(array $cities): bool
+    {
+        if (empty($cities)) {
+            return true;
+        }
+
+        foreach ([reset($cities), end($cities)] as $row) {
+            $exists = $this->cityRepository->findOneBy([
+                'inseeCode' => $row['insee_code'],
+                'postalCode' => $row['zip_code'],
+                'name' => $row['name'],
+            ]);
+
+            if (!$exists) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     private function readCsvFileFrance(): Reader
     {
-        $csv = Reader::createFromPath('%kernel.root.dir%/../import/cities.csv','r');
+        $csv = Reader::createFromPath($this->projectDir . '/import/cities.csv', 'r');
         $csv->setHeaderOffset(0);
 
         return $csv;

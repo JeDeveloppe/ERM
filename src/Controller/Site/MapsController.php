@@ -38,8 +38,8 @@ class MapsController extends AbstractController
                 ],
                 [
                 'isGranted' => 'ROLE_ERM',
-                'url' => $this->generateUrl('app_map_all_shops_under_cgo', ['classeName' => 'mv']),
-                'name' => 'Tous les centres sous cgo MV',
+                'url' => $this->generateUrl('app_map_all_shops_under_cgo', ['classeName' => 'mx']),
+                'name' => 'Tous les centres sous cgo MX',
                 'icon' => 'solar:garage-bold'
                 ],
                 [
@@ -63,8 +63,8 @@ class MapsController extends AbstractController
                 ],
                 [
                 'isGranted' => 'ROLE_ERM',
-                'url' => $this->generateUrl('app_map_all_zones', ['classeName' => 'mv']),
-                'name' => 'Toutes les zones MV'
+                'url' => $this->generateUrl('app_map_all_zones', ['classeName' => 'mx']),
+                'name' => 'Toutes les zones MX'
                 ],
                 [
                 'isGranted' => 'ROLE_ERM',
@@ -92,7 +92,7 @@ class MapsController extends AbstractController
                 ],
                 [
                     'isGranted' => 'ROLE_MCF',
-                    'url' => $this->generateUrl('app_map_technicians_telematique'),
+                    'url' => $this->generateUrl('app_map_people_telematique'),
                     'name' => 'Carte des téchniciens télématiques',
                     'icon' => 'ri:taxi-wifi-fill'
                 ],
@@ -210,8 +210,7 @@ class MapsController extends AbstractController
         if($classe){
 
             //?on recupere les donnees dans le service
-            $mapDonnees = $this->mapsService->constructionMapOfZonesByClasse($classe->getName());
-            //$mapDonnees = $this->mapsService->constructionMapOfZonesByClasseWithUx($classe->getName());
+            $mapDonnees = $this->mapsService->constructionMapOfZonesByClasseWithUx($classe->getName());
     
             return $this->render('site/maps/all_zones.html.twig', [
                 'mapDonnees' => $mapDonnees,

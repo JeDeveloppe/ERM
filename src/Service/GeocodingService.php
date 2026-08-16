@@ -7,14 +7,12 @@ use App\Entity\City;
 use App\Entity\Shop;
 use App\Repository\CgoRepository;
 use App\Repository\CityRepository;
-use App\Repository\ManagerClassRepository;
 use App\Repository\ShopRepository;
-use App\Repository\ManagerRepository;
 use App\Repository\ZoneErmRepository;
 use App\Repository\RegionErmRepository;
 
 use App\Repository\ShopClassRepository;
-use App\Repository\TechnicianRepository;
+use App\Repository\PersonRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -28,15 +26,13 @@ class GeocodingService
         private EntityManagerInterface $em,
         private ShopClassRepository $shopClassRepository,
         private ZoneErmRepository $zoneErmRepository,
-        private ManagerRepository $managerRepository,
         private CityRepository $cityRepository,
         private CgoRepository $cgoRepository,
         private RegionErmRepository $regionErmRepository,
-        private ManagerClassRepository $managerClassRepository,
         private MapsService $mapsService,
         private ShopRepository $shopRepository,
         private HttpClientInterface $client,
-        private TechnicianRepository $technicianRepository,
+        private PersonRepository $personRepository,
         private HttpClientInterface $httpClient,
         private Security $security
         ){

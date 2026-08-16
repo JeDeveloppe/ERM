@@ -12,7 +12,7 @@
                             <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"><i class="fas fa-map-marked-alt"></i> Cartes</a>
                             <div class="dropdown-menu">
                                 <a class="dropdown-item" href="{{ path('app_map_all_shops') }}"><i class="fas fa-store"></i> Tous les centres</a>
-                                <a class="dropdown-item" href="{{ path('app_map_all_shops_under_cgo', {'classeName': 'mv'}) }}"><i class="fas fa-truck-moving"></i> Centres sous CGO MV</a>
+                                <a class="dropdown-item" href="{{ path('app_map_all_shops_under_cgo', {'classeName': 'mx'}) }}"><i class="fas fa-truck-moving"></i> Centres sous CGO MX</a>
                                 <a class="dropdown-item" href="{{ path('app_map_all_shops_under_cgo', {'classeName': 'vl'}) }}"><i class="fas fa-car-side"></i> Centres sous CGO VL</a>
                                 <a class="dropdown-item" href="{{ path('app_map_all_cts') }}"><i class="fas fa-map-marker-alt"></i> Carte des CT</a>
                             </div>
@@ -21,7 +21,7 @@
                             <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"><i class="fas fa-chart-area"></i> Zones</a>
                             <div class="dropdown-menu">
                                 <a class="dropdown-item" href="{{ path('app_map_all_regions') }}"><i class="fas fa-globe-europe"></i> Toutes les régions</a>
-                                <a class="dropdown-item" href="{{ path('app_map_all_zones', {'classeName': 'mv'}) }}"><i class="fas fa-truck-moving"></i> Toutes les zones MV</a>
+                                <a class="dropdown-item" href="{{ path('app_map_all_zones', {'classeName': 'mx'}) }}"><i class="fas fa-truck-moving"></i> Toutes les zones MX</a>
                                 <a class="dropdown-item" href="{{ path('app_map_all_zones', {'classeName': 'vl'}) }}"><i class="fas fa-car-side"></i> Toutes les zones VL</a>
                             </div>
                         </li>
@@ -38,7 +38,7 @@
                                 <a class="dropdown-item" href="{{ path('app_prime') }}">
                                     <i class="bi bi-currency-euro me-2"></i> Calcul prime mensuelle
                                 </a>
-                                <a class="dropdown-item" href="{{ path('app_reunion_home') }}">
+                                <a class="dropdown-item" href="#">
                                     <i class="bi bi-calendar-check me-2"></i> Réunions
                                 </a>
                             </div>
@@ -49,7 +49,7 @@
                             <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"><i class="fas fa-satellite-dish"></i> Télématique</a>
                             <div class="dropdown-menu">
                                 <a class="dropdown-item" href="{{ path('app_map_zones_telematique') }}"><i class="fas fa-map-pin"></i> Les zones télématiques</a>
-                                <a class="dropdown-item" href="{{ path('app_map_technicians_telematique') }}"><i class="fas fa-user-hard-hat"></i> Carte des techniciens télématiques</a>
+                                <a class="dropdown-item" href="{{ path('app_map_people_telematique') }}"><i class="fas fa-user-hard-hat"></i> Carte des techniciens télématiques</a>
                                 <hr class="dropdown-divider">
                                 <a class="dropdown-item" href="{{ path('app_search_distance_for_telematic_assistance') }}"><i class="fas fa-street-view"></i> Télématiciens les plus proches</a>
                             </div>

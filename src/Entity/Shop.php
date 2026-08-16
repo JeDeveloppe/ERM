@@ -35,7 +35,7 @@ class Shop
     #[ORM\ManyToOne(inversedBy: 'shops')]
     private ?City $city = null;
 
-    #[ORM\Column(length: 25)]
+    #[ORM\Column(length: 50)]
     private ?string $phone = null;
 
     /**
@@ -44,33 +44,23 @@ class Shop
     #[ORM\ManyToMany(targetEntity: Cgo::class, mappedBy: 'shopsUnderControls')]
     private Collection $cgos;
 
-    #[ORM\ManyToOne(inversedBy: 'shops')]
-    private ?Manager $manager = null;
+    /**
+     * @var Collection<int, Person>
+     */
+    #[ORM\OneToMany(targetEntity: Person::class, mappedBy: 'shop')]
+    private Collection $people;
 
     /**
-     * @var Collection<int, Technician>
+     * @var Collection<int, Person>
      */
-    #[ORM\OneToMany(targetEntity: Technician::class, mappedBy: 'shop')]
-    private Collection $technicians;
-
-    /**
-     * @var Collection<int, TechnicalAdvisor>
-     */
-    #[ORM\OneToMany(targetEntity: TechnicalAdvisor::class, mappedBy: 'attachmentCenter')]
-    private Collection $technicalAdvisors;
-
-    /**
-     * @var Collection<int, TechnicalAdvisor>
-     */
-    #[ORM\ManyToMany(targetEntity: TechnicalAdvisor::class, mappedBy: 'workForShops')]
-    private Collection $technicalAdvisorsWorkingForMe;
+    #[ORM\ManyToMany(targetEntity: Person::class, mappedBy: 'workForShops')]
+    private Collection $peopleWorkingForMe;
 
     public function __construct()
     {
         $this->cgos = new ArrayCollection();
-        $this->technicians = new ArrayCollection();
-        $this->technicalAdvisors = new ArrayCollection();
-        $this->technicalAdvisorsWorkingForMe = new ArrayCollection();
+        $this->people = new ArrayCollection();
+        $this->peopleWorkingForMe = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -194,100 +184,70 @@ class Shop
         return $this;
     }
 
-    public function getManager(): ?Manager
-    {
-        return $this->manager;
-    }
-
-    public function setManager(?Manager $manager): static
-    {
-        $this->manager = $manager;
-
-        return $this;
-    }
 
     /**
-     * @return Collection<int, Technician>
+     * @return Collection<int, Person>
      */
-    public function getTechnicians(): Collection
+    public function getPeople(): Collection
     {
-        return $this->technicians;
+        return $this->people;
     }
 
-    public function addTechnician(Technician $technician): static
+    public function addPerson(Person $person): static
     {
-        if (!$this->technicians->contains($technician)) {
-            $this->technicians->add($technician);
-            $technician->setShop($this);
+        if (!$this->people->contains($person)) {
+            $this->people->add($person);
+            $person->setShop($this);
         }
 
         return $this;
     }
 
-    public function removeTechnician(Technician $technician): static
+    public function removePerson(Person $person): static
     {
-        if ($this->technicians->removeElement($technician)) {
+        if ($this->people->removeElement($person)) {
             // set the owning side to null (unless already changed)
-            if ($technician->getShop() === $this) {
-                $technician->setShop(null);
+            if ($person->getShop() === $this) {
+                $person->setShop(null);
             }
         }
 
         return $this;
     }
 
-    /**
-     * @return Collection<int, TechnicalAdvisor>
-     */
-    public function getTechnicalAdvisors(): Collection
+    public function getRcsPerson(): ?Person
     {
-        return $this->technicalAdvisors;
-    }
-
-    public function addTechnicalAdvisor(TechnicalAdvisor $technicalAdvisor): static
-    {
-        if (!$this->technicalAdvisors->contains($technicalAdvisor)) {
-            $this->technicalAdvisors->add($technicalAdvisor);
-            $technicalAdvisor->setAttachmentCenter($this);
-        }
-
-        return $this;
-    }
-
-    public function removeTechnicalAdvisor(TechnicalAdvisor $technicalAdvisor): static
-    {
-        if ($this->technicalAdvisors->removeElement($technicalAdvisor)) {
-            // set the owning side to null (unless already changed)
-            if ($technicalAdvisor->getAttachmentCenter() === $this) {
-                $technicalAdvisor->setAttachmentCenter(null);
+        foreach ($this->people as $person) {
+            if ($person->hasRole('RCS')) {
+                return $person;
             }
         }
 
-        return $this;
+        return null;
     }
 
     /**
-     * @return Collection<int, TechnicalAdvisor>
+     * @return Collection<int, Person>
      */
-    public function getTechnicalAdvisorsWorkingForMe(): Collection
+    public function getPeopleWorkingForMe(): Collection
     {
-        return $this->technicalAdvisorsWorkingForMe;
+        return $this->peopleWorkingForMe;
     }
 
-    public function addTechnicalAdvisorsWorkingForMe(TechnicalAdvisor $technicalAdvisorsWorkingForMe): static
+    public function addPersonWorkingForMe(Person $personWorkingForMe): static
     {
-        if (!$this->technicalAdvisorsWorkingForMe->contains($technicalAdvisorsWorkingForMe)) {
-            $this->technicalAdvisorsWorkingForMe->add($technicalAdvisorsWorkingForMe);
-            $technicalAdvisorsWorkingForMe->addWorkForShop($this);
+        if (!$this->peopleWorkingForMe->contains($personWorkingForMe)) {
+            $this->peopleWorkingForMe->add($personWorkingForMe);
+            $personWorkingForMe->addWorkForShop($this);
         }
 
         return $this;
     }
 
-    public function removeTechnicalAdvisorsWorkingForMe(TechnicalAdvisor $technicalAdvisorsWorkingForMe): static
+    public function removePersonWorkingForMe(Person $personWorkingForMe): static
     {
-        if ($this->technicalAdvisorsWorkingForMe->removeElement($technicalAdvisorsWorkingForMe)) {
-            $technicalAdvisorsWorkingForMe->removeWorkForShop($this);
+        if ($this->peopleWorkingForMe->removeElement($personWorkingForMe)) {
+            $personWorkingForMe->removeWorkForShop($this);
         }
 
         return $this;

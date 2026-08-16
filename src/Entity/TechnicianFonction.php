@@ -19,10 +19,10 @@ class TechnicianFonction
     private ?string $name = null;
 
     /**
-     * @var Collection<int, Technician>
+     * @var Collection<int, Person>
      */
-    #[ORM\ManyToMany(targetEntity: Technician::class, mappedBy: 'fonctions')]
-    private Collection $technicians;
+    #[ORM\ManyToMany(targetEntity: Person::class, mappedBy: 'fonctions')]
+    private Collection $people;
 
     #[ORM\Column(length: 15)]
     private ?string $color = null;
@@ -35,7 +35,7 @@ class TechnicianFonction
 
     public function __construct()
     {
-        $this->technicians = new ArrayCollection();
+        $this->people = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -56,27 +56,27 @@ class TechnicianFonction
     }
 
     /**
-     * @return Collection<int, Technician>
+     * @return Collection<int, Person>
      */
-    public function getTechnicians(): Collection
+    public function getPeople(): Collection
     {
-        return $this->technicians;
+        return $this->people;
     }
 
-    public function addTechnician(Technician $technician): static
+    public function addPerson(Person $person): static
     {
-        if (!$this->technicians->contains($technician)) {
-            $this->technicians->add($technician);
-            $technician->addFonction($this);
+        if (!$this->people->contains($person)) {
+            $this->people->add($person);
+            $person->addFonction($this);
         }
 
         return $this;
     }
 
-    public function removeTechnician(Technician $technician): static
+    public function removePerson(Person $person): static
     {
-        if ($this->technicians->removeElement($technician)) {
-            $technician->removeFonction($this);
+        if ($this->people->removeElement($person)) {
+            $person->removeFonction($this);
         }
 
         return $this;

@@ -45,7 +45,7 @@ class Cgo
 
     #[ORM\ManyToOne(inversedBy: 'cgos')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Manager $manager = null;
+    private ?Person $manager = null;
 
     #[ORM\ManyToOne(inversedBy: 'cgos')]
     #[ORM\JoinColumn(nullable: false)]
@@ -58,15 +58,15 @@ class Cgo
     private ?TelematicArea $telematicArea = null;
 
     /**
-     * @var Collection<int, Technician>
+     * @var Collection<int, Person>
      */
-    #[ORM\OneToMany(targetEntity: Technician::class, mappedBy: 'controledByCgo')]
-    private Collection $technicians;
+    #[ORM\OneToMany(targetEntity: Person::class, mappedBy: 'controledByCgo')]
+    private Collection $people;
 
     public function __construct()
     {
         $this->shopsUnderControls = new ArrayCollection();
-        $this->technicians = new ArrayCollection();
+        $this->people = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -187,12 +187,12 @@ class Cgo
         return $this->name.' '.$this->cm;
     }
 
-    public function getManager(): ?Manager
+    public function getManager(): ?Person
     {
         return $this->manager;
     }
 
-    public function setManager(?Manager $manager): static
+    public function setManager(?Person $manager): static
     {
         $this->manager = $manager;
 
@@ -236,29 +236,29 @@ class Cgo
     }
 
     /**
-     * @return Collection<int, Technician>
+     * @return Collection<int, Person>
      */
-    public function getTechnicians(): Collection
+    public function getPeople(): Collection
     {
-        return $this->technicians;
+        return $this->people;
     }
 
-    public function addTechnician(Technician $technician): static
+    public function addPerson(Person $person): static
     {
-        if (!$this->technicians->contains($technician)) {
-            $this->technicians->add($technician);
-            $technician->setControledByCgo($this);
+        if (!$this->people->contains($person)) {
+            $this->people->add($person);
+            $person->setControledByCgo($this);
         }
 
         return $this;
     }
 
-    public function removeTechnician(Technician $technician): static
+    public function removePerson(Person $person): static
     {
-        if ($this->technicians->removeElement($technician)) {
+        if ($this->people->removeElement($person)) {
             // set the owning side to null (unless already changed)
-            if ($technician->getControledByCgo() === $this) {
-                $technician->setControledByCgo(null);
+            if ($person->getControledByCgo() === $this) {
+                $person->setControledByCgo(null);
             }
         }
 
