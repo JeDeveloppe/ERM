@@ -836,13 +836,17 @@ class MapsService
             $map->center(new Point(46.6, 2.2))->zoom(6);
         }
 
+        // Fond de carte clair (CartoDB Positron) plutôt que l'OSM standard : les
+        // zones vertes de l'OSM standard écrasaient les couleurs des polygones
+        // (départements/zones/régions).
         $leafletOptions = (new LeafletOptions())
             ->tileLayer(new TileLayer(
-                url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+                attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/attributions">CARTO</a>',
                 options: [
                     'minZoom' => 6,
-                    'maxZoom' => 10,        
+                    'maxZoom' => 10,
+                    'subdomains' => 'abcd',
                 ]
                 ));
         // Add the custom options to the map
