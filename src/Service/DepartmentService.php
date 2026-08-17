@@ -8,6 +8,7 @@ use App\Entity\CgoTelematicArea;
 use App\Repository\DepartmentRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\LargeRegionRepository;
+use App\Repository\RegionErmRepository;
 use App\Repository\CgoTelematicAreaRepository;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\String\Slugger\SluggerInterface;
@@ -18,6 +19,7 @@ class DepartmentService
         private EntityManagerInterface $em,
         private DepartmentRepository $departmentRepository,
         private LargeRegionRepository $largeregionRepository,
+        private RegionErmRepository $regionErmRepository,
         private SluggerInterface $sluggerInterface,
         ){
     }
@@ -118,5 +120,53 @@ class DepartmentService
 
 
         return $department;
+    }
+
+    /**
+     * Applique les rattachements département → région ERM saisis à la main
+     * dans l'admin (voir import/department_region_erm.csv, exporté depuis la
+     * base). Ne dérive rien tout seul (les zones/CGO/CT ne suffisent pas à
+     * couvrir tous les départements et se chevauchent par endroits) : ce
+     * fichier est la seule source de vérité pour ce rattachement, à
+     * régénérer manuellement (export CSV depuis la table) si l'admin change.
+     */
+    public function importDepartmentRegionErm(SymfonyStyle $io): void
+    {
+        $io->title('Rattachement des départements aux régions ERM');
+
+        $rows = $this->readCsvFileDepartmentRegionErm();
+
+        $io->progressStart(count($rows));
+
+        foreach ($rows as $row) {
+            $io->progressAdvance();
+
+            $department = $this->departmentRepository->findOneByCode($row['code']);
+            if (!$department) {
+                $io->warning('Aucun département pour le code "' . $row['code'] . '" - ligne ignorée');
+                continue;
+            }
+
+            $regionErm = $this->regionErmRepository->findOneByName($row['region_name']);
+            if (!$regionErm) {
+                $io->warning('Aucune région ERM "' . $row['region_name'] . '" pour le département "' . $row['code'] . '" - ligne ignorée');
+                continue;
+            }
+
+            $department->setRegionErm($regionErm);
+        }
+
+        $this->em->flush();
+
+        $io->progressFinish();
+        $io->success('Rattachement terminé');
+    }
+
+    private function readCsvFileDepartmentRegionErm(): Reader
+    {
+        $csv = Reader::createFromPath('%kernel.root.dir%/../import/department_region_erm.csv', 'r');
+        $csv->setHeaderOffset(0);
+
+        return $csv;
     }
 }

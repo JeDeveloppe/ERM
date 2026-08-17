@@ -1,0 +1,84 @@
+code,department_name,region_name
+01,Ain,AURA
+02,Aisne,EST
+03,Allier,CENTRE
+04,Alpes-de-Haute-Provence,SUD
+05,Hautes-Alpes,AURA
+06,Alpes-Maritimes,SUD
+07,Ardèche,AURA
+08,Ardennes,EST
+09,Ariège,SUD
+10,Aube,EST
+11,Aude,SUD
+12,Aveyron,SUD
+13,Bouches-du-Rhône,SUD
+14,Calvados,OUEST
+15,Cantal,AURA
+16,Charente,CENTRE
+17,Charente-Maritime,CENTRE
+18,Cher,CENTRE
+19,Corrèze,CENTRE
+21,Côte-d'Or,EST
+22,Côtes-d'Armor,OUEST
+23,Creuse,CENTRE
+25,Doubs,EST
+26,Drôme,AURA
+27,Eure,OUEST
+28,Eure-et-Loir,CENTRE
+29,Finistère,OUEST
+30,Gard,SUD
+34,Hérault,SUD
+35,Ille-et-Vilaine,OUEST
+36,Indre,CENTRE
+37,Indre-et-Loire,CENTRE
+38,Isère,AURA
+39,Jura,EST
+41,Loir-et-Cher,CENTRE
+42,Loire,AURA
+43,Haute-Loire,AURA
+44,Loire-Atlantique,OUEST
+45,Loiret,CENTRE
+48,Lozère,AURA
+49,Maine-et-Loire,OUEST
+50,Manche,OUEST
+51,Marne,EST
+52,Haute-Marne,EST
+53,Mayenne,OUEST
+54,Meurthe-et-Moselle,EST
+55,Meuse,EST
+56,Morbihan,OUEST
+57,Moselle,EST
+58,Nièvre,CENTRE
+59,Nord,"IDF NORD"
+60,Oise,"IDF NORD"
+61,Orne,OUEST
+62,Pas-de-Calais,"IDF NORD"
+63,Puy-de-Dôme,AURA
+66,Pyrénées-Orientales,SUD
+67,Bas-Rhin,EST
+68,Haut-Rhin,EST
+69,Rhône,AURA
+70,Haute-Saône,EST
+71,Saône-et-Loire,EST
+72,Sarthe,OUEST
+73,Savoie,AURA
+74,Haute-Savoie,AURA
+75,Paris,"IDF NORD"
+76,Seine-Maritime,OUEST
+77,Seine-et-Marne,"IDF NORD"
+78,Yvelines,"IDF NORD"
+79,Deux-Sèvres,CENTRE
+80,Somme,"IDF NORD"
+83,Var,SUD
+84,Vaucluse,SUD
+85,Vendée,OUEST
+86,Vienne,CENTRE
+87,Haute-Vienne,CENTRE
+88,Vosges,EST
+89,Yonne,EST
+90,"Territoire de Belfort",EST
+91,Essonne,"IDF NORD"
+92,Hauts-de-Seine,"IDF NORD"
+93,Seine-Saint-Denis,"IDF NORD"
+94,Val-de-Marne,"IDF NORD"
+95,Val-d'Oise,"IDF NORD"

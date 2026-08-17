@@ -93,6 +93,7 @@ class InitDataBase extends Command
         $this->cityService->importCitiesOfFrance($io);
         $this->roleErmService->seedRoles($io);
         $this->regionErmService->importRegionserm($io);
+        $this->departmentService->importDepartmentRegionErm($io);
         $this->zoneErmService->importZoneserm($io);
         $this->shopClassService->importShopClasses($io);
         $this->personService->importDR($io);
