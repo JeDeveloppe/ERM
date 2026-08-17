@@ -836,17 +836,13 @@ class MapsService
             $map->center(new Point(46.6, 2.2))->zoom(6);
         }
 
-        // Fond de carte CartoDB Dark Matter (sombre) : Positron/Voyager jugés
-        // trop clairs/pâles, les couleurs des polygones ressortent bien mieux
-        // en contraste sur un fond sombre.
         $leafletOptions = (new LeafletOptions())
             ->tileLayer(new TileLayer(
-                url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-                attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/attributions">CARTO</a>',
+                url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
                 options: [
                     'minZoom' => 6,
                     'maxZoom' => 10,
-                    'subdomains' => 'abcd',
                 ]
                 ));
         // Add the custom options to the map
