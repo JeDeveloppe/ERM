@@ -48,10 +48,11 @@ class DashboardController extends AbstractDashboardController
 
             MenuItem::linkToDashboard('Dashboard', 'fa fa-home'),
             MenuItem::linkToRoute('Site', 'fa fa-globe', 'app_maps_choices'),
-            // MenuItem::linkToCrud('Zones opérationnelles (par centres)', 'fas fa-list', CgoOperationalAreaByShops::class),
-            // MenuItem::linkToCrud('Zones télématiques', 'fas fa-list', CgoTelematicArea::class),
+
             MenuItem::section('Télématique:')->setPermission('ROLE_MCF_ADMIN'),
-            MenuItem::linkToCrud('Liste des personnes', 'fas fa-list', Person::class)->setPermission('ROLE_MCF_ADMIN'),
+            MenuItem::linkToCrud('Liste des techniciens télématiques', 'fas fa-list', Person::class)
+                ->setController(PersonTelematicCrudController::class)
+                ->setPermission('ROLE_MCF_ADMIN'),
             MenuItem::linkToCrud('Liste des formations', 'fas fa-list', TechnicianFormations::class)->setPermission('ROLE_MCF_ADMIN'),
             MenuItem::linkToCrud('Liste des fonctions', 'fas fa-list', TechnicianFonction::class)->setPermission('ROLE_MCF_ADMIN'),
             MenuItem::linkToCrud('Liste des véhicules', 'fas fa-list', TechnicianVehicle::class)->setPermission('ROLE_MCF_ADMIN'),
