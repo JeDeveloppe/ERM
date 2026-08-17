@@ -33,7 +33,14 @@ export default class extends Controller {
     }
 
     _onPreConnect(event) { }
-    _onConnect(event) { }
+
+    _onConnect(event) {
+        const { map, extra } = event.detail;
+
+        if (map && extra && extra.maxBounds) {
+            map.setMaxBounds(extra.maxBounds);
+        }
+    }
 
     _onMarkerBeforeCreate(event) {
         const definition = event.detail.definition;

@@ -852,6 +852,13 @@ class MapsService
         // Add the custom options to the map
         $map->options($leafletOptions);
 
+        // Cantonne la carte à la France métropolitaine + Corse : évite de pouvoir
+        // dézoomer/glisser jusqu'à voir le reste du monde. Lu côté JS par
+        // mymap_controller.js (ux:map:connect) via Leaflet's setMaxBounds().
+        $map->extra([
+            'maxBounds' => [[41.0, -5.5], [51.5, 10.0]],
+        ]);
+
         return $map;
     }
 
