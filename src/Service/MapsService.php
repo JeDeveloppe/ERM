@@ -798,8 +798,12 @@ class MapsService
 
         }
 
-        $this->addDepartmentPolygonsToMap($mapOnlyWithCts, $departments, fn(Department $department) => $stylesByDepartment[$department->getId()]);
-        $this->addDepartmentPolygonsToMap($mapOnlyWithShops, $departments, fn(Department $department) => $stylesByDepartment[$department->getId()]);
+        // Les plaques de couleur par département n'ont de sens que sur la vue
+        // "carte des CT" (une couleur = un CT) ; sur la vue "tous les centres",
+        // elles n'apportent rien et gênent la lecture des marqueurs de centres.
+        if($optionName == 'cts'){
+            $this->addDepartmentPolygonsToMap($mapOnlyWithCts, $departments, fn(Department $department) => $stylesByDepartment[$department->getId()]);
+        }
 
         //! choices from the form
         if($optionName == 'cts')
