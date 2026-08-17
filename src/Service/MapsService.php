@@ -836,12 +836,12 @@ class MapsService
             $map->center(new Point(46.6, 2.2))->zoom(6);
         }
 
-        // Fond de carte clair (CartoDB Positron) plutôt que l'OSM standard : les
-        // zones vertes de l'OSM standard écrasaient les couleurs des polygones
-        // (départements/zones/régions).
+        // Fond de carte CartoDB Voyager : moins chargé que l'OSM standard (qui
+        // écrasait les couleurs des polygones avec ses zones vertes) mais garde
+        // un peu de couleur/relief, contrairement au gris uni de Positron.
         $leafletOptions = (new LeafletOptions())
             ->tileLayer(new TileLayer(
-                url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+                url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
                 attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/attributions">CARTO</a>',
                 options: [
                     'minZoom' => 6,
