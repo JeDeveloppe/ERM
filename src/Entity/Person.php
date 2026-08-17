@@ -405,6 +405,11 @@ class Person
         return false;
     }
 
+    public function getRoleNames(): string
+    {
+        return implode(', ', array_map(fn(RoleErm $role) => $role->getName(), $this->roles->toArray()));
+    }
+
     public function getRegionErm(): ?RegionErm
     {
         return $this->regionErm;

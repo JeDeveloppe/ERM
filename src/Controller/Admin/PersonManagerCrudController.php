@@ -24,8 +24,9 @@ class PersonManagerCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         return [
-            TextField::new('roles', 'Rôles:')
+            TextField::new('roleNames', 'Rôles:')
                 ->onlyOnIndex()
+                ->renderAsHtml()
                 ->formatValue(fn ($value, Person $person) => implode(' ', array_map(
                     fn(RoleErm $role) => '<span class="badge rounded-pill bg-primary me-1">'.htmlspecialchars($role->getName()).'</span>',
                     $person->getRoles()->toArray()
