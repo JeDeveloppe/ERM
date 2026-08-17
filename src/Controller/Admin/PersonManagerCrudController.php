@@ -24,7 +24,15 @@ class PersonManagerCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         return [
-            AssociationField::new('roles', 'Rôles:')->setFormTypeOptions(['by_reference' => false]),
+            AssociationField::new('roles', 'Rôles:')
+                ->onlyOnIndex()
+                ->formatValue(fn ($value, Person $person) => implode(', ', array_map(
+                    fn(RoleErm $role) => $role->getName(),
+                    $person->getRoles()->toArray()
+                ))),
+            AssociationField::new('roles', 'Rôles:')
+                ->onlyOnForms()
+                ->setFormTypeOptions(['by_reference' => false]),
             TextField::new('firstName', 'Prénom:'),
             TextField::new('name', 'Nom:'),
             TextField::new('phone', 'Tel:'),
