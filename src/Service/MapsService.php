@@ -705,6 +705,12 @@ class MapsService
         //?on recupere tous les ct
         $cts = $this->personRepository->findByRole(\App\Entity\RoleErm::CT);
 
+        // Départements couverts par chaque CT (son centre de rattachement + les
+        // centres qu'il inspecte), pour colorer la carte comme pour les régions.
+        // Un même département n'est colorié qu'une fois (premier CT trouvé).
+        $departments = [];
+        $stylesByDepartment = [];
+
         //?on construit la map
         foreach($cts as $ct)
         {
@@ -712,7 +718,7 @@ class MapsService
                 continue;
             }
 
-            $color = $ct->getZoneColor();
+            $color = $ct->getZoneColor() ?? $this->randomHexadecimalColor();
             $iconOfTechnicalAdvisor = Icon::ux('fa6-solid:magnifying-glass-dollar')->width(24)->height(24)->color($color);
             $workForShops = '<p>Fait les inspections pour:<br/>';
             foreach($ct->getWorkForShops() as $shop) {
@@ -761,8 +767,39 @@ class MapsService
                     ],
                 ));
             }
-            
+
+            $ctShops = $ct->getWorkForShops()->toArray();
+            $ctShops[] = $ct->getShop();
+
+            foreach($ctShops as $ctShop){
+                if(!$ctShop->getCity() || !$ctShop->getCity()->getDepartment()){
+                    continue;
+                }
+
+                $department = $ctShop->getCity()->getDepartment();
+                $ctName = $ct->getFirstName().' '.$ct->getName();
+
+                if(isset($stylesByDepartment[$department->getId()])){
+                    // Plusieurs CT peuvent couvrir le même département (pas de
+                    // territoire exclusif) : on garde la couleur du premier CT
+                    // trouvé, mais on liste tous les CT dans le libellé.
+                    if(!str_contains($stylesByDepartment[$department->getId()]['label'], $ctName)){
+                        $stylesByDepartment[$department->getId()]['label'] .= ', '.$ctName;
+                    }
+                    continue;
+                }
+
+                $departments[$department->getId()] = $department;
+                $stylesByDepartment[$department->getId()] = [
+                    'label' => $ctName,
+                    'color' => $color,
+                ];
+            }
+
         }
+
+        $this->addDepartmentPolygonsToMap($mapOnlyWithCts, $departments, fn(Department $department) => $stylesByDepartment[$department->getId()]);
+        $this->addDepartmentPolygonsToMap($mapOnlyWithShops, $departments, fn(Department $department) => $stylesByDepartment[$department->getId()]);
 
         //! choices from the form
         if($optionName == 'cts')

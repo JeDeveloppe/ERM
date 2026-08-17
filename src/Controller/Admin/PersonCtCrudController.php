@@ -37,7 +37,7 @@ class PersonCtCrudController extends AbstractCrudController
             TextField::new('firstName', 'Prénom:'),
             TextField::new('phone', 'Tel:'),
             TextField::new('email', 'Email:'),
-            AssociationField::new('shop', 'Centre de rattachement:'),
+            AssociationField::new('shop', 'Centre de rattachement:')->onlyOnForms(),
             TextField::new('workForShopsNames', 'Inspections pour les centres de:')
                 ->onlyOnIndex()
                 ->renderAsHtml()
@@ -48,7 +48,7 @@ class PersonCtCrudController extends AbstractCrudController
             AssociationField::new('workForShops', 'Inspections pour les centres de:')
                 ->onlyOnForms(),
             ColorField::new('zoneColor', 'Couleur de sa zone:')->onlyOnForms(),
-            AssociationField::new('manager', 'Manager:'),
+            AssociationField::new('manager', 'Manager:')->onlyOnForms(),
         ];
     }
 
