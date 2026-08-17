@@ -28,7 +28,7 @@ class PersonManagerCrudController extends AbstractCrudController
                 ->onlyOnIndex()
                 ->renderAsHtml()
                 ->formatValue(fn ($value, Person $person) => implode(' ', array_map(
-                    fn(RoleErm $role) => '<span class="badge rounded-pill bg-primary me-1">'.htmlspecialchars($role->getName()).'</span>',
+                    fn(RoleErm $role) => '<span class="badge rounded-pill me-1" style="background-color: '.htmlspecialchars($role->getColor() ?? '#6c757d').';">'.htmlspecialchars($role->getName()).'</span>',
                     $person->getRoles()->toArray()
                 ))),
             AssociationField::new('roles', 'Rôles:')

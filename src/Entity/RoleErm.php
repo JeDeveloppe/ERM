@@ -45,6 +45,9 @@ class RoleErm
     #[ORM\Column(length: 30)]
     private ?string $name = null;
 
+    #[ORM\Column(length: 10, nullable: true)]
+    private ?string $color = null;
+
     /**
      * @var Collection<int, Person>
      */
@@ -69,6 +72,18 @@ class RoleErm
     public function setName(string $name): static
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getColor(): ?string
+    {
+        return $this->color;
+    }
+
+    public function setColor(?string $color): static
+    {
+        $this->color = $color;
 
         return $this;
     }
