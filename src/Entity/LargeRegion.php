@@ -24,6 +24,9 @@ class LargeRegion
     #[ORM\Column(length: 255)]
     private ?string $slug = null;
 
+    #[ORM\Column(length: 10, nullable: true)]
+    private ?string $color = null;
+
     /**
      * @var Collection<int, Department>
      */
@@ -72,6 +75,18 @@ class LargeRegion
     public function setSlug(string $slug): static
     {
         $this->slug = $slug;
+
+        return $this;
+    }
+
+    public function getColor(): ?string
+    {
+        return $this->color;
+    }
+
+    public function setColor(?string $color): static
+    {
+        $this->color = $color;
 
         return $this;
     }
