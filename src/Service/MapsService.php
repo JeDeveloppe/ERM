@@ -836,12 +836,12 @@ class MapsService
             $map->center(new Point(46.6, 2.2))->zoom(6);
         }
 
-        // Fond de carte CartoDB Voyager : moins chargé que l'OSM standard (qui
-        // écrasait les couleurs des polygones avec ses zones vertes) mais garde
-        // un peu de couleur/relief, contrairement au gris uni de Positron.
+        // Fond de carte CartoDB Dark Matter (sombre) : Positron/Voyager jugés
+        // trop clairs/pâles, les couleurs des polygones ressortent bien mieux
+        // en contraste sur un fond sombre.
         $leafletOptions = (new LeafletOptions())
             ->tileLayer(new TileLayer(
-                url: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+                url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
                 attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors © <a href="https://carto.com/attributions">CARTO</a>',
                 options: [
                     'minZoom' => 6,
