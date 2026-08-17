@@ -202,7 +202,8 @@ class PersonService
             $this->em->flush($manager);
         }
 
-        $person = $this->personRepository->findOneBy(['name' => $array['Nom']]) ?? $this->newPersonWithDefaults($shop);
+        $existingPerson = $this->personRepository->findOneBy(['name' => $array['Nom']]);
+        $person = $existingPerson ?? $this->newPersonWithDefaults($shop);
 
         $person
             ->setName($array['Nom'])
@@ -211,8 +212,15 @@ class PersonService
             ->setPhone($array['Tél mobile'])
             ->setManager($manager)
             ->setShop($shop)
-            ->setZoneColor($this->mapsService->randomHexadecimalColor())
             ;
+
+        // La couleur n'est tirée que si la personne n'en a pas déjà une (voir
+        // RegionErmService/ZoneErmService/CgoService pour le même correctif)
+        // pour ne pas casser l'espacement des couleurs entre CT à chaque
+        // réimport.
+        if (!$person->getZoneColor()) {
+            $person->setZoneColor($this->mapsService->randomHexadecimalColor('person-zone'));
+        }
         if ($ctRole) {
             $person->addRole($ctRole);
         }

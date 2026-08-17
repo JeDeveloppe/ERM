@@ -60,10 +60,12 @@ class TelematicAreasService
             $cgoArea = new TelematicArea();
         }
 
+        if(!$cgoArea->getTerritoryColor()){
+            $cgoArea->setTerritoryColor($this->mapsService->randomHexadecimalColor('telematic'));
+        }
+
         //"id","cgo_who_controls_area_id","zone_color"
-        $cgoArea
-            ->addCgo($cgo)
-            ->setTerritoryColor($this->mapsService->randomHexadecimalColor());
+        $cgoArea->addCgo($cgo);
 
         return $cgoArea;
     }

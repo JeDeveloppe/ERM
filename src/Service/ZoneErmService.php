@@ -63,7 +63,7 @@ class ZoneErmService
             // Sécurité : normalement déjà créée par RegionErmService qui tourne avant dans le
             // pipeline, mais on ne veut pas planter/laisser une zone sans région si l'ordre change.
             $regionErm = new RegionErm();
-            $regionErm->setName($regionName)->setTerritoryColor($this->mapsService->randomHexadecimalColor());
+            $regionErm->setName($regionName)->setTerritoryColor($this->mapsService->randomHexadecimalColor('region'));
             $this->em->persist($regionErm);
             $this->em->flush($regionErm);
         }
@@ -74,7 +74,15 @@ class ZoneErmService
             $zoneErm = new ZoneErm();
         }
 
-        $zoneErm->setName($arrayEntity['Zone'])->setRegionErm($regionErm)->setTerritoryColor($this->mapsService->randomHexadecimalColor());
+        // La couleur n'est tirée que si la zone n'en a pas déjà une : sinon une
+        // zone déjà existante (retrouvée sur une ligne CSV suivante) verrait sa
+        // couleur réécrite à chaque ligne, cassant l'espacement des couleurs
+        // entre zones.
+        if(!$zoneErm->getTerritoryColor()){
+            $zoneErm->setTerritoryColor($this->mapsService->randomHexadecimalColor('zone'));
+        }
+
+        $zoneErm->setName($arrayEntity['Zone'])->setRegionErm($regionErm);
 
         return $zoneErm;
     }

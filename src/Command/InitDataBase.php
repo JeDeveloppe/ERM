@@ -28,12 +28,20 @@ use Symfony\Component\Console\Output\OutputInterface;
 class InitDataBase extends Command
 {
     /**
-     * Tables (re)créées par app:initdatabase / app:initdatabase2, dans un ordre
-     * où les tables "enfants" (jointures) sont vidées avant les tables "parents".
-     * Ne touche pas aux tables de référence (city, department, shop_class,
-     * large_region, role_erm...) qui sont peuplées par upsert (findOneBy avant
-     * création) et ne se dupliquent donc jamais — et pour role_erm, ça évite
-     * aussi de perdre les couleurs configurées à la main dans l'admin.
+     * Tables de jointure (relations many-to-many) vidées par --reset. Elles ne
+     * se dupliquent jamais (les entités ajoutent via des méthodes qui vérifient
+     * `contains()` avant d'ajouter), mais les vider permet de refléter les
+     * suppressions de relations dans le CSV source (une personne qui ne
+     * travaille plus pour tel centre, etc.) — un import normal n'ajoute que
+     * des relations, il n'en retire jamais.
+     *
+     * Ne touche PAS aux tables "identité" (person, cgo, shop, zone_erm,
+     * region_erm, telematic_area, technician_vehicle/fonction/formations,
+     * role_erm...) : leurs services dédoublonnent déjà par nom/CM avant
+     * création (findOneBy), donc les vider ne sert à rien pour éviter les
+     * doublons, et ça casse en plus les ID stables dont dépendent les
+     * relations montées à la main dans l'admin (ex: département → région
+     * ERM, couleurs personnalisées).
      */
     private const TABLES_TO_RESET = [
         'person_role_erm',
@@ -41,15 +49,6 @@ class InitDataBase extends Command
         'person_technician_formations',
         'person_work_for_shop',
         'cgo_shop',
-        'person',
-        'cgo',
-        'shop',
-        'zone_erm',
-        'region_erm',
-        'telematic_area',
-        'technician_vehicle',
-        'technician_fonction',
-        'technician_formations',
     ];
 
     public function __construct(
@@ -73,7 +72,7 @@ class InitDataBase extends Command
 
     protected function configure(): void
     {
-        $this->addOption('reset', null, InputOption::VALUE_NONE, 'Vide les tables ERM avant de réimporter, pour repartir d\'une base propre (évite les doublons laissés par d\'anciens imports)');
+        $this->addOption('reset', null, InputOption::VALUE_NONE, 'Vide les tables de jointure (relations many-to-many) avant de réimporter, pour refléter les relations supprimées côté CSV. Ne touche pas aux entités elles-mêmes (déjà dédoublonnées par nom/CM à l\'import).');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -110,7 +109,7 @@ class InitDataBase extends Command
 
     private function resetTables(SymfonyStyle $io): void
     {
-        $io->title('Remise à zéro des tables ERM avant réimport');
+        $io->title('Remise à zéro des tables de jointure avant réimport');
 
         $this->connection->executeStatement('SET FOREIGN_KEY_CHECKS=0');
 
@@ -119,15 +118,9 @@ class InitDataBase extends Command
             $io->text("Table vidée : $table");
         }
 
-        // department.region_erm_id / telematic_area_id pointeraient sinon vers
-        // des lignes qui viennent d'être supprimées (region_erm/telematic_area
-        // ne sont pas des tables de référence, elles sont recréées à l'import).
-        $this->connection->executeStatement('UPDATE department SET region_erm_id = NULL, telematic_area_id = NULL');
-        $io->text('Références region_erm_id/telematic_area_id de department réinitialisées');
-
         $this->connection->executeStatement('SET FOREIGN_KEY_CHECKS=1');
 
-        $io->success('Tables ERM vidées, réimport en cours...');
+        $io->success('Tables de jointure vidées, réimport en cours...');
     }
 
 }

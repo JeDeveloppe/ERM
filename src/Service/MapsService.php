@@ -65,7 +65,7 @@ class MapsService
                 continue;
             }
 
-            $color = $area->getTerritoryColor() ?? $this->randomHexadecimalColor();
+            $color = $area->getTerritoryColor() ?? $this->randomHexadecimalColor('telematic');
 
             $contactCgo = "";
             foreach($area->getCgos() as $cgo){
@@ -127,7 +127,7 @@ class MapsService
             [
                 "lat" => $cgo->getCity()->getLatitude(),
                 "lng" => $cgo->getCity()->getLongitude(),
-                "color" => $cgo->getTerritoryColor() ?? $this->randomHexadecimalColor(),
+                "color" => $cgo->getTerritoryColor() ?? $this->randomHexadecimalColor('cgo'),
                 "name" => $cgo->getName().' ('.$cgo->getCm().')',
                 "description" => $cgo->getManager() ? $cgo->getManager()->getFirstName().' '.$cgo->getManager()->getName() : 'MANAGER DE CGO NON RENSEIGNÉ !',
                 "size" => 30,
@@ -214,7 +214,7 @@ class MapsService
 
         foreach($regionErms as $regionErm)
         {
-            $color = $regionErm->getTerritoryColor() ?? $this->randomHexadecimalColor();
+            $color = $regionErm->getTerritoryColor() ?? $this->randomHexadecimalColor('region');
 
             //?les départements rattachés directement à la région
             $this->addDepartmentPolygonsToMap($map, $regionErm->getDepartments(), fn(Department $department) => [
@@ -246,7 +246,7 @@ class MapsService
 
         foreach($zones as $zone){
 
-            $color = $zone->getTerritoryColor() ?? $this->randomHexadecimalColor();
+            $color = $zone->getTerritoryColor() ?? $this->randomHexadecimalColor('zone');
 
             $managerOfZone = $zone->getManager();
             if($managerOfZone !== null){
@@ -281,15 +281,41 @@ class MapsService
     }
 
     /**
-     * Génère une couleur aléatoire vive et saturée, en évitant la bande de
-     * teintes verte (~75°-170° en HSL) pour bien ressortir sur le fond de
-     * carte OpenStreetMap (dominé par du vert). Une couleur purement aléatoire
-     * (RGB uniforme) peut sinon tomber sur un vert ou un gris terne qui se
-     * fond dans le fond de carte.
+     * Compteurs de séquence pour l'espacement par angle d'or des couleurs
+     * générées (voir randomHexadecimalColor), un par "contexte" (région, zone,
+     * cgo...) pour que chaque famille de couleurs affichée ensemble sur une
+     * même carte reste bien espacée entre elles — un compteur unique partagé
+     * entre tous les types d'entités casserait l'espacement des zones par
+     * exemple dès que des centaines de couleurs de personnes sont générées
+     * entre deux zones dans le même import. Remis à zéro à chaque nouvelle
+     * requête/commande, ce qui suffit puisque ces couleurs sont surtout
+     * générées en masse pendant un même import.
+     *
+     * @var array<string, int>
      */
-    public function randomHexadecimalColor(): string
+    private array $colorSequenceIndexes = [];
+
+    /**
+     * Génère une couleur vive et saturée, bien espacée des précédentes couleurs
+     * générées dans le même contexte pendant ce run (angle d'or ≈137.5°, la
+     * technique standard pour répartir des couleurs de façon maximalement
+     * distincte sans connaître à l'avance combien il en faudra), et en évitant
+     * la bande de teintes verte (~75°-170° en HSL) pour bien ressortir sur le
+     * fond de carte OpenStreetMap. Un tirage purement aléatoire peut sinon
+     * produire deux couleurs très proches l'une de l'autre, illisibles côte à
+     * côte sur la carte.
+     *
+     * @param string $context Regroupe les couleurs affichées ensemble sur une
+     *  même carte (ex: 'region', 'zone', 'cgo', 'telematic', 'person-zone').
+     */
+    public function randomHexadecimalColor(string $context = 'default'): string
     {
-        $hue = mt_rand(0, 360 - 95);
+        $allowedRange = 360 - 95; // la bande verte (~95°) est exclue de la plage
+
+        $index = $this->colorSequenceIndexes[$context] ?? 0;
+        $hue = fmod($index * $allowedRange * 0.6180339887, $allowedRange);
+        $this->colorSequenceIndexes[$context] = $index + 1;
+
         if ($hue >= 75) {
             $hue += 95;
         }
@@ -507,7 +533,7 @@ class MapsService
                 [
                     "lat" => $cgo->getCity()->getLatitude(),
                     "lng" => $cgo->getCity()->getLongitude(),
-                    "color" => $cgo->getTerritoryColor() ?? $this->randomHexadecimalColor(),
+                    "color" => $cgo->getTerritoryColor() ?? $this->randomHexadecimalColor('cgo'),
                     "name" => $cgo->getName().' ('.$cgo->getCm().')',
                     "description" => $cgo->getManager() ? $cgo->getManager()->getFirstName().' '.$cgo->getManager()->getName() : 'MANAGER DE CGO NON RENSEIGNÉ !',
                     "size" => 30,
@@ -538,7 +564,7 @@ class MapsService
                     [
                         "lat" => $shop->getCity()->getLatitude(),
                         "lng" => $shop->getCity()->getLongitude(),
-                        "color" => $cgo->getTerritoryColor() ?? $this->randomHexadecimalColor(),
+                        "color" => $cgo->getTerritoryColor() ?? $this->randomHexadecimalColor('cgo'),
                         "name" => $shop->getName().' ('.$shop->getCm().')',
                         "description" => $contactShop,
                         "url" => $baseUrl,
@@ -753,7 +779,7 @@ class MapsService
                 continue;
             }
 
-            $color = $ct->getZoneColor() ?? $this->randomHexadecimalColor();
+            $color = $ct->getZoneColor() ?? $this->randomHexadecimalColor('person-zone');
             $iconOfTechnicalAdvisor = Icon::ux('fa6-solid:magnifying-glass-dollar')->width(24)->height(24)->color($color);
             $workForShops = '<p>Fait les inspections pour:<br/>';
             foreach($ct->getWorkForShops() as $shop) {

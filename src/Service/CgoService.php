@@ -214,6 +214,13 @@ class CgoService
             $cgo = new Cgo();
         }
 
+        // La couleur n'est tirée que si le CGO n'en a pas déjà une (voir
+        // RegionErmService/ZoneErmService pour le même correctif) pour ne pas
+        // casser l'espacement des couleurs entre CGO à chaque réimport.
+        if(!$cgo->getTerritoryColor()){
+            $cgo->setTerritoryColor($this->mapsService->randomHexadecimalColor('cgo'));
+        }
+
         $regionErm = $cgo->getRegionErm();
         if ($regionName !== null) {
             $regionErm = $this->regionErmRepository->findOneByName($regionName);
@@ -241,8 +248,7 @@ class CgoService
             ->setClassErm($this->shopClassRepository->findOneByName($class))
             ->setEmail($arrayEntity['Email générique CGO'])
             ->setZoneName($zoneName)
-            ->setCity($city)
-            ->setTerritoryColor($this->mapsService->randomHexadecimalColor());
+            ->setCity($city);
 
         return $cgo;
     }

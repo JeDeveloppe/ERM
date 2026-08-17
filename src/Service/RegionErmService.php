@@ -61,7 +61,14 @@ class RegionErmService
             $regionErm = new RegionErm();
         }
 
-        $regionErm->setName($name)->setTerritoryColor($this->mapsService->randomHexadecimalColor());
+        // La couleur n'est tirée que si la région n'en a pas déjà une (voir
+        // ZoneErmService pour le même correctif) pour ne pas casser
+        // l'espacement des couleurs entre régions à chaque réimport.
+        if(!$regionErm->getTerritoryColor()){
+            $regionErm->setTerritoryColor($this->mapsService->randomHexadecimalColor('region'));
+        }
+
+        $regionErm->setName($name);
 
         return $regionErm;
     }
