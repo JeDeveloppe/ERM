@@ -38,7 +38,15 @@ class PersonCtCrudController extends AbstractCrudController
             TextField::new('phone', 'Tel:'),
             TextField::new('email', 'Email:'),
             AssociationField::new('shop', 'Centre de rattachement:'),
-            AssociationField::new('workForShops', 'Inspections pour les centres de:'),
+            TextField::new('workForShopsNames', 'Inspections pour les centres de:')
+                ->onlyOnIndex()
+                ->renderAsHtml()
+                ->formatValue(fn ($value, Person $person) => implode(' ', array_map(
+                    fn($shop) => '<span class="badge rounded-pill bg-info text-dark me-1">'.htmlspecialchars($shop->getName()).'</span>',
+                    $person->getWorkForShops()->toArray()
+                ))),
+            AssociationField::new('workForShops', 'Inspections pour les centres de:')
+                ->onlyOnForms(),
             ColorField::new('zoneColor', 'Couleur de sa zone:')->onlyOnForms(),
             AssociationField::new('manager', 'Manager:'),
         ];

@@ -410,6 +410,11 @@ class Person
         return implode(', ', array_map(fn(RoleErm $role) => $role->getName(), $this->roles->toArray()));
     }
 
+    public function getWorkForShopsNames(): string
+    {
+        return implode(', ', array_map(fn(Shop $shop) => $shop->getName(), $this->workForShops->toArray()));
+    }
+
     public function getRegionErm(): ?RegionErm
     {
         return $this->regionErm;
