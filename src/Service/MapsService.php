@@ -280,12 +280,47 @@ class MapsService
         return $map;
     }
 
-    public function randomHexadecimalColor()
+    /**
+     * Génère une couleur aléatoire vive et saturée, en évitant la bande de
+     * teintes verte (~75°-170° en HSL) pour bien ressortir sur le fond de
+     * carte OpenStreetMap (dominé par du vert). Une couleur purement aléatoire
+     * (RGB uniforme) peut sinon tomber sur un vert ou un gris terne qui se
+     * fond dans le fond de carte.
+     */
+    public function randomHexadecimalColor(): string
     {
-        $rand = array('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f');
-        $color = '#'.$rand[rand(0,15)].$rand[rand(0,15)].$rand[rand(0,15)].$rand[rand(0,15)].$rand[rand(0,15)].$rand[rand(0,15)];
+        $hue = mt_rand(0, 360 - 95);
+        if ($hue >= 75) {
+            $hue += 95;
+        }
 
-        return $color;
+        return $this->hslToHex($hue, 75, 48);
+    }
+
+    private function hslToHex(float $hue, float $saturationPercent, float $lightnessPercent): string
+    {
+        $s = $saturationPercent / 100;
+        $l = $lightnessPercent / 100;
+
+        $c = (1 - abs(2 * $l - 1)) * $s;
+        $x = $c * (1 - abs(fmod($hue / 60, 2) - 1));
+        $m = $l - $c / 2;
+
+        [$r, $g, $b] = match (true) {
+            $hue < 60 => [$c, $x, 0],
+            $hue < 120 => [$x, $c, 0],
+            $hue < 180 => [0, $c, $x],
+            $hue < 240 => [0, $x, $c],
+            $hue < 300 => [$x, 0, $c],
+            default => [$c, 0, $x],
+        };
+
+        return sprintf(
+            '#%02x%02x%02x',
+            (int) round(($r + $m) * 255),
+            (int) round(($g + $m) * 255),
+            (int) round(($b + $m) * 255)
+        );
     }
 
     /**
