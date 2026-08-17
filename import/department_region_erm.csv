@@ -7,7 +7,7 @@ code,department_name,region_name
 06,Alpes-Maritimes,SUD
 07,Ardèche,AURA
 08,Ardennes,EST
-09,Ariège,SUD
+09,Ariège,"TACHY PNEU"
 10,Aube,EST
 11,Aude,SUD
 12,Aveyron,SUD
@@ -21,23 +21,30 @@ code,department_name,region_name
 21,Côte-d'Or,EST
 22,Côtes-d'Armor,OUEST
 23,Creuse,CENTRE
+24,Dordogne,"TACHY PNEU"
 25,Doubs,EST
 26,Drôme,AURA
 27,Eure,OUEST
 28,Eure-et-Loir,CENTRE
 29,Finistère,OUEST
 30,Gard,SUD
+31,Haute-Garonne,"TACHY PNEU"
+32,Gers,"TACHY PNEU"
+33,Gironde,"TACHY PNEU"
 34,Hérault,SUD
 35,Ille-et-Vilaine,OUEST
 36,Indre,CENTRE
 37,Indre-et-Loire,CENTRE
 38,Isère,AURA
 39,Jura,EST
+40,Landes,"TACHY PNEU"
 41,Loir-et-Cher,CENTRE
 42,Loire,AURA
 43,Haute-Loire,AURA
 44,Loire-Atlantique,OUEST
 45,Loiret,CENTRE
+46,Lot,"TACHY PNEU"
+47,Lot-et-Garonne,"TACHY PNEU"
 48,Lozère,AURA
 49,Maine-et-Loire,OUEST
 50,Manche,OUEST
@@ -54,6 +61,8 @@ code,department_name,region_name
 61,Orne,OUEST
 62,Pas-de-Calais,"IDF NORD"
 63,Puy-de-Dôme,AURA
+64,Pyrénées-Atlantiques,"TACHY PNEU"
+65,Hautes-Pyrénées,"TACHY PNEU"
 66,Pyrénées-Orientales,SUD
 67,Bas-Rhin,EST
 68,Haut-Rhin,EST
@@ -69,6 +78,8 @@ code,department_name,region_name
 78,Yvelines,"IDF NORD"
 79,Deux-Sèvres,CENTRE
 80,Somme,"IDF NORD"
+81,Tarn,"TACHY PNEU"
+82,Tarn-et-Garonne,"TACHY PNEU"
 83,Var,SUD
 84,Vaucluse,SUD
 85,Vendée,OUEST
