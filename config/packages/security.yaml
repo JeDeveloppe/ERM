@@ -37,6 +37,10 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
         - { path: ^/admin, roles: ROLE_ADMIN }
+        # Page vitrine publique du portfolio : données 100% fictives, codées en
+        # dur dans DemoController - jamais de requête vers les repositories/BDD
+        # réels, donc pas de risque à la laisser accessible sans connexion.
+        - { path: ^/vitrine, roles: PUBLIC_ACCESS }
         - { path: ^/autocomplete, roles: ROLE_USER }
         - { path: ^/maps, roles: ROLE_USER }
         - { path: ^/prime, roles: ROLE_ERM }

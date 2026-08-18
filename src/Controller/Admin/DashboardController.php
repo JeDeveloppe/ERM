@@ -48,6 +48,7 @@ class DashboardController extends AbstractDashboardController
 
             MenuItem::linkToDashboard('Dashboard', 'fa fa-home'),
             MenuItem::linkToRoute('Site', 'fa fa-globe', 'app_maps_choices'),
+            MenuItem::linkToRoute('Page vitrine (démo publique)', 'fa fa-eye', 'app_demo_showcase')->setLinkTarget('_blank'),
 
             MenuItem::section('Télématique:')->setPermission('ROLE_MCF_ADMIN'),
             MenuItem::linkToCrud('Zones télématiques', 'fas fa-list', TelematicArea::class)->setPermission('ROLE_MCF_ADMIN'),
