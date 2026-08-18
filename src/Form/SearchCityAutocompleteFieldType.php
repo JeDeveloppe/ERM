@@ -22,12 +22,19 @@ class SearchCityAutocompleteFieldType extends AbstractType
                 'class' => 'form-control',
             ],
             'choice_label' => function (City $ville) {
-                return $ville->getPostalCode().' - '.$ville->getName();
+                $department = $ville->getDepartment();
+                $departmentLabel = $department ? ' — '.$department->getName() : '';
+
+                return $ville->getName().' ('.$ville->getPostalCode().')'.$departmentLabel;
             },
 
-            // choose which fields to use in the search
-            // if not passed, *all* fields are used
-            // 'searchable_fields' => ['name'],
+            // Nom et code postal uniquement : évite de chercher dans des champs
+            // sans intérêt pour l'utilisateur (slug, code insee...).
+            'searchable_fields' => ['name', 'postalCode'],
+
+            // Plus de résultats affichés par défaut (10 était trop court pour
+            // des noms de villes courants comme "Saint-..." ou "Paris").
+            'max_results' => 20,
 
             // 'security' => 'ROLE_SOMETHING',
         ]);
