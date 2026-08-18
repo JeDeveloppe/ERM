@@ -51,8 +51,8 @@ class PrimeForPeopleType extends AbstractType
                     'placeholder' => 'Ex: 69',
                 ],
                 'constraints' => [
-                    new PositiveOrZero(['message' => 'Le bonus ne peut pas être négatif']),
-                    new Type(['type' => 'integer', 'message' => 'Veuillez saisir un nombre entier']),
+                    new PositiveOrZero(message: 'Le bonus ne peut pas être négatif'),
+                    new Type(type: 'integer', message: 'Veuillez saisir un nombre entier'),
                 ],
             ])
             ->add('versionNew', ChoiceType::class, [

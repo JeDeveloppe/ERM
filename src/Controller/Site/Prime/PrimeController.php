@@ -68,16 +68,16 @@ public function prime(Request $request): Response
             $fullPs = $form->get('fullPs')->getData();
             $psByPersonZone = $this->primeLevelService->getPsByPerson($fullPs, $divider);
 
-            // Calcul de la différence réelle incluant le bonus
-            $totalNewWithBonus = $primeByPersonNew + $bonus;
-            $deltaReel = $totalNewWithBonus - $primeByPersonOld;
-
             // Calculs
             $primeLevelOld = $this->primeLevelService->getPrimeLevel($psByPersonZone, $vOld);
             $primeByPersonOld = $primeLevelOld ? $this->primeLevelService->calculateValuePrimeByPerson($psByPersonZone, $primeLevelOld, $this->primeMax) : 0;
 
             $primeLevelNew = $this->primeLevelService->getPrimeLevel($psByPersonZone, $vNew);
             $primeByPersonNew = $primeLevelNew ? $this->primeLevelService->calculateValuePrimeByPerson($psByPersonZone, $primeLevelNew, $this->primeMax) : 0;
+
+            // Calcul de la différence réelle incluant le bonus (une fois les deux primes connues)
+            $totalNewWithBonus = $primeByPersonNew + $bonus;
+            $deltaReel = $totalNewWithBonus - $primeByPersonOld;
 
             if($primeByPersonNew < $this->primeMax){
                 $nextLevel = $this->primeLevelService->getPrimeLevel($primeLevelNew->getEnd(), $vNew);
