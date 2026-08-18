@@ -2,14 +2,12 @@
 
 namespace App\Controller\Site;
 
-use App\Form\TechnicianAdvisorMapOptionsTypeForm;
 use App\Service\MapsService;
 use App\Repository\ShopClassRepository;
 use App\Repository\TelematicAreaRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Request;
 
 class MapsController extends AbstractController
 {
@@ -134,36 +132,18 @@ class MapsController extends AbstractController
     }
 
     #[Route('/maps/france/ct/{optionNameChoice?}', name: 'app_map_all_cts')]
-    public function mapAllCts(Request $request, ?string $optionNameChoice): Response
+    public function mapAllCts(?string $optionNameChoice): Response
     {
+        $optionsNamePossibilities = ['cts', 'shops'];
+        $optionName = in_array($optionNameChoice, $optionsNamePossibilities, true) ? $optionNameChoice : 'cts';
 
-        $form = $this->createForm(TechnicianAdvisorMapOptionsTypeForm::class);
-
-        // Handle the form submission
-        $form->handleRequest($request);
-
-        // Check if the form was submitted and is valid
-        if($form->isSubmitted() && $form->isValid()) {
-            $data = $form->getData();
-            $optionName = $data['options'];
-            $optionsNamePossibilities = ['cts', 'shops']; //! choices from the form
-
-            if(!in_array($optionName, $optionsNamePossibilities)){
-                $optionName = 'cts';
-            }
-
-            //?on recupere les donnees dans le service
-            $mapDonnees = $this->mapsService->constructionMapOfAllCtWihUxMap($optionName);
-
-        }else{
-            //?on recupere les donnees dans le service
-            $mapDonnees = $this->mapsService->constructionMapOfAllCtWihUxMap('cts');
-        }
+        //?on recupere les donnees dans le service
+        $mapDonnees = $this->mapsService->constructionMapOfAllCtWihUxMap($optionName);
 
         return $this->render('site/maps/all_cts.html.twig', [
             'mapDonnees' => $mapDonnees,
             'title' => 'Carte des CT',
-            'form' => $form
+            'optionName' => $optionName,
         ]);
     }
 

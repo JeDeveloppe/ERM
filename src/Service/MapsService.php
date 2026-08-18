@@ -905,7 +905,7 @@ class MapsService
         $map = (new Map())->fitBoundsToMarkers($hasMarkersToFit);
 
         if(!$hasMarkersToFit){
-            $map->center(new Point(46.6, 2.2))->zoom(6);
+            $map->center(new Point(46.6, 2.2))->zoom(7);
         }
 
         $leafletOptions = (new LeafletOptions())
@@ -913,7 +913,7 @@ class MapsService
                 url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                 attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
                 options: [
-                    'minZoom' => 6,
+                    'minZoom' => 7,
                     'maxZoom' => 10,
                 ]
                 ));
@@ -921,15 +921,15 @@ class MapsService
         $map->options($leafletOptions);
 
         // Cantonne la carte autour de la France métropolitaine + Corse : évite
-        // de pouvoir dézoomer/glisser jusqu'à voir le reste du monde. Lu côté
-        // JS par mymap_controller.js (ux:map:connect) via Leaflet's
-        // setMaxBounds(). Marge large (au-delà des frontières réelles) exprès :
-        // des bornes trop serrées empêchaient Leaflet de faire défiler
-        // suffisamment la carte pour révéler entièrement une popup ouverte
-        // près du bord (ex: marqueur proche du nord de la France), la coupant
-        // visuellement en haut.
+        // de pouvoir dézoomer/glisser jusqu'à voir le reste du monde. Une marge
+        // (au-delà des frontières réelles : France ~ lat 41-51.5, lon -5.5-10)
+        // reste nécessaire pour que Leaflet puisse faire défiler suffisamment
+        // la carte et révéler entièrement une popup ouverte près du bord (ex:
+        // marqueur proche du nord de la France) sans la couper visuellement en
+        // haut - mais elle est resserrée pour ne plus laisser voir l'Espagne,
+        // le Royaume-Uni, l'Allemagne ou l'Afrique du Nord au chargement.
         $map->extra([
-            'maxBounds' => [[35.0, -15.0], [58.0, 20.0]],
+            'maxBounds' => [[38.0, -8.0], [54.0, 13.0]],
         ]);
 
         return $map;
