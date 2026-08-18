@@ -169,7 +169,7 @@
                                                         <i class="fas fa-clock me-1 text-info"></i>
                                                         {% if hours > 0 %}{{ hours }} h {% endif %}{{ minutes }} min
                                                     </span>
-                                                    <span><i class="fas fa-user-hard-hat me-1 text-primary"></i>{{ data.shop.people|length }} technicien{{ data.shop.people|length > 1 ? 's' : '' }}</span>
+                                                    <span><i class="fas fa-user-hard-hat me-1 text-primary"></i>{{ data.filteredPeople|length }} technicien{{ data.filteredPeople|length > 1 ? 's' : '' }}</span>
                                                 </span>
                                             </span>
                                         </span>
@@ -177,7 +177,7 @@
                                 </h2>
                                 <div id="resultAccordion{{ loop.index }}" class="accordion-collapse collapse" data-bs-parent="#resultsAccordion">
                                     <div class="accordion-body">
-                                        {% for technician in data.shop.people %}
+                                        {% for technician in data.filteredPeople %}
                                             <div class="d-flex align-items-start gap-2 py-2 {% if not loop.last %}border-bottom{% endif %}">
                                                 <span class="avatar-circle bg-soft-info flex-shrink-0">{{ technician.name|slice(0, 1)|upper }}</span>
                                                 <div class="min-width-0">

@@ -131,6 +131,23 @@ class TelematicController extends AbstractController
                 $datas = $this->cgoService->getShopsByClassErmAndOptionArroundCityOfIntervention($cityOfIntervention, $classErm, $option, $optionsTelematique);
                 $map = $this->mapsService->getMapWithInterventionPointAndAllShopsArround($cityOfIntervention, $datas, $option);
 
+                // Dans l'accordéon, un centre ne doit montrer que les techniciens
+                // correspondant réellement à la formation recherchée (un centre peut
+                // avoir d'autres techniciens sans cette formation).
+                $formationNamesArray = $formations ? $formations->map(fn($f) => $f->getName())->toArray() : [];
+                foreach ($datas as &$data) {
+                    $data['filteredPeople'] = empty($formationNamesArray)
+                        ? $data['shop']->getPeople()->toArray()
+                        : array_values(array_filter(
+                            $data['shop']->getPeople()->toArray(),
+                            fn($person) => array_any(
+                                $person->getTechnicianFormations()->toArray(),
+                                fn($formation) => in_array($formation->getName(), $formationNamesArray, true)
+                            )
+                        ));
+                }
+                unset($data);
+
                 
                 $this->apiLogService->saveApiLog('MCF_SEARCH', $startTime, 'app_search_distance_for_telematic_assistance', 'success', null);
                 
