@@ -55,6 +55,10 @@ class ZoneErmCrudController extends AbstractCrudController
     {
         return $filters
             ->add('regionErm')
+            // Pas de vrai champ "classe" sur la zone : VL/MV fait partie du nom
+            // ("Zone VL Xxx" / "Zone MV Xxx"). Le filtre texte par défaut
+            // d'EasyAdmin permet de taper VL ou MV avec l'opérateur "contient".
+            ->add('name')
         ;
     }
 }

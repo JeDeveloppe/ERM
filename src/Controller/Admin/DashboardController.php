@@ -50,6 +50,7 @@ class DashboardController extends AbstractDashboardController
             MenuItem::linkToRoute('Site', 'fa fa-globe', 'app_maps_choices'),
 
             MenuItem::section('Télématique:')->setPermission('ROLE_MCF_ADMIN'),
+            MenuItem::linkToCrud('Zones télématiques', 'fas fa-list', TelematicArea::class)->setPermission('ROLE_MCF_ADMIN'),
             MenuItem::linkToCrud('Liste des techniciens télématiques', 'fas fa-list', Person::class)
                 ->setController(PersonTelematicCrudController::class)
                 ->setPermission('ROLE_MCF_ADMIN'),
@@ -63,7 +64,6 @@ class DashboardController extends AbstractDashboardController
                 ->setPermission('ROLE_ERM_ADMIN'),
 
             MenuItem::section('Les zones / régions ERM:')->setPermission('ROLE_MCF_ADMIN'),
-            MenuItem::linkToCrud('Zones télématiques', 'fas fa-list', TelematicArea::class)->setPermission('ROLE_MCF_ADMIN'),
             MenuItem::linkToCrud('Les régions ERM', 'fas fa-list', RegionErm::class)->setPermission('ROLE_ERM_ADMIN'),
             MenuItem::linkToCrud('Les zones ERM', 'fas fa-list', ZoneErm::class)->setPermission('ROLE_ERM_ADMIN'),
 
