@@ -4,26 +4,45 @@
 
 {% block body %}
 
-    <div class="row g-0 justify-content-center align-items-stretch py-5">
-        <div class="col-11 col-sm-8 col-md-5 p-5 d-flex justify-content-center align-items-center">
-            <img src="{{ asset('images/logo.png') }}" alt="Logo ErmMaps" class="img-fluid">
-        </div>
-        <div class="col-11 col-sm-8 col-md-6 p-1 shadow-lg d-flex flex-wrap justify-content-center align-items-center h5">
-            {% for theme in routes %}
-                {% if is_granted(theme.isGranted) %}
-                    <div class="list-group col-11 mb-3">
-                            {{ theme.title }}
-                            {% for route in theme.routes %}
-                                {% set icon = 'fa6-solid:map-location-dot' %}
-                                {% if route.icon is defined %}
-                                    {% set icon = route.icon %}
-                                {% endif %}
-                                <a href="{{ route.url }}" class="list-group-item list-group-item-action">{{ ux_icon(icon,  {height: '16px', width: '16px', 'aria-hidden': true}) }} {{ route.name }}</a>
-                            {% endfor %}
-                    </div>
-                {% endif %}
-            {% endfor %}
-        </div>
+    <div class="text-center py-5">
+        <img src="{{ asset('images/logo.png') }}" alt="Logo ErmMaps" class="img-fluid mb-3" style="max-height: 90px;">
+        <h1 class="fw-900 mb-1">ERM Maps</h1>
+        <p class="text-muted mb-0">Choisissez une carte ou un outil pour commencer.</p>
     </div>
-    
+
+    <div class="row g-4 justify-content-center pb-5">
+        {% for theme in routes %}
+            {% if is_granted(theme.isGranted) %}
+                <div class="col-12 col-md-6 col-xl-5">
+                    <div class="card erm-tile h-100 border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <h2 class="h6 fw-900 text-uppercase text-primary mb-3">{{ theme.title|replace({':': ''}) }}</h2>
+                            <div class="d-flex flex-column gap-2">
+                                {% for route in theme.routes %}
+                                    {% set icon = route.icon is defined ? route.icon : 'fa6-solid:map-location-dot' %}
+                                    <a href="{{ route.url }}" class="d-flex align-items-center gap-3 p-3 rounded-3 text-decoration-none erm-tile-link">
+                                        <span class="bg-soft-primary rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 40px; height: 40px;">
+                                            {{ ux_icon(icon, {height: '18px', width: '18px', 'aria-hidden': true}) }}
+                                        </span>
+                                        <span class="fw-semibold text-dark">{{ route.name }}</span>
+                                        <i class="fas fa-chevron-right ms-auto text-muted small"></i>
+                                    </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <style>
+        .erm-tile-link {
+            transition: background-color 0.15s ease;
+        }
+        .erm-tile-link:hover {
+            background-color: var(--erm-primary-light);
+        }
+    </style>
+
 {% endblock %}

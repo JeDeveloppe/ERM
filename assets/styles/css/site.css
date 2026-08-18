@@ -1,8 +1,210 @@
+:root {
+  --erm-primary: #003399;
+  --erm-primary-dark: #002266;
+  --erm-primary-light: #e7edfb;
+}
+
 body {
-  background-color: #f0f0f0;
+  background-color: #f5f7fb;
 }
 
 .footerIconeSize {
   width: 40px;
   height: 40px;
-}/*# sourceMappingURL=site.css.map */
+}
+
+/* ==========================================================================
+   Système de design ERM : recolore Bootstrap sur le bleu de marque
+   (#003399, déjà utilisé dans le module RH) plutôt que le bleu Bootstrap
+   par défaut, et fournit des utilitaires partagés réutilisés sur tout le
+   site (hors admin).
+   ========================================================================== */
+
+.btn-primary {
+  --bs-btn-bg: var(--erm-primary);
+  --bs-btn-border-color: var(--erm-primary);
+  --bs-btn-hover-bg: var(--erm-primary-dark);
+  --bs-btn-hover-border-color: var(--erm-primary-dark);
+  --bs-btn-active-bg: var(--erm-primary-dark);
+  --bs-btn-active-border-color: var(--erm-primary-dark);
+  --bs-btn-disabled-bg: var(--erm-primary);
+  --bs-btn-disabled-border-color: var(--erm-primary);
+  --bs-btn-focus-shadow-rgb: 0, 51, 153;
+}
+
+.btn-outline-primary {
+  --bs-btn-color: var(--erm-primary);
+  --bs-btn-border-color: var(--erm-primary);
+  --bs-btn-hover-bg: var(--erm-primary);
+  --bs-btn-hover-border-color: var(--erm-primary);
+  --bs-btn-active-bg: var(--erm-primary);
+  --bs-btn-active-border-color: var(--erm-primary);
+  --bs-btn-focus-shadow-rgb: 0, 51, 153;
+}
+
+.bg-primary {
+  background-color: var(--erm-primary) !important;
+}
+
+.text-primary {
+  color: var(--erm-primary) !important;
+}
+
+.border-primary {
+  border-color: var(--erm-primary) !important;
+}
+
+.badge.bg-primary {
+  background-color: var(--erm-primary) !important;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--erm-primary);
+  box-shadow: 0 0 0 0.2rem rgba(0, 51, 153, 0.15);
+}
+
+.btn-check:checked + .btn-outline-primary,
+.btn-check:active + .btn-outline-primary {
+  background-color: var(--erm-primary);
+  border-color: var(--erm-primary);
+}
+
+/* Poids de police et petits textes réutilisés (badges, libellés discrets) */
+.fw-900 {
+  font-weight: 900;
+}
+
+.x-small {
+  font-size: 0.7rem;
+}
+
+/* Pastille d'avatar (initiales), utilisée pour les personnes/collaborateurs */
+.avatar-circle {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
+/* Badges "doux" (fond pastel, texte de la même teinte) */
+.bg-soft-primary {
+  background-color: var(--erm-primary-light);
+  color: var(--erm-primary);
+}
+
+.bg-soft-success {
+  background-color: rgba(25, 135, 84, 0.12);
+  color: #146c43;
+}
+
+.bg-soft-info {
+  background-color: rgba(13, 202, 240, 0.12);
+  color: #0aa2c0;
+}
+
+.bg-soft-warning {
+  background-color: rgba(255, 193, 7, 0.15);
+  color: #997404;
+}
+
+/* Boutons d'action ronds (icône seule), utilisés dans les listes/tableaux */
+.btn-action {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1px solid #eee;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.btn-action.btn-edit {
+  background-color: var(--erm-primary-light);
+  color: var(--erm-primary);
+}
+
+.btn-action.btn-edit:hover {
+  background-color: var(--erm-primary);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.btn-action.btn-view {
+  background-color: #f8f9fa;
+  color: #333;
+}
+
+.btn-action.btn-view:hover {
+  background-color: #333;
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+/* Groupe de navigation en pilule (sous-menus de section), déjà utilisé pour
+   le module RH — réutilisable pour n'importe quelle section avec plusieurs
+   pages liées. */
+.nav-pill-group {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 6px;
+  background-color: #f1f4f9;
+  border-radius: 50px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.03);
+}
+
+.nav-pill-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 24px;
+  border-radius: 40px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: #6c757d;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-pill-item:hover {
+  color: var(--erm-primary);
+  background-color: rgba(255, 255, 255, 0.6);
+}
+
+.nav-pill-item.active {
+  color: var(--erm-primary);
+  background-color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 51, 153, 0.12);
+  transform: scale(1.02);
+}
+
+.nav-pill-item.active i {
+  color: var(--erm-primary);
+}
+
+.nav-pill-item i {
+  font-size: 1.1rem;
+  line-height: 0;
+}
+
+/* Cartes de contenu générales : légère élévation au survol, pour les listes
+   de liens/résultats cliquables (hub d'accueil, résultats de recherche...). */
+.erm-tile {
+  border: 1px solid #edf0f5;
+  border-radius: 1rem;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.erm-tile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08);
+}

@@ -1,5 +1,5 @@
-<footer class="row g-0 align-items-center p-4 mt-auto" style="background-color: rgba(0, 0, 0, 0.05);">
-	<div class="col-12 col-md-4 text-center text-md-start mb-3 mb-md-0">
+<footer class="row g-0 align-items-center p-4 mt-auto border-top" style="background-color: #fff;">
+	<div class="col-12 col-md-4 text-center text-md-start mb-3 mb-md-0 text-muted small">
     {% set startedAt = 2025 %}
     {% set now = 'now'|date('Y') %}
     {% if startedAt != now %}
@@ -7,6 +7,7 @@
     {% else %}
         {{ now }}
     {% endif %}
+    &middot; ERM Maps
 	</div>
 	<div class="col-12 col-md-4 text-center mb-3 mb-md-0">
 		<a href="http://www.linkedin.com/in/wetta-rene-jd" class="mx-2" target="_blank" role="button"><twig:ux:icon name="skill-icons:linkedin" class="footerIconeSize"/></a>

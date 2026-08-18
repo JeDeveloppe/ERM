@@ -1,18 +1,31 @@
-    <form method="post" class="col-12 col-xl-6">
+    <form method="post">
         {% if error %}
-            <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-        {% endif %}
-
-        {% if app.user %}
-            <div class="mb-3">
-                Déjà connecté en tant que {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Déconnexion</a>
+            <div class="alert alert-danger rounded-3 d-flex align-items-center gap-2">
+                <i class="fas fa-exclamation-circle"></i>
+                <span>{{ error.messageKey|trans(error.messageData, 'security') }}</span>
             </div>
         {% endif %}
 
-        <label for="username">Identifiant:</label>
-        <input type="email" value="{{ last_username }}" name="_username" id="username" class="form-control mb-3" autocomplete="email" required autofocus>
-        <label for="password">Mot de passe:</label>
-        <input type="password" name="_password" id="password" class="form-control mb-3" autocomplete="current-password" required>
+        {% if app.user %}
+            <div class="alert alert-info rounded-3 small">
+                Déjà connecté en tant que <strong>{{ app.user.userIdentifier }}</strong>, <a href="{{ path('app_logout') }}">se déconnecter</a>
+            </div>
+        {% endif %}
+
+        <div class="mb-3">
+            <label for="username" class="form-label fw-semibold small">Identifiant</label>
+            <div class="input-group">
+                <span class="input-group-text bg-light border-end-0"><i class="fas fa-user text-muted"></i></span>
+                <input type="email" value="{{ last_username }}" name="_username" id="username" class="form-control border-start-0 ps-0" autocomplete="email" required autofocus>
+            </div>
+        </div>
+        <div class="mb-4">
+            <label for="password" class="form-label fw-semibold small">Mot de passe</label>
+            <div class="input-group">
+                <span class="input-group-text bg-light border-end-0"><i class="fas fa-key text-muted"></i></span>
+                <input type="password" name="_password" id="password" class="form-control border-start-0 ps-0" autocomplete="current-password" required>
+            </div>
+        </div>
         <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
         {#
@@ -25,5 +38,7 @@
             </div>
         #}
 
-        <button class="btn btn-lg btn-success" type="submit">Se connecter</button>
+        <button class="btn btn-primary w-100 py-2 fw-semibold rounded-3" type="submit">
+            <i class="fas fa-sign-in-alt me-2"></i>Se connecter
+        </button>
     </form>

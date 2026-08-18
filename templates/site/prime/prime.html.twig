@@ -4,8 +4,21 @@
 
 {% block body %}
 
-<div class="container my-5">
-    <h1 class="text-center mb-4">{{ title }}</h1>
+<div class="container my-4">
+
+    <div class="row justify-content-center mb-4">
+        <div class="col-12 col-xl-10">
+            <div class="rounded-4 shadow-lg text-white p-4 p-md-5 d-flex align-items-center gap-4 flex-wrap flex-md-nowrap" style="background: linear-gradient(135deg, var(--erm-primary) 0%, var(--erm-primary-dark) 100%);">
+                <span class="d-inline-flex align-items-center justify-content-center flex-shrink-0" style="width: 56px; height: 56px; background: rgba(255,255,255,0.15); border-radius: 16px;">
+                    <i class="fas fa-euro-sign fa-lg"></i>
+                </span>
+                <div>
+                    <h1 class="h3 mb-1 fw-bold">{{ title }}</h1>
+                    <p class="mb-0 opacity-75">Estimez et comparez une prime entre deux barèmes.</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="row justify-content-center">
         {# --- ZONE DE RÉSULTAT (S'affiche après calcul) --- #}
