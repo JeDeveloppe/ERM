@@ -195,12 +195,17 @@ class MapsService
 
             $iconOfShopUnderCgo = Icon::ux('solar:garage-bold')->width(12)->height(12)->color($this->COLORS_OF_MARKERS);
 
+            $infoWindowContent = $this->twig->render(
+                'site/maps/popups/shop_infowindow.html.twig',
+                ['shop' => $shop]
+            );
+
             $map->addMarker(new Marker(
                 position: new Point($shop->getCity()->getLatitude(), $shop->getCity()->getLongitude()),
                 icon: $iconOfShopUnderCgo,
                 title: $shop->getName(),
                 infoWindow: new InfoWindow(
-                    content: $shop->getName().'('.$shop->getCm().')<p>'.$shop->getRcsPerson()?->getNameAndFirstName().'<br/>'.$shop->getPhone().'</p>',
+                    content: $infoWindowContent,
                 ),
                 extra: [
                     'markerColor' => $this->COLORS_OF_MARKERS
