@@ -23,7 +23,9 @@
     </head>
     <body class="d-flex flex-column vh-100">
 
-        {% include "site/components/_navbar.html.twig" %}
+        {% block navbar %}
+            {% include "site/components/_navbar.html.twig" %}
+        {% endblock %}
 
         <div class="container">
             {% include "site/components/_flash_message.html.twig" %}
