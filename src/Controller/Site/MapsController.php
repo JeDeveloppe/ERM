@@ -63,8 +63,8 @@ class MapsController extends AbstractController
                 ],
                 [
                 'isGranted' => 'ROLE_ERM',
-                'url' => $this->generateUrl('app_map_all_zones', ['classeName' => 'mx']),
-                'name' => 'Toutes les zones MX'
+                'url' => $this->generateUrl('app_map_all_zones', ['classeName' => 'vi']),
+                'name' => 'Toutes les zones VI, MV et MX'
                 ],
                 [
                 'isGranted' => 'ROLE_ERM',

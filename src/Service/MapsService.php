@@ -234,9 +234,11 @@ class MapsService
     {
         $map = $this->generationUxMapWithBaseOptions(hasMarkersToFit: false);
 
-        // Les zones en base gardent encore l'ancien nom "MV" (jamais renommées en
-        // "MX" lors du découpage VL/VI/MX des centres).
-        $zoneClasseName = $classeName === 'MX' ? 'MV' : $classeName;
+        // Les zones en base gardent encore l'ancien nom "MV" (jamais renommées
+        // lors du découpage des centres en VL/VI/MX) : cette vue couvre en
+        // réalité VI + MV + MX (un CGO VI gère les 3), donc les 3 libellés
+        // doivent tous retomber sur la même recherche de zones "MV".
+        $zoneClasseName = in_array($classeName, ['VI', 'MX', 'MV'], true) ? 'MV' : $classeName;
 
         //on recupere toutes les zones
         $zones = $this->zoneErmRepository->findByClasse($zoneClasseName);
