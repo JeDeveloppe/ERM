@@ -913,11 +913,16 @@ class MapsService
         // Add the custom options to the map
         $map->options($leafletOptions);
 
-        // Cantonne la carte à la France métropolitaine + Corse : évite de pouvoir
-        // dézoomer/glisser jusqu'à voir le reste du monde. Lu côté JS par
-        // mymap_controller.js (ux:map:connect) via Leaflet's setMaxBounds().
+        // Cantonne la carte autour de la France métropolitaine + Corse : évite
+        // de pouvoir dézoomer/glisser jusqu'à voir le reste du monde. Lu côté
+        // JS par mymap_controller.js (ux:map:connect) via Leaflet's
+        // setMaxBounds(). Marge large (au-delà des frontières réelles) exprès :
+        // des bornes trop serrées empêchaient Leaflet de faire défiler
+        // suffisamment la carte pour révéler entièrement une popup ouverte
+        // près du bord (ex: marqueur proche du nord de la France), la coupant
+        // visuellement en haut.
         $map->extra([
-            'maxBounds' => [[41.0, -5.5], [51.5, 10.0]],
+            'maxBounds' => [[35.0, -15.0], [58.0, 20.0]],
         ]);
 
         return $map;
