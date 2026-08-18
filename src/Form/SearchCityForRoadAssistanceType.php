@@ -6,7 +6,6 @@ use Symfony\Component\Form\AbstractType;
 use App\Form\SearchCityAutocompleteFieldType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class SearchCityForRoadAssistanceType extends AbstractType
 {
@@ -14,16 +13,9 @@ class SearchCityForRoadAssistanceType extends AbstractType
     {
 
         $builder
-        ->add('city', SearchCityAutocompleteFieldType::class)
-        ->add('options', ChoiceType::class, [
-            'label' => false,
-            'choices' => ['Afficher les centres MV et MX les plus proches' => 'depannage'],
-            'mapped' => false,
-            'placeholder' => false,
-            'attr' => [
-                'class' => 'form-control mb-3',
-            ]
-        ]);
+        ->add('city', SearchCityAutocompleteFieldType::class);
+        // Pas d'autre champ "type de recherche" : ce formulaire ne sert qu'au
+        // dépannage routier, il n'y a jamais eu qu'un seul choix possible.
     }
 
     public function configureOptions(OptionsResolver $resolver): void
