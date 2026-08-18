@@ -8,7 +8,12 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h1 class="fw-900 text-primary mb-0">PILOTAGE RH</h1>
-            <p class="text-muted fw-bold small text-uppercase mb-0">Gestion globale des effectifs</p>
+            <p class="text-muted fw-bold small text-uppercase mb-0">
+                Gestion globale des effectifs
+                {% if collaborators|length > 0 %}
+                    &middot; {{ collaborators|length }} collaborateur{{ collaborators|length > 1 ? 's' : '' }}
+                {% endif %}
+            </p>
         </div>
         
         {# BOUTON POUR OUVRIR LA MODALE #}
@@ -144,17 +149,6 @@
 </div>
 
 <style>
-    .fw-900 { font-weight: 900; }
-    .x-small { font-size: 0.7rem; }
-    .bg-soft-success { background-color: rgba(46, 184, 92, 0.12); }
-    
-    .avatar-circle {
-        width: 38px; height: 38px;
-        border-radius: 50%;
-        display: flex; align-items: center; justify-content: center;
-        font-weight: 800; font-size: 0.75rem;
-    }
-
     .table tbody tr { transition: all 0.2s; }
     .table tbody tr:hover { background-color: #f8fafc !important; }
 
@@ -164,17 +158,6 @@
     .form-control:focus {
         border-color: #003399; box-shadow: 0 0 0 3px rgba(0, 51, 153, 0.1);
     }
-
-    .btn-action {
-        width: 34px; height: 34px;
-        display: flex; align-items: center; justify-content: center;
-        border-radius: 50%; border: 1px solid #eee;
-        transition: all 0.2s ease;
-    }
-    .btn-edit { background-color: #f0f7ff; color: #003399; }
-    .btn-edit:hover { background-color: #003399; color: #fff; transform: translateY(-2px); }
-    .btn-view { background-color: #f8f9fa; color: #333; }
-    .btn-view:hover { background-color: #333; color: #fff; transform: translateY(-2px); }
 
     /* Modale Design */
     .modal-content { border: none; }
