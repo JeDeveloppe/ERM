@@ -72,6 +72,27 @@ class TelematicAreaCrudController extends AbstractCrudController
             ->setPermission(Action::DELETE, 'ROLE_SUPER_ADMIN');
     }
 
+    public function deleteEntity(EntityManagerInterface $entityManager, $entityInstance): void
+    {
+        if ($entityInstance instanceof TelematicArea) {
+            // Les CGO et départements référencent leur zone télématique
+            // (telematic_area_id) : supprimer la zone sans les détacher
+            // d'abord viole la contrainte de clé étrangère. On les détache
+            // (sans les supprimer) plutôt que de cascade-supprimer des
+            // entités métier réelles.
+            foreach ($entityInstance->getCgos() as $cgo) {
+                $cgo->setTelematicArea(null);
+            }
+            foreach ($entityInstance->getDepartments() as $department) {
+                $department->setTelematicArea(null);
+            }
+            $entityManager->flush();
+        }
+
+        $entityManager->remove($entityInstance);
+        $entityManager->flush();
+    }
+
     public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
         if ($entityInstance instanceof TelematicArea) {
