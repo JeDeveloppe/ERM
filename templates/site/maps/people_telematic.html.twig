@@ -9,7 +9,7 @@
 
     <div class="row justify-content-center">
         <div class="col-12 col-xl-11">
-            <div class="card shadow-lg mb-4 border-0">
+            <div class="card shadow-sm mb-4 border-0 rounded-4 overflow-hidden">
                 <div class="card-body p-0">
                     {% if mapDonnees is not empty %}
                         {{ ux_map(mapDonnees, { 'data-controller': 'mymap', 'controller_id': false, style: 'height: 80vh; min-height: 500px; border-radius: 8px;' }) }}
@@ -23,14 +23,14 @@
         </div>
 
         <div class="col-12 col-xl-11">
-            <div class="card shadow-lg border-0">
+            <div class="card shadow-sm border-0 rounded-4">
                 <div class="card-body p-4">
                     <h3 class="card-title text-center mb-4"><i class="fas fa-filter me-2"></i>Filtrer les techniciens télématiques</h3>
                     {{ form_start(form) }}
                         <div class="row g-4">
                             {# Formations Section #}
                             <div class="col-12 col-lg-4">
-                                <div class="p-3 border border-primary rounded h-100">
+                                <div class="p-3 border border-primary rounded-4 h-100">
                                     <h5 class="w-100 text-primary"><i class="fas fa-graduation-cap me-2"></i>Formations</h5>
                                     <div class="d-flex flex-wrap gap-2 mt-2">
                                         {% for child in form.formations %}
@@ -54,7 +54,7 @@
 
                             {# Fonctions Section #}
                             <div class="col-12 col-lg-4">
-                                <div class="p-3 border border-secondary rounded h-100">
+                                <div class="p-3 border border-secondary rounded-4 h-100">
                                     <h5 class="w-100 text-secondary"><i class="fas fa-cogs me-2"></i>Fonctions</h5>
                                     <div class="d-flex flex-wrap gap-2 mt-2">
                                         {% for child in form.fonctions %}
@@ -78,7 +78,7 @@
 
                             {# Véhicules Section #}
                             <div class="col-12 col-lg-4">
-                                <div class="p-3 border border-info rounded h-100">
+                                <div class="p-3 border border-info rounded-4 h-100">
                                     <h5 class="w-100 text-info"><i class="fas fa-car-side me-2"></i>Véhicules</h5>
                                     <div class="d-flex flex-wrap gap-2 mt-2">
                                         {% for child in form.vehicles %}
