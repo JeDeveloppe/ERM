@@ -26,35 +26,6 @@
         </a>
     {% endif %}
 
-    {% if option == 'telematique' %}
-        <div class="map-popup-section">
-            <h6 class="map-popup-section-title"><i class="fas fa-tools me-1"></i>Techniciens</h6>
-            {% for technician in shop.people %}
-                <div class="d-flex align-items-start gap-2 mb-2">
-                    <span class="avatar-circle bg-soft-info flex-shrink-0">{{ technician.name|slice(0, 1)|upper }}</span>
-                    <div class="min-width-0">
-                        <p class="mb-0 fw-semibold small text-truncate">{{ technician.nameAndFirstName() }}</p>
-                        {% if technician.phone %}
-                            <a href="tel:{{ technician.phone|replace({' ': ''}) }}" class="text-decoration-none text-muted x-small">
-                                <i class="fas fa-phone me-1"></i>{{ technician.phone }}
-                            </a>
-                        {% endif %}
-                        <div class="d-flex flex-wrap gap-1 mt-1">
-                            {% for formation in technician.technicianFormations %}
-                                <span class="badge rounded-pill x-small" style="background-color:{{ formation.color }}">{{ formation.name }}</span>
-                            {% endfor %}
-                            {% for function in technician.fonctions %}
-                                <span class="badge rounded-pill x-small" style="background-color:{{ function.color }}">{{ function.name }}</span>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-            {% else %}
-                <p class="text-muted fst-italic x-small mb-0">Aucun technicien</p>
-            {% endfor %}
-        </div>
-    {% endif %}
-
     <div class="map-popup-section">
         <h6 class="map-popup-section-title"><i class="fas fa-handshake me-1"></i>CGO(s)</h6>
         {% if shop.cgos is not empty %}
