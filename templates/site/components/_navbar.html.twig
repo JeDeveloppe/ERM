@@ -62,21 +62,28 @@
                     {% endif %}
                 </ul>
             {% endif %}
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item dropdown dropstart">
-                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"><i class="fas fa-user-circle"></i></a>
-                    <div class="dropdown-menu">
-                        {% if is_granted('ROLE_USER') %}
+            <ul class="navbar-nav ms-auto align-items-lg-center">
+                {% if is_granted('ROLE_USER') %}
+                    <li class="nav-item dropdown dropstart">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center gap-2" data-bs-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                            <span class="avatar-circle bg-white text-primary" style="width: 30px; height: 30px;">{{ app.user.userIdentifier|first|upper }}</span>
+                            <span class="d-none d-xl-inline text-truncate" style="max-width: 160px;">{{ app.user.userIdentifier }}</span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end">
                             {% if is_granted('ROLE_ADMIN') %}
                                 <a class="dropdown-item" href="{{ path('admin') }}"><i class="fas fa-cog"></i> ADMIN</a>
                                 <div class="dropdown-divider"></div>
                             {% endif %}
                             <a class="dropdown-item" href="{{ path('app_logout')}}"><i class="fas fa-sign-out-alt text-warning"></i> Déconnexion</a>
-                        {% else %}
-                            <a class="dropdown-item" href="{{ path('app_login')}}"><i class="fas fa-sign-in-alt text-warning"></i> Se connecter</a>
-                        {% endif %}
-                    </div>
-                </li>
+                        </div>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a href="{{ path('app_login') }}" class="btn btn-light rounded-pill fw-bold px-3 py-2">
+                            <i class="fas fa-sign-in-alt me-2"></i>Se connecter
+                        </a>
+                    </li>
+                {% endif %}
             </ul>
         </div>
     </div>
