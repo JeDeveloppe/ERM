@@ -55,7 +55,11 @@ class MapsService
 
     public function constructionMapOfZonesTelematique(): Map
     {
-        $map = $this->generationUxMapWithBaseOptions();
+        // Les marqueurs CGO (9 seulement) ne couvrent pas toute la France :
+        // fitBoundsToMarkers cadrerait trop serré et couperait des polygones
+        // de départements pourtant affichés. On garde le cadrage fixe France
+        // entière (comme pour la carte des régions).
+        $map = $this->generationUxMapWithBaseOptions(hasMarkersToFit: false);
         $areas = $this->telematicAreaRepository->findAllWithRelations();
 
         foreach($areas as $area)
