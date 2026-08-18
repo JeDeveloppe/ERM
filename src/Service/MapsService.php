@@ -905,7 +905,7 @@ class MapsService
         $map = (new Map())->fitBoundsToMarkers($hasMarkersToFit);
 
         if(!$hasMarkersToFit){
-            $map->center(new Point(46.6, 2.2))->zoom(7);
+            $map->center(new Point(46.6, 2.2))->zoom(6);
         }
 
         $leafletOptions = (new LeafletOptions())
@@ -913,7 +913,7 @@ class MapsService
                 url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                 attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
                 options: [
-                    'minZoom' => 7,
+                    'minZoom' => 6,
                     'maxZoom' => 10,
                 ]
                 ));
