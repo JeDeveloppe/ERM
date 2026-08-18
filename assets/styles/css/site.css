@@ -208,3 +208,31 @@ body {
   transform: translateY(-2px);
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08);
 }
+
+/* Vignettes (popups) des cartes Leaflet : le wrapper par défaut est trop
+   étroit (~300px) pour un contenu structuré (badges, techniciens...). */
+.leaflet-popup-content-wrapper {
+  border-radius: 14px;
+  box-shadow: 0 0.75rem 2rem rgba(0, 0, 0, 0.18);
+}
+
+.leaflet-popup-content {
+  width: 300px !important;
+  margin: 14px 16px;
+}
+
+.map-popup-section {
+  border-top: 1px solid #edf0f5;
+  padding-top: 8px;
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.map-popup-section-title {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: #6c757d;
+  margin-bottom: 6px;
+}

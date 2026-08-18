@@ -1,68 +1,74 @@
-<div class="p-2">
-    <div class="d-flex align-items-center mb-2">
-        <i class="fas fa-store fa-2x text-primary me-2"></i>
-        <div>
-            <h6 class="mb-0 fw-bold">{{ shop.name }} ({{ shop.cm }})</h6>
-            <small class="text-muted">{{ shop.phone }}</small>
+<div class="map-popup">
+    <div class="map-popup-header d-flex align-items-center gap-2 mb-2">
+        <span class="avatar-circle bg-soft-primary flex-shrink-0"><i class="fas fa-store"></i></span>
+        <div class="min-width-0">
+            <h6 class="mb-0 fw-bold text-truncate">{{ shop.name }}</h6>
+            <span class="badge bg-light text-muted border x-small">{{ shop.cm }}</span>
         </div>
     </div>
-    
-    <ul class="list-unstyled mb-0">
-        <li class="d-flex align-items-center mb-1">
-            <i class="fas fa-route me-2 text-success"></i>
-            Distance : <span class="fw-bold ms-1">{{ (data.distance / 1000) | round(1) }} KMS</span>
-        </li>
-        <li class="d-flex align-items-center mb-1">
-            <i class="fas fa-clock me-2 text-info"></i>
-            Temps : 
+
+    <div class="d-flex gap-2 mb-2">
+        <span class="badge bg-soft-success rounded-pill flex-fill py-2">
+            <i class="fas fa-route me-1"></i>{{ (data.distance / 1000) | round(1) }} km
+        </span>
+        <span class="badge bg-soft-info rounded-pill flex-fill py-2">
+            <i class="fas fa-clock me-1"></i>
             {% set dureeEnSecondes = data.duration %}
             {% set hours = (dureeEnSecondes / 3600) | round(0, 'floor') %}
             {% set minutes = (dureeEnSecondes / 60) % 60 | round(0, 'floor') %}
-            <span class="fw-bold ms-1">
-                {% if hours > 0 %}
-                    {{ hours }} H
-                {% endif %}
-                {{ minutes }} min
-            </span>
-        </li>
-    </ul>
+            {% if hours > 0 %}{{ hours }} h {% endif %}{{ minutes }} min
+        </span>
+    </div>
+
+    {% if shop.phone %}
+        <a href="tel:{{ shop.phone|replace({' ': ''}) }}" class="d-flex align-items-center gap-2 text-decoration-none text-muted small mb-2">
+            <i class="fas fa-phone text-primary"></i>{{ shop.phone }}
+        </a>
+    {% endif %}
 
     {% if option == 'telematique' %}
-        <hr>
-        <h6 class="fw-bold mb-1"><i class="fas fa-tools me-2 text-primary"></i> Techniciens</h6>
-        {% for technician in shop.people %}
-            <div class="my-2">
-                <p class="mb-0 fw-bold">{{ technician.nameAndFirstName() }}</p>
-                <i class="fas fa-phone me-1 text-success"></i><a href="tel:{{ technician.phone|replace({' ': ''}) }}">{{ technician.phone }}</a>
-                <div class="d-flex flex-wrap gap-1 mt-1">
-                    {% for formation in technician.technicianFormations %}
-                        <span class="badge rounded-pill" style="background-color:{{ formation.color }}">{{ formation.name }}</span>
-                    {% endfor %}
-                    {% for function in technician.fonctions %}
-                        <span class="badge rounded-pill" style="background-color:{{ function.color }}">{{ function.name }}</span>
-                    {% endfor %}
+        <div class="map-popup-section">
+            <h6 class="map-popup-section-title"><i class="fas fa-tools me-1"></i>Techniciens</h6>
+            {% for technician in shop.people %}
+                <div class="d-flex align-items-start gap-2 mb-2">
+                    <span class="avatar-circle bg-soft-info flex-shrink-0">{{ technician.name|slice(0, 1)|upper }}</span>
+                    <div class="min-width-0">
+                        <p class="mb-0 fw-semibold small text-truncate">{{ technician.nameAndFirstName() }}</p>
+                        {% if technician.phone %}
+                            <a href="tel:{{ technician.phone|replace({' ': ''}) }}" class="text-decoration-none text-muted x-small">
+                                <i class="fas fa-phone me-1"></i>{{ technician.phone }}
+                            </a>
+                        {% endif %}
+                        <div class="d-flex flex-wrap gap-1 mt-1">
+                            {% for formation in technician.technicianFormations %}
+                                <span class="badge rounded-pill x-small" style="background-color:{{ formation.color }}">{{ formation.name }}</span>
+                            {% endfor %}
+                            {% for function in technician.fonctions %}
+                                <span class="badge rounded-pill x-small" style="background-color:{{ function.color }}">{{ function.name }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
                 </div>
+            {% else %}
+                <p class="text-muted fst-italic x-small mb-0">Aucun technicien</p>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="map-popup-section">
+        <h6 class="map-popup-section-title"><i class="fas fa-handshake me-1"></i>CGO(s)</h6>
+        {% if shop.cgos is not empty %}
+            <div class="d-flex flex-wrap gap-1">
+                {% for cgo in shop.cgos %}
+                    <span class="badge bg-light text-dark border x-small">{{ cgo.name }}</span>
+                {% endfor %}
             </div>
         {% else %}
-            <p class="text-muted fst-italic">Aucun technicien</p>
-        {% endfor %}
-    {% endif %}
+            <p class="text-muted fst-italic x-small mb-0">Aucun CGO rattaché</p>
+        {% endif %}
+    </div>
 
-    <hr>
-    
-    <h6 class="fw-bold mb-1"><i class="fas fa-handshake me-2 text-warning"></i> CGO(s)</h6>
-    {% if shop.cgos is not empty %}
-        <ul class="list-unstyled">
-            {% for cgo in shop.cgos %}
-                <li class="mb-0">{{ cgo.name }}</li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p class="text-muted fst-italic">Aucun cgo rattaché</p>
-    {% endif %}
-
-    <hr>
-    <a href="https://www.google.com/maps/dir/?api=1&origin={{ cityOfIntervention.latitude }},{{ cityOfIntervention.longitude }}&destination={{ shop.city.latitude }},{{ shop.city.longitude }}" target="_blank" class="btn btn-primary btn-sm w-100">
-        <i class="fas fa-directions me-1"></i> Itinéraire
+    <a href="https://www.google.com/maps/dir/?api=1&origin={{ cityOfIntervention.latitude }},{{ cityOfIntervention.longitude }}&destination={{ shop.city.latitude }},{{ shop.city.longitude }}" target="_blank" class="btn btn-primary btn-sm w-100 mt-2">
+        <i class="fas fa-directions me-1"></i>Itinéraire
     </a>
 </div>
