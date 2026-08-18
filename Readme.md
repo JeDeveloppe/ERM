@@ -16,8 +16,8 @@ Display all shops from ERM in France.
 ### INSTALLER COMPOSER DANS LE PROJET
     curl -sS https://getcomposer.org/installer
 
-Cela permet d'utiliser la commande:  /usr/bin/php8.2-cli\
-Exemple: /usr/bin/php8.2-cli bin/console d:m:m
+Cela permet d'utiliser la commande:  /usr/bin/php8.4-cli\
+Exemple: /usr/bin/php8.4-cli bin/console d:m:m
 
 ### FICHIERS À TRANSFÉRER MANUELLEMENT (FTP/SCP) - jamais dans Git
 Ces fichiers sont volontairement exclus du dépôt (`.gitignore`) et n'existent
@@ -33,19 +33,19 @@ Tout le reste (dont `public/`, `import/department_region_erm.csv`) est déjà
 dans le dépôt Git, rien à transférer en plus.
 
 ### INSTALLER LES DEPENDANCES DU PROJET
-    /usr/bin/php8.2-cli composer.phar install --no-dev --optimize-autoloader
+    /usr/bin/php8.4-cli composer.phar install --no-dev --optimize-autoloader
 
 ### FAIRE TOURNER LES MIGRATIONS OU METTRE LA BDD EN PLACE
-    /usr/bin/php8.2-cli bin/console d:m:m
+    /usr/bin/php8.4-cli bin/console d:m:m
 
-    /usr/bin/php8.2-cli bin/console d:s:u --force
+    /usr/bin/php8.4-cli bin/console d:s:u --force
 
 ### ON INITIALISE LE PROJET (charge les CSV de import/ en base)
-    /usr/bin/php8.2-cli bin/console app:initdatabase
+    /usr/bin/php8.4-cli bin/console app:initdatabase
 
 ### ON COMPILE LES ASSETS (AssetMapper, pas de build Sass)
-    /usr/bin/php8.2-cli bin/console cache:clear --env=prod
-    /usr/bin/php8.2-cli bin/console asset-map:compile
+    /usr/bin/php8.4-cli bin/console cache:clear --env=prod
+    /usr/bin/php8.4-cli bin/console asset-map:compile
 
 ### SUR HEBERGEUR
     faire pointer l'espace web sur le dossier public
@@ -57,10 +57,10 @@ dans le dépôt Git, rien à transférer en plus.
     ssh vers le serveur
     cd {nom du projet}
     git pull origin master
-    /usr/bin/php8.2-cli composer.phar install --no-dev --optimize-autoloader
-    /usr/bin/php8.2-cli bin/console d:m:m --no-interaction
-    /usr/bin/php8.2-cli bin/console cache:clear --env=prod
-    /usr/bin/php8.2-cli bin/console asset-map:compile
+    /usr/bin/php8.4-cli composer.phar install --no-dev --optimize-autoloader
+    /usr/bin/php8.4-cli bin/console d:m:m --no-interaction
+    /usr/bin/php8.4-cli bin/console cache:clear --env=prod
+    /usr/bin/php8.4-cli bin/console asset-map:compile
 
 Ne PAS relancer `app:initdatabase --reset` sur la prod : ça vide les tables
 de jointure (rôles, formations, véhicules...) pour les reconstruire depuis
