@@ -6,6 +6,7 @@ use App\Entity\ZoneErm;
 use App\Entity\RoleErm;
 use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ColorField;
@@ -46,6 +47,14 @@ class ZoneErmCrudController extends AbstractCrudController
             ->setPageTitle('index', 'Liste des zones ERM')
             ->setPageTitle('new', 'Nouvelle zone ERM')
             ->setPageTitle('edit', 'Modifier la zone ERM')
+            ->setSearchFields(['name'])
             ->showEntityActionsInlined();
+    }
+
+    public function configureFilters(Filters $filters): Filters
+    {
+        return $filters
+            ->add('regionErm')
+        ;
     }
 }
