@@ -43,14 +43,8 @@ class TelematicAreaCrudController extends AbstractCrudController
                 ColorField::new('territoryColor', 'Couleur de la zone:'),
                 AssociationField::new('departments', 'Nombre de departements:')->onlyOnIndex(),
                 AssociationField::new('departments', 'Les departements de la zone')
-                ->autocomplete()
                 ->onlyOnForms()
-                ->setFormTypeOption('by_reference', false),
-                // ->setQueryBuilder(
-                //     fn(QueryBuilder $queryBuilder) => 
-                //     $queryBuilder
-                //     ->orderBy('entity.name', 'ASC')
-                //     )
+                ->setFormTypeOptions(['by_reference' => false]),
             FormField::addTab('Mise à jour'),
                 AssociationField::new('updatedBy', 'Mise à jour par:')->setDisabled(true)->onlyOnForms(),
                 DateTimeField::new('updatedAt', 'Mise à jour le:')->setDisabled(true)->onlyOnForms(),
