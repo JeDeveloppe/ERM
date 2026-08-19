@@ -41,6 +41,9 @@ security:
         # dur dans DemoController - jamais de requête vers les repositories/BDD
         # réels, donc pas de risque à la laisser accessible sans connexion.
         - { path: ^/vitrine, roles: PUBLIC_ACCESS }
+        # Mentions légales : doivent rester accessibles sans connexion (obligation
+        # légale pour la page vitrine publique ci-dessus).
+        - { path: ^/mentions-legales, roles: PUBLIC_ACCESS }
         - { path: ^/autocomplete, roles: ROLE_USER }
         - { path: ^/maps, roles: ROLE_USER }
         - { path: ^/prime, roles: ROLE_ERM }
